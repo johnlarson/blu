@@ -16,6 +16,7 @@ pytest-unordered = "*"
 sphinx = "*"
 sphinx-autobuild = "*"
 sphinx-copybutton = "*"
+requests = "*"
 
 [requires]
 python_version = "3.12"

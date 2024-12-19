@@ -39,10 +39,4 @@ This will start up the app and output a url where you can access it (``http://12
 
 If it works, you've created a simple web app using Blu.
 
-To learn how to serve from URL paths other than ``/``, see :ref:`Routing`.
-
 To learn how make more complex pages in Blu, see :ref:`Creating Pages`.
-
-For a tutorial covering some basic topics, see :ref:`Tutorial: To-do List App`.
-
-Other topics are covered in the :ref:`User Guide`.

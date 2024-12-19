@@ -14,6 +14,5 @@ Welcome Blu's documentation.
 
    install
    quickstart
-   tutorial-todo/index
    user-guide/index
    api-reference/index

@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+blu = {file = ".", editable = true}
+aiohttp = "*"
+mypy = "*"
+pytest = "*"
+pytest-asyncio = "*"
+pytest-xdist = "*"
+pytest-playwright = "*"
+beautifulsoup4 = "*"
+pytest-unordered = "*"
+sphinx = "*"
+sphinx-autobuild = "*"
+sphinx-copybutton = "*"
+
+[requires]
+python_version = "3.12"
+python_full_version = "3.12.1"

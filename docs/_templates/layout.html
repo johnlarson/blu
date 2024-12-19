@@ -1,0 +1,17 @@
+{% extends "!layout.html" %}
+
+{% block document %}
+  {{ super() }}
+  <ul class="footer-nav">
+    {%- if prev %}
+      <li class="prev">
+        <a href="{{ prev.link|e }}">&lt; {{ prev.title }}</a>
+      </li>
+    {% endif %}
+    {%- if next %}
+      <li class="next">
+        <a href="{{ next.link|e }}">{{ next.title }} &gt;</a>
+      </li>
+    {%- endif %}
+  </ul>
+{% endblock %}

@@ -69,7 +69,8 @@ def _get_app_port_target(
     raise Exception('Process completed without specifying port in stderr.')
 
 
-async def test_dev_match_cli_no_port_provided(page: Page):
+async def test_html_element_with_children(page: Page):
+    """Serves a page with a single HTML element with children."""
     with run_in_background(
         ['blu', 'dev'],
         cwd=test_projects / 'basic',
@@ -80,5 +81,5 @@ async def test_dev_match_cli_no_port_provided(page: Page):
     ) as proc:
         port = get_app_port(proc)
         await page.goto(f'http://127.0.0.1:{port}')
-        div = page.locator('div')
-        await expect(div).to_have_text('Hello World!')
+        element = page.locator('mytagname')
+        await expect(element).to_have_text('Hello World!')

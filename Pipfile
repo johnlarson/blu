@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-blu = {file = ".", editable = true}
 aiohttp = "*"
 mypy = "*"
 pytest = "*"
@@ -17,6 +16,8 @@ sphinx = "*"
 sphinx-autobuild = "*"
 sphinx-copybutton = "*"
 requests = "*"
+blu = {file = ".", editable = true}
+quart = "*"
 
 [requires]
 python_version = "3.12"

@@ -24,24 +24,22 @@ The :ref:`Quickstart` guide shows how to make a simple page with html, head, and
             body['Hello World!'],
         ]
 
-You can import any HTML tag from :mod:`blu.html`, as long as the tag name is a valid Python identifier:
+You can import any HTML tag from :mod:`blu.html`:
 
 .. code-block:: python
 
     from blu.html import div, span, select, canvas, mymadeuptagname
 
-
-    def __page__():
-        return html[
-            head,
-            body[
-              div,
-              span,
-              select,
-              canvas,
-              mymadeuptagname,
-            ],
-        ]
+    html[
+        head,
+        body[
+            div,
+            span,
+            select,
+            canvas,
+            mymadeuptagname,
+        ],
+    ]
 
 .. code-block:: html
 
@@ -56,6 +54,99 @@ You can import any HTML tag from :mod:`blu.html`, as long as the tag name is a v
         </body>
     </html>
 
+If the HTML tag name you want to import is not a valid Python identifier or is a reserved word in Python, you can use the builtin :py:func:`getattr` function:
+
+.. code-block:: python
+
+    import blu.html
+
+    del_ = getattr(blu.html, 'del')
+    tag_name_with_dashes = getattr(blu.html, 'tag-name-with-dashes')
+
+    tag_name_with_dashes[
+        del_['Hello, World!'],
+    ]
+
+.. code-block:: html
+
+    <tag-name-with-dashes>
+        <del>Hello, World!</del>
+    </tag-name-with-dashes>
+
+
+HTML Attributes
++++++++++++++++
+
+You can set the HTML attributes of an element by calling it as a function:
+
+.. code-block:: python
+
+    from blu.html import div
+
+    div(id='my-id')
+
+.. code-block:: html
+
+    <div id="my-id"></div>
+
+.. note::
+
+    Calling an HTML element as a function does not mutate the original; instead, it returns a copy with the new attributes.
+
+    .. code-block:: python
+
+        from blu.html import div
+
+        without_attributes = div
+        with_attributes = div(a='1', b='2')
+
+        without_attributes  # <div></div>
+        with_attributes  # <div a="1" b="2"></div>
+
+.. note::
+
+    When you set HTML attributes on an element, you completely replace the existing attributes, rather than adding attributes on top:
+
+    .. code-block:: python
+
+        from blu.html import div
+
+        original = div(a='1', b='2')
+        
+        original(c='3', d='4')  # <div c="3" d="4"></div>
+
+.. note::
+
+    Blu HTML elements take the same attributes as React HTML elements, not native HTML elements (see https://react.dev/reference/react-dom/components for more information):
+
+    .. code-block:: python
+
+        # Wrong!
+        div(class='my-class')
+
+        # Right.
+        div(className='my-class')
+
+
+For attribute names that are not valid Python identifiers or are reserved words in python, pass in a :py:class:`Mapping <collections.abc.Mapping>` as the first positional argument:
+
+.. code-block:: python
+
+    from blu.html import form, input, label
+
+    form[
+        label({'for': 'value-input'})['Value:'],
+        input({'data-value': '23'}, id='value-input'),
+    ]
+
+
+.. code-block:: html
+
+    <form>
+        <label for="value-input">Value:</label>
+        <input data-value="23" id="value-input"></input>
+    </form>
+
 
 Children
 ++++++++
@@ -65,7 +156,6 @@ You can add children to an html element using square bracket notation:
 .. code-block:: python
 
     from blu.html import div, span, br
-
 
     div[
         p['Hi.'],
@@ -78,3 +168,29 @@ You can add children to an html element using square bracket notation:
         <p>Hi.</p>
         <p>Hello.</p>
     </div>
+
+.. note::
+
+    Using square bracket notation on an HTML element does not mutate the original; instead, it returns a copy with the new attributes.
+
+    .. code-block:: python
+
+        from blu.html import div
+
+        without_children = div
+        with_children = div['Hello, World!']
+
+        without_children  # <div></div>
+        with_children  # <div>Hello, World!</div>
+
+.. note::
+
+    When you set children on an HTML element, you completely replace any existing children, rather than appending to them:
+
+    .. code-block:: python
+
+        from blu.html import div
+
+        original = div['A', 'B']
+        
+        original['C', 'D']  # <div>CD</div>

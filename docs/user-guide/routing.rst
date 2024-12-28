@@ -335,7 +335,11 @@ You can also return a :class:`blu.Response` to set the status code and/or respon
 Custom HTTP Behavior
 --------------------
 
-Blu is built on top of a web framework called `Quart <https://quart.palletsprojects.com>`_, and each request is handled in a Quart context. As a result, any context you can access in a Quart request handler can also be accessed in a Blu handler. You can also return any Quart response object from a handler.
+Blu is built on top of a web framework called `Quart <https://quart.palletsprojects.com>`_, and each request is handled in a Quart context. As a result, any context you can access in a Quart request handler can also be accessed in a Blu handler.
+
+You can also return any Quart response object from a handler.
+
+The example below makes use of Quart's API to create a REST API endpoint.
 
 .. code-block:: python
 

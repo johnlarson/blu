@@ -128,6 +128,21 @@ You can set the HTML attributes of an element by calling it as a function:
         div(className='my-class')
 
 
+.. note::
+
+    Event-handling attributes like "onClick" are only supported in client-side rendering (see :ref:`Client-Side Rendering` for more details).
+
+    .. code-block:: python
+
+        from blu.html import div
+
+        def log_clicked(e):
+            print('Cicked!')
+
+        # Only allowed in client-side rendering.
+        div(onClick=log_clicked)
+
+
 For attribute names that are not valid Python identifiers or are reserved words in python, pass in a :py:class:`Mapping <collections.abc.Mapping>` as the first positional argument:
 
 .. code-block:: python
@@ -146,6 +161,7 @@ For attribute names that are not valid Python identifiers or are reserved words 
         <label for="value-input">Value:</label>
         <input data-value="23" id="value-input"></input>
     </form>
+
 
 
 Children

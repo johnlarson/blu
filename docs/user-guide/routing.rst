@@ -55,9 +55,9 @@ To add a dynamic route segment, create a directory whose name is surrounded by s
 
 Now, if you go to ``/employees/325832``, or to ``/employees/839481``, or event to ``/employees/cheese``, you'll get something like this:
 
-.. raw:: html
+    .. raw:: html
 
-    <p>This is an employee profile page.</p>
+        <p>This is an employee profile page.</p>
 
 Dynamic route segments usually aren't that useful unless there's actual dyanmic content, so let's use that employee id from the URL path in our page:
 
@@ -71,11 +71,11 @@ Dynamic route segments usually aren't that useful unless there's actual dyanmic 
 
 Now, visiting ``/employees/325832`` gives us:
 
-.. raw:: html
+    .. raw:: html
 
-    <p>This is the profile page for employee #325832.</p>
+        <p>This is the profile page for employee #325832.</p>
 
-Notice that the *__page__* function now has the argument *employee_id*. Because of this, Blu looks for a route segment in ``__index__.py``'s URL path that matches the argument name, with single underscores around it, and takes the value of that segment in the actual URL to pass in as that argument.
+Notice that the *__page__()* function now has the argument *employee_id*. Because of this, Blu looks for a route segment in ``__index__.py``'s URL path that matches the argument name, with single underscores around it, and takes the value of that segment in the actual URL to pass in as that argument.
 
 A route can have multiple dynamic segments::
 
@@ -89,16 +89,105 @@ A route can have multiple dynamic segments::
 .. code-block:: python
     :caption: app/employees/_employee_id_/time_punch/_date_/__index__.py
 
+    from blu.html import p
+
     def __page__(employee_id, date):
         return p[f'This is employee #{employee_id}\'s time card for {date}.']
 
 
 In this case, visiting ``/employees/325832/time_card/2024-12-10`` gives us:
 
-.. raw:: html
+    .. raw:: html
 
-    <p>This is employee #325832's time card for 2024-12-10.</p>
+        <p>This is employee #325832's time card for 2024-12-10.</p>
 
 
+Default Handlers
+----------------
 
-              
+You can add a catch-all handler to a route segment that handles a request if the route is matched up to that point but no ``__index__.py`` file is on a path that exactly matches the URL. You do this by creating a ``__default__.py`` file with a *__page__()* function::
+
+    app/
+      foo/
+        __default__.py
+        bar/
+          __index__.py
+
+.. code-block:: python
+    :caption: app/foo/__default__.py
+
+    from blu.html import p
+
+    def __page__():
+        return p['This is the default page.']
+
+.. code-block:: python
+    :caption: app/foo/bar/__index__.py
+
+    from blu.html import p
+
+    def __page__():
+        return p['This is the page for /foo/bar.']
+
+In this example, visiting ``/foo/bar`` will give us:
+
+    .. raw:: html
+
+        <p>This is the page for /foo/bar.</p>
+
+But visiting ``/foo`` or ``/foo/some/other/path`` or ``/foo/bar/some/other/path`` will give us:
+
+    .. raw:: html
+
+        <p>This is the default page.</p>
+
+Accessing the remaining path
+++++++++++++++++++++++++++++
+
+To read the remaining, unmatched portion of the URL in a default handler, you can accept a positional-only argument in the *__page__()* function. This is done by adding a slash to *__page__()*'s function signature::
+
+    app/
+      foo/
+        __default__.py
+
+.. code-block:: python
+    :caption: app/foo/__default__.py
+
+    def __page__(path, /):
+        return p[f'The remaining path is {path}.']
+
+In this example, visiting ``/foo/a/b/c`` gives us:
+
+    .. raw:: html
+
+        The remaining path is a/b/c.
+
+Any dynamic route arguments should come after the slash::
+
+    app/
+      _my_param_/
+        __default__.py
+
+
+.. code-block:: python
+    :caption: app/_my_param_/__default__.py
+
+    from blu.html import div, b, br
+
+    def __page__(path, /, my_param):
+        return div[
+            b['my_param value:'], ' ', my_param,
+            br,
+            b['remaining path:'], ' ', path,
+        ]
+
+In this example, visiting ``/my-param-value/a/b/c`` gives us:
+
+
+    .. raw:: html
+
+        <div>
+            <b>my_param value:</b> my-param-value
+            <br>
+            <b>remaining path:</b> a/b/c
+        </div>

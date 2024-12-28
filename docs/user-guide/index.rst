@@ -8,3 +8,4 @@ User Guide
    :caption: Contents:
 
    creating-pages
+   routing

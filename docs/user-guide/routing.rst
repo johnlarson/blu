@@ -191,3 +191,97 @@ In this example, visiting ``/my-param-value/a/b/c`` gives us:
             <br>
             <b>remaining path:</b> a/b/c
         </div>
+
+
+Query Parameters
+----------------
+
+To access a request's query parameters in an ``__index__.py`` or ``__default__.py`` handler, add keyword-only arguments to the *__page__()* function. This is done by adding an asterisk to the function signature::
+
+    app/
+      foo/
+        __index__.py
+
+.. code-block:: python
+    :caption: app/foo/__index__.py
+
+    from blu.html import div, b, br
+
+    def __page__(*, bar, baz):
+        return div[
+            b['bar:'], ' ', bar,
+            br,
+            b['baz:'], ' ', baz,
+        ]
+
+In this example, visiting ``/foo?bar=A&baz=B`` gives us:
+
+    .. raw:: html
+
+        <div>
+            <b>bar:</b> A
+            <br>
+            <b>baz:</b> B
+        </div>
+
+The *__page__()* function can also accept a keyword argument :py:class:`dict`::
+
+    app/
+      foo/
+        __index__.py
+
+.. code-block:: python
+    :caption: app/foo/__index__.py
+
+    from blu.html import div, b, br
+
+    def __page__(*, bar, **kwargs):
+        return div[
+            b['bar:'], ' ', bar,
+            br,
+            b['baz:'], ' ', kwargs['baz'],
+            br,
+            b['hello:'], ' ', kwargs['hello']
+        ]
+
+In this example, visiting ``/foo?bar=A&baz=B&hello=C`` gives us:
+
+    .. raw:: html
+
+        <div>
+            <b>bar:</b> A
+            <br>
+            <b>baz:</b> B
+            <br>
+            <b>hello:</b> C
+        </div>
+
+If there are dynamic route arguments, those should come before the asterisk::
+
+    app/
+      _foo_/
+        __index__.py
+    
+.. code-block:: python
+    :caption: app/_foo_/__index__.py
+
+        def __page__(foo, *, bar, baz):
+        return div[
+            b['foo:'], ' ', foo,
+            br,
+            b['bar:'], ' ', bar,
+            br,
+            b['baz:'], ' ', baz,
+        ]
+
+In this example, visiting ``/A?bar=B&baz=C`` gives us:
+
+    .. raw:: html
+
+        <div>
+            <b>foo:</b> A
+            <br>
+            <b>bar:</b> B
+            <br>
+            <b>baz:</b> C
+        </div>

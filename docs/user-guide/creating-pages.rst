@@ -210,3 +210,94 @@ You can add children to an html element using square bracket notation:
         original = div['A', 'B']
         
         original['C', 'D']  # <div>CD</div>
+
+
+A child of an HTML element can be any of the following types:
+
+- Another :class:`blu.HTMLElement`.
+- A :py:class:`str`. In this case, it will be rendered as an HTML text node.
+- :py:data:`None`. Nothing is rendered in the place where a :py:data:`None` value is found.
+- :py:data:`True`. This renders as a text node whose text is "true".
+- :py:data:`False`. This renders as a text node whose text is "false".
+- A :py:class:`int`. This renders as a text node whose text is the :py:class:`str` representation of the integer.
+- A :py:class:`float`. This renders as a text node whose text is the :py:class:`str` representation of the float.
+- An :py:class:`Iterable <collections.abc.Iterable>` of valid children. This renders as all the child nodes contained in the :py:class:`Iterable <collections.abc.Iterable>`.
+
+.. code-block:: python
+
+    from blu.html import div, span, p
+
+    div[
+        span,
+        'Hello!',
+        None,
+        True,
+        False,
+        1,
+        1.0,
+        (
+            p,
+            'Hello again!',
+            None,
+            True,
+            False,
+            2,
+            2.0,
+        )
+    ]
+
+.. code-block:: html
+
+    <div>
+        <span></span>
+        Hello!truefalse11.0
+        <p></p>
+        Hello again!truefalse22.0
+    </div>
+
+
+.. note::
+
+    Items in :py:class:`Iterable <collections.abc.Iterable>` children (other than :py:class:`str`\ s and :py:class:`tuple`\ s) must be keyed:
+
+    .. code-block::
+
+        from blu import Key
+        from blu.html import div
+
+        PEOPLE = [
+            {'id': 0, 'name': 'Ana'},
+            {'id': 1, 'name': 'Bill'},
+            {'id': 2, 'name': 'Charlotte'},
+        ]
+
+        # Wrong!
+        div[
+            [f'Hello, {person["name"]' for person in PEOPLE],
+        ]
+
+        # Right.
+        div[
+            [
+                Key(person["id"])[
+                    f'Hello, {person["name"]',
+                ]
+                for person in PEOPLE
+            ],
+        ]
+
+        # Right.
+        div[
+            (
+                'Hello, Ana!',
+                'Hello, Bill!',
+                'Hello, Charlotte!',
+            ),
+        ]
+
+        # Right.
+        div['Hello, Ana! Hello, Bill! Hello, Charlotte!']
+
+    The rationale here is that, in :ref:`client-side rendering <Client-Side Rendering>`, items in a sequence may be moved around in response to user interaction. Giving keys to these items allows React to maintain state and render efficiently even when an item's position in a sequence changes.
+
+You can tell Blu that items' positions won't change by putting them in a :py:class:`tuple`. If you do this, you won't have to key the items. For those familiar with React, this is how React `fragments <https://react.dev/reference/react/Fragment>`_ are defined in Blu.

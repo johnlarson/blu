@@ -285,3 +285,77 @@ In this example, visiting ``/A?bar=B&baz=C`` gives us:
             <br>
             <b>baz:</b> C
         </div>
+
+
+Return Values
+-------------
+
+A *__page__()* function can return any valid child of an HTML element (see the :ref:`Children` subsection of :ref:`Creating Pages`). The same rules apply for :py:class:`Iterable <collections.abc.Iterable>`\ s (again, see the :ref:`Children` subsection of :ref:`Creating Pages`):
+
+.. code-block:: python
+
+    from blu import Key
+
+    # Wrong! All Iterables except strings and tuples must be keyed.
+    def __page__():
+        return ['A', 'B', 'C']
+    
+    # Right. The list is keyed.
+    def __page__():
+        return [
+            Key(0)['A'],
+            Key(1)['B'],
+            Key(2)['C'],
+        ]
+
+    # Right. Strings don't have to be keyed, even though they are iterable.
+    def __page__():
+        return 'ABC'
+    
+    # Right. Tuples don't have to be keyed, even though they are iterable.
+    def __page__():
+        return ('A', 'B', 'C')
+
+You can also return a :class:`blu.Response` to set the status code and/or response headers of the page:
+
+.. code-block:: python
+    
+    from blu import Response
+
+    def __page__():
+        return Response(
+            div['Hello.'],
+            status=404,
+            headers={
+                'Cache-Control': 'no-cache',
+                'Last-Modified': 'Tue, 10 Dec 2024 10:00:00 GMT',
+            },
+        )
+
+Custom HTTP Behavior
+--------------------
+
+In Blu, each request is handled in a Quart context, so any context you can access in a Quart request handler can also be accessed in a Blu handler. You can also return any Quart response object from a handler.
+
+.. code-block:: python
+
+    from quart import request, make_response
+
+    from app.some_business_logic_module import create_item
+
+    async def __page__():
+        if request.method != 'POST':
+            response = make_response({'message': f'Expected a POST request; received a {request.method} request.')
+            response.status = 405
+            return response
+        new_item = await request.get_json()
+        new_item_id = await create_item(new_item)
+        return make_response({
+            **new_item,
+            'id': new_item_id,
+        })
+
+        
+If you've used Flask, Quart's APIs will feel familiar; Quart is an asynchronous version of Flask made by the development group behind Flask.
+
+For more information about Quart responses and the state you can access in a Quart context, see the `official Quart documentation <https://quart.palletsprojects.com>`_.

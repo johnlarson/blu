@@ -442,9 +442,11 @@ Sometimes, you'll want to perform some action immediately after rendering, witho
 .. code-block:: python
 
     from blu import client, use_effect
+    from blu.html import p
 
     if client:
         from js import alert
+
 
     @client
     def MyClientElement():
@@ -471,4 +473,39 @@ What's happening here:
 7. This causes an alert modal to pop up in front of the page with the provided message.
 8. The user can then dismiss the alert modal.
 
+
+.. note::
+
+    If your effect has lingering side effects, make sure you clean up after yourself. To do so, use the **yield** keyword after your setup code, followed by your cleanup code:
+
+    .. code-block:: python
+
+        from blu import client, use_effect
+        from blu.html import p
+
+        if client:
+            # The pyscript module is automatically made available in
+            # Blu client-side code. See https://docs.pyscript.net
+            # for details on this module.
+            from pyscript import window
+        
+
+        @client
+        def MyClientElement():
+
+            click_count, set_click_count = use_state(0)
+
+            @use_effect
+            def window_click_handlers():
+
+                def handle_click_anywhere(e):
+                    set_click_count(click_click + 1)
+                
+                window.addEventListener('click', handle_click_anywhere)
+                yield
+                window.removeEventListener('click', handle_click_anywhere)
+            
+            return p['You\'ve clicked on this page ', click_count, ' times.']
+
+    .. todo:: GIF
 

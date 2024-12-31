@@ -255,3 +255,43 @@ You can also pass child nodes to client elements using square bracket notation a
         return span(style={'color': color})[
             (yield),
         ]
+
+.. note::
+    
+    Using square bracket notation on a client element does it mutate the original client element; instead, it returns a copy of the original client element with the new child nodes.
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import div
+
+        @client
+        ClientDiv():
+            return div[(yield)]
+
+        original = ClientDiv['ABC']
+        copy = original['123']
+
+        original  # <div>ABC</div>
+        copy  # <div>123</div>
+
+.. note::
+
+    Using square bracket notation on a client element replaces any existing children rather than appending.
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import p
+
+
+        @client
+        MyClientElement():
+            return p[(yield)]
+        
+
+        original = MyClientElement['A', 'B', 'C']
+        copy = original[1, 2, 3]
+
+        original  # <p>ABC</p>
+        copy  # <p>123</p>

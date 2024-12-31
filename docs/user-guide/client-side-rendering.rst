@@ -74,6 +74,27 @@ So your page renders as:
 with an event listener attached to the button that prints "Hello!" to the web browser's developer console when the button is clicked.
 
 .. note::
+    
+    Client elements cannot be created from asynchronous functions.
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import p
+
+        # Wrong!
+        @client
+        async def Hello():
+            return p['Hello, World!']
+
+        
+        # Right.
+        @client
+        def Hello():
+            return p['Hello, World!']
+
+
+.. note::
 
     Client-side code runs in a different environment than server-side code. If your client-side code uses an external library, make sure it is installed in the client environment by adding it to the list of client dependencies in ``app/__settings__.py`` (if the ``__settings__.py`` doesn't exist, create it)::
 
@@ -162,18 +183,12 @@ Client elements can take arguments:
 
 
     def __page__():
-        ColoredText('red', bold=True)
+        ColoredText('red', text='This should be red.')
 
     
     @client
-    def ColoredText(color, bold = False):
-        style = {'color': color}
-        if bold:
-            style = {
-                **style,
-                'fontWeight': 'bold',
-            }
-        return span(style=style)
+    def ColoredText(color, text='Hello, World!'):
+        return span(style={'color': color})[text]
 
 .. note:: Calling a client element as a function does not immediately result in its rendering function being called; that call is deferred until the element is rendered on the client.
 
@@ -218,4 +233,25 @@ Client elements can take arguments:
         copy  # <p>1,2</p>
 
 
-        
+Passing Children to Client Elements
+-----------------------------------
+
+You can also pass child nodes to client elements using square bracket notation and access them in the rendering function with the *yield* keyword:
+
+.. code-block:: python
+
+    from blu import client
+    from blu.html import span
+
+
+    def __page__():
+        ColoredText('red')[
+            'This should be red.',
+        ]
+
+    
+    @client
+    def ColoredText(color):
+        return span(style={'color': color})[
+            (yield),
+        ]

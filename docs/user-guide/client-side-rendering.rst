@@ -390,8 +390,8 @@ What's going on here is:
             .
 
 
-Manipulating the DOM After Rendering
-------------------------------------
+Directly Manipulating Elements After Rendering
+----------------------------------------------
 
 Most of the time, you will be able to get the interactive behavior you want by changing state in response to user interaction. For cases where you need to directly manipulate the DOM, you can use :func:`blu.use_ref`. In the example below, we use :func:`use_ref <blu.use_ref>` to focus an input when the button next to it is clicked.
 
@@ -413,5 +413,24 @@ Most of the time, you will be able to get the interactive behavior you want by c
             input(ref=input_ref),
         ]
 
-todo:: GIF
+.. todo:: GIF
+
+What's happening here is:
+
+1. We create a reference object using :func:`use_ref <blu.use_ref>`.
+    - A reference object is a box containing a value that doesn't change from render to render unless you explicitly set it.
+    - Because we didn't pass any value into :func:`use_ref <blu.use_ref>`, the initial value is :py:data:`None`.
+
+2. We return a div containing:
+    - A button that will call *set_focus_to_input()* when clicked, and
+    - An input element whose ref is set to the reference object we created. This causes *input_ref*'s value to be set to the rendered input element once rendering is complete.
+
+3. The client element renders the div and its child elements.
+
+4. Because you passed *input_ref* as the *ref* attribute of the input element, the input element that just rendered is set as *input_ref*'s value.
+
+5. If the user clicks the button, *set_focus_to_input()* will be called. *set_focus_to_input()* performs the following steps:
+    1. Gets the current value of *input_ref* using ``[:]`` (remember that the current value is the rendered input element).
+    2. Calls the *focus()* method on that value. Because the current value is a rendered HTML input element, calling its *focus()* method causes the input element to receive the browser's focus.
+
 

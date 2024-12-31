@@ -5,15 +5,15 @@
 
     Document the following:
 
-    HTMLElement
-    app
-    Node
-    Response
-    client
-    ClientElement
-    use_state
-    use_ref
-    use_effect
+    - HTMLElement
+    - app
+    - Node
+    - Response
+    - client
+    - ClientElement
+    - use_state
+    - use_ref
+    - use_effect
 
 .. automodule:: blu
     :exclude-members: HTMLElement

@@ -5,6 +5,6 @@ External Libraries
 
     Write intro paragraph and document the following:
 
-    React HTML elements
-    Quart
-    Pyscript
+    - React HTML elements
+    - Quart
+    - Pyscript

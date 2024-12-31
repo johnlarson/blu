@@ -9,3 +9,4 @@ User Guide
 
    creating-pages
    routing
+   client-side-rendering

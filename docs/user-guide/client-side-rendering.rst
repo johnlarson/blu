@@ -99,3 +99,51 @@ with an event listener attached to the button that prints "Hello!" to the web br
         CLIENT_REQUIREMENTS = ['arrr']
 
 
+.. note::
+
+    Client-side code runs in a different environment than server-side code. If your client-side code uses dependencies that aren't available on the server, make sure you check the environment before importing those dependencies:
+
+    .. code-block:: python
+        :caption: Wrong!
+        :emphasize-lines: 4
+
+        from blu import client
+        from blu.html import button
+        
+        from pyscript import window
+
+
+        def __page__():
+            return GoToPyPIButton
+
+        
+        @client
+        def GoToPythonDotOrgButton():
+            return button(onClick=navigate_to_python_dot_org)
+
+        
+        def navigate_to_python_dot_org(e):
+            window.location = 'https://www.python.org'
+
+    .. code-block:: python
+        :caption: Right.
+        :emphasize-lines: 4-5
+
+        from blu import client
+        from blu.html import button
+        
+        if client:
+            from pyscript import window
+
+
+        def __page__():
+            return GoToPyPIButton
+
+        
+        @client
+        def GoToPythonDotOrgButton():
+            return button(onClick=navigate_to_python_dot_org)
+
+        
+        def navigate_to_python_dot_org(e):
+            window.location = 'https://www.python.org'

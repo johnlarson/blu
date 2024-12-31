@@ -1,6 +1,13 @@
 Command Line Interface
 ======================
 
+.. todo::
+
+  Document the following:
+
+  dev
+  build
+
 .. code-block:: console
    
   $ blu [command]

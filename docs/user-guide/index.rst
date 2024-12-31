@@ -10,3 +10,5 @@ User Guide
    creating-pages
    routing
    client-side-rendering
+   static-files
+   deploying-your-app

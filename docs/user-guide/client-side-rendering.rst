@@ -147,3 +147,33 @@ with an event listener attached to the button that prints "Hello!" to the web br
         
         def navigate_to_python_dot_org(e):
             window.location = 'https://www.python.org'
+
+
+Passing Arguments to Client Elements
+------------------------------------
+
+
+Client elements can take arguments:
+
+.. code-block:: python
+
+    from blu import client
+    from blu.html import span
+
+
+    def __page__():
+        ColoredText('red', bold=True)
+
+    
+    @client
+    def ColoredText(color, bold = False):
+        style = {'color': color}
+        if bold:
+            style = {
+                **style,
+                'fontWeight': 'bold',
+            }
+        return span(style=style)
+
+.. note:: Calling a client element as an argument does not immediately call its rendering function nor does it mutate the client element in-place; instead, it returns a copy of the original client element that will later be rendered on the client by calling the rendering function with the provided arguments.
+

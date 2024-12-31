@@ -295,3 +295,123 @@ You can also pass child nodes to client elements using square bracket notation a
 
         original  # <p>ABC</p>
         copy  # <p>123</p>
+
+Responding to User Interaction
+------------------------------
+
+Use :func:`blu.use_state` to specify UI state and change that state in response to user interaction:
+
+.. code-block:: python
+
+    from blu import use_state
+
+
+    @client
+    def MyClientElement():
+        click_count, set_click_count = use_state(0)
+
+        def increment_click_count(e):
+            set_click_count(click_count + 1)
+
+        return button(onClick=increment_click_count)[
+            'Click Count: ',
+            count_count,
+        ]
+
+This will result in a button that tells you how many times it's been clicked:
+
+.. todo:: GIF
+
+
+What's going on here is:
+
+1. We use :func:`use_state <blu.use_state>` to create a state container for the number of clicks whose initial value is 0.
+2. :func:`use_state <blu.use_state>` returns a tuple containing the current value and a function that we can use to change the value.
+3. We set the onClick attribute of our button element to our *increment_click_count()* function.
+4. When the element renders, the current value for the state is 0, so the button will say "Click Count: 0".
+5. When the user clicks the button, *increment_click_count()* is called.
+6. Within the function body of *increment_click_count()*, *set_click_count()* is called with *click_count + 1* as the new value. *click_count* was 0, so the new value is 1.
+7. React sets the state value to 1, and then calls *MyClientElement*'s render function again. This time, the current value is 1, so *click_count* is 1, so the button will say "Click Count: 1".
+8. If the user clicks the button again, the current value will again be incremented, and the render function will be called again, resulting in a button that says "Click Count: 2".
+
+.. note::
+
+    use_state is a special type of function used in react called a *hook*. Hooks follow a couple of rules:
+
+    - They must only be used in the scope of client element rendering functions, or in the scope of custom hooks.
+
+    - Within a client element renderer or a custom hook, the same hooks must be called in the same order every time the rendering function or custom hook is called. As long as you don't call hooks in **if** blocks or loops, this condition will be met.
+
+    .. code-block:: python
+
+        from blu import client
+
+
+        # Wrong!
+        @client
+        def MyClientElement(some_condition):
+            if some_condition:
+                value, set_value = use_state(0)
+            .
+            .
+            .
+        
+
+        # Wrong!
+        @client
+        def MyClientElement(some_list_of_numbers):
+            for n in some_list_of_numbers:
+                item_value, set_item_value = use_state(n)
+                .
+                .
+                .
+            .
+            .
+            .
+
+        # Wrong!
+        @client
+        def MyClientElement(loop_count)
+            i = 0
+            while i < loop_count:
+                value, set_value = use_state(0)
+                i += 1
+            .
+            .
+            .
+        
+
+        # Right.
+        @client
+        def MyClientElement():
+            value, set_value = use_state(0)
+            .
+            .
+            .
+
+
+Manipulating the DOM After Rendering
+------------------------------------
+
+Most of the time, you will be able to get the interactive behavior you want by changing state in response to user interaction. For cases where you need to directly manipulate the DOM, you can use :func:`blu.use_ref`. In the example below, we use :func:`use_ref <blu.use_ref>` to focus an input when the button next to it is clicked.
+
+.. code-block:: python
+
+    from blu import client, use_ref
+    from blu.html import div, button, input
+
+
+    @client
+    def MyClientElement():
+        input_ref = use_ref()
+
+        def set_focus_to_input(e):
+            input_ref[:].focus()
+        
+        return div[
+            button(onClick=set_focus_to_input)['Focus on Input'],
+            input(ref=input_ref),
+        ]
+
+todo:: GIF
+

@@ -296,6 +296,91 @@ You can also pass child nodes to client elements using square bracket notation a
         original  # <p>ABC</p>
         copy  # <p>123</p>
 
+Hooks
+-----
+
+Blu is a React framework, and React provides a special type of function called a *hook*. These are the functions you import from Blu whose names start with ``use``. They are used for managing UI state and adding callbacks for lifecycle phases, and there are certain restrictions on how they can be used:
+
+1. A hook can only be called in the scope of a client element's rendering function body, or the scope of a custom hook's function body (a *custom hook* is any function whose name starts with ``use`` that calls other hooks).
+2. A client element rendering function or custom hook must call the same hooks in the same order *every time* the rendering function or custom hook is called. The best way to follow this rule is just to never call a hook in a conditional block or loop.
+
+Breaking either of these rules will result in undefined behavior.
+
+.. code-block:: python
+
+    from blu import client, use_ref
+    from blu.html import p
+
+
+    # Wrong! This function is not a client element or custom hook, so
+    # it can't call hooks.
+    def some_function():
+        some_ref = use_ref()
+    
+
+    # Right. This is a client element whose rendering function calls
+    # the use_ref hook.
+    @client
+    def SomeClientElement():
+        some_ref = use_ref()
+        return p['(client element content)']
+
+    
+    # Right. Because this function's name starts with "use", it is a
+    # valid custom hook and can call other hooks.
+    def use_some_hook():
+        return some_ref()
+
+    
+    # Wrong! Hook called in an conditional block.
+    @client
+    def SomeClientElement(some_condition):
+        if some_condition:
+            my_ref = use_ref()
+        else:
+            my_ref = None
+        return p['(client element content)']
+    
+    
+    # Wrong! Hook called in a conditional block.
+    def use_some_hook(some_condition):
+        if some_condition:
+            return None
+        else:
+            return use_ref()
+    
+
+    # Wrong! Hook called in a loop.
+    def use_some_hook(some_list):
+        result = []
+        for item in some_list:
+            result.append(use_ref())
+        return result
+    
+    
+    # Wrong! Hook called in a loop.
+    @client
+    def SomeClientElement(num_iterations):
+        i = 0
+        while i < num_iterations:
+            my_ref = use_ref()
+        return p['(client element content)']
+
+    
+    # Wrong! use_my_custom_hook is a custom hook, so it must *not* be
+    # called in a conditinal block.
+    @client
+    def SomeClientElement(some_condition):
+        if some_condition:
+            value = use_my_custom_hook()
+        else:
+            value = None
+        return p['(client element content)']
+
+
+    def use_my_custom_hook():
+        return use_ref()
+
 Responding to User Interaction
 ------------------------------
 
@@ -334,60 +419,7 @@ What's going on here is:
 7. React sets the state value to 1, and then calls *MyClientElement*'s render function again. This time, the current value is 1, so *click_count* is 1, so the button will say "Click Count: 1".
 8. If the user clicks the button again, the current value will again be incremented, and the render function will be called again, resulting in a button that says "Click Count: 2".
 
-.. note::
-
-    use_state is a special type of function used in react called a *hook*. Hooks follow a couple of rules:
-
-    - They must only be used in the scope of client element rendering functions, or in the scope of custom hooks.
-
-    - Within a client element renderer or a custom hook, the same hooks must be called in the same order every time the rendering function or custom hook is called. As long as you don't call hooks in **if** blocks or loops, this condition will be met.
-
-    .. code-block:: python
-
-        from blu import client
-
-
-        # Wrong!
-        @client
-        def MyClientElement(some_condition):
-            if some_condition:
-                value, set_value = use_state(0)
-            .
-            .
-            .
-        
-
-        # Wrong!
-        @client
-        def MyClientElement(some_list_of_numbers):
-            for n in some_list_of_numbers:
-                item_value, set_item_value = use_state(n)
-                .
-                .
-                .
-            .
-            .
-            .
-
-        # Wrong!
-        @client
-        def MyClientElement(loop_count)
-            i = 0
-            while i < loop_count:
-                value, set_value = use_state(0)
-                i += 1
-            .
-            .
-            .
-        
-
-        # Right.
-        @client
-        def MyClientElement():
-            value, set_value = use_state(0)
-            .
-            .
-            .
+.. note:: :func:`use_state <blu.use_state>` is a special type of function used in React called a *hook*. There are specific rules you have to follow when using hooks. See :ref:`Hooks` for more details.
 
 
 Directly Manipulating Rendered Elements
@@ -433,6 +465,8 @@ What's happening here is:
     1. Gets the current value of *input_ref* using ``[:]`` (remember that the current value is the rendered input element).
     2. Calls the *focus()* method on that value. Because the current value is a rendered HTML input element, calling its *focus()* method causes the input element to receive the browser's focus.
 
+.. note:: :func:`use_ref <blu.use_ref>` is a special type of function used in React called a *hook*. There are specific rules you have to follow when using hooks. See :ref:`Hooks` for more details.
+
 
 Performing an Action Immediately After Rendering
 ------------------------------------------------
@@ -473,6 +507,7 @@ What's happening here:
 7. This causes an alert modal to pop up in front of the page with the provided message.
 8. The user can then dismiss the alert modal.
 
+.. note:: :func:`use_effect <blu.use_effect>` is a special type of function used in React called a *hook*. There are specific rules you have to follow when using hooks. See :ref:`Hooks` for more details.
 
 .. note::
 

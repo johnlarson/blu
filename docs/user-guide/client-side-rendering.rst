@@ -390,8 +390,8 @@ What's going on here is:
             .
 
 
-Directly Manipulating Elements After Rendering
-----------------------------------------------
+Directly Manipulating Rendered Elements
+---------------------------------------
 
 Most of the time, you will be able to get the interactive behavior you want by changing state in response to user interaction. For cases where you need to directly manipulate the DOM, you can use :func:`blu.use_ref`. In the example below, we use :func:`use_ref <blu.use_ref>` to focus an input when the button next to it is clicked.
 
@@ -432,5 +432,43 @@ What's happening here is:
 5. If the user clicks the button, *set_focus_to_input()* will be called. *set_focus_to_input()* performs the following steps:
     1. Gets the current value of *input_ref* using ``[:]`` (remember that the current value is the rendered input element).
     2. Calls the *focus()* method on that value. Because the current value is a rendered HTML input element, calling its *focus()* method causes the input element to receive the browser's focus.
+
+
+Performing an Action Immediately After Rendering
+------------------------------------------------
+
+Sometimes, you'll want to perform some action immediately after rendering, without waiting for user interaction. For these cases, use :func:`blu.use_effect`. For example, maybe we want to trigger an alert modal once the element is rendered:
+
+.. code-block:: python
+
+    from blu import client, use_effect
+
+    if client:
+        from js import alert
+
+    @client
+    def MyClientElement():
+
+        @use_effect
+        def send_alert():
+            alert(
+                'Hello, there! Nothing to report; just wanted to say '
+                'hi. Have a nice day!'
+            )
+        
+        return p['(element content)']
+
+.. todo:: GIF
+
+What's happening here:
+
+1. On the client side only, we import the *alert()* function from the *js* module. The *js* module is automatically made available in client-side code in Blu apps, and does not need to be installed. It provides access to the global JavaScript scope of the page.
+2. We use :func:`use_effect <blu.use_effect>` to tell React to call *send_alert()* right after rendering.
+3. We return a paragraph element that just says "(element content)".
+4. The client element renders based as the return value of its rendering function, a paragraph element with the text "(element content)".
+5. Immediately after rendering, *send_alert()* is called.
+6. *send_alert()* calls *alert()* with a message.
+7. This causes an alert modal to pop up in front of the page with the provided message.
+8. The user can then dismiss the alert modal.
 
 

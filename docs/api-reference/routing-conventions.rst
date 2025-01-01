@@ -20,8 +20,8 @@ Routing Conventions
 Segments
 --------
 
-Static Segment
-++++++++++++++
+**{literal_segment}**
++++++++++++++++++++++
 ``^(?!_).*[^_]$``
 
 Files

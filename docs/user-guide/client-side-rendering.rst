@@ -106,9 +106,15 @@ with an event listener attached to the button that prints "Hello!" to the web br
         :caption: app/__index__.py
 
         import arrr
+        from blu import client
 
 
         def __page__():
+            return MyClientElement
+        
+
+        @client
+        def MyClientElement():
             return p[
                 arrr.translate('Hello there. How are you?')
             ]

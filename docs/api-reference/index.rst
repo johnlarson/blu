@@ -7,6 +7,6 @@ API Reference
 
    blu
    blu.html
-   routing-conventions
+   file-conventions
    cli
    external-libraries

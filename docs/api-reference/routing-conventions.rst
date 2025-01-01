@@ -16,4 +16,14 @@ Routing Conventions
 
 
 
-    
+
+Segments
+--------
+
+Static Segment
+++++++++++++++
+``^(?!_).*[^_]$``
+
+Files
+-----
+

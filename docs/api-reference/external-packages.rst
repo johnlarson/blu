@@ -59,8 +59,6 @@ For more information, see:
 - `API reference for the Quart request object <https://quart.palletsprojects.com/en/latest/reference/source/quart.wrappers.html#quart.wrappers.Request>`_
 
 
-
-
 Available on the Client
 -----------------------
 
@@ -68,15 +66,49 @@ Available on the Client
 ``pyscript``
 ++++++++++++
 
-(What it is and why you use it in Blu)
+PyScript is an tool created by Anaconda, Inc. that runs Python in web browsers. Client-side code in a Blu app is run in a PyScript environment. Because of this, the ``pyscript`` package is available to your client-side code.
+
+The ``pyscript`` package provides Python utilities for working within a browser environment.
+
+.. code-block:: python
+
+    from blu import client
+
+    
+    def handle_click(e):
+        print('Clicked!')
+    
+
+    if client:
+        from pyscript import window
+
+        window.addEventListener('click', handle_click)
+
+.. note::
+
+    ``pyscript`` can only be imported in a client context.
+
+    .. code-block:: python
+
+        from blu import client
+
+        # Wrong!
+        from pyscript import window
+
+        # Right.
+        if client:
+            from pyscript import window
 
 
-How it works in Blu
-^^^^^^^^^^^^^^^^^^^
+.. note::
 
+    Blu configures PyScript to use MicroPython.
+    
+    PyScript allows you to use a more feature-complete but less-efficient Python interpreter called Pyodide, or a faster interpreter called MicroPython.
 
-Documentation links
-^^^^^^^^^^^^^^^^^^^
+    Because Blu uses MicroPython, not all Python standard library modules are available client-side, and many PyPI packages are not compatible with Blu's client-side environment.
+
+    For more information, see
 
 
 ``js``

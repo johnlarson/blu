@@ -11,9 +11,6 @@ File Conventions
         - __page__()
     - __default__ - explain
         - __page__()
-    - __settings__ - explain
-        - CLIENT_REQUIREMENTS
-    - static files
 
 
 

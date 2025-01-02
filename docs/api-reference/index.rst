@@ -9,4 +9,4 @@ API Reference
    blu.html
    file-conventions
    cli
-   external-libraries
+   external-packages

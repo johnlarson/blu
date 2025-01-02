@@ -14,7 +14,7 @@
     - use_state
     - use_ref
     - use_effect
-    - Settings (protocol)
+    - Settings
 
 .. automodule:: blu
     :exclude-members: HTMLElement

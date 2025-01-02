@@ -1,13 +1,6 @@
 External Packages
 =================
 
-.. todo::
-
-    Document the following:
-
-    - js
-
-
 Blu operates in a `Quart <https://quart.palletsprojects.com>`_ request context on the back end and a PyScript environment on the front end. As a result, some packages external to Blu are available to you without you having to install them. This document lists them and explains how they operate in a Blu app.
 
 

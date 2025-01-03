@@ -1,14 +1,24 @@
 File Conventions
 ================
 
-When you run a Blu app, Blu looks for certain filenames under the 
+A Blu app is defined by the :ref:`special files <Special Files>` under its ``app/`` directory. The ``app/`` directory should be placed in the project root (this is where you run ``blu dev`` from).
+
+Note that some special files' behavior is influenced by :ref:`the directories in their paths <Directories>`, relative to the ``app/`` directory.
+
+You can also put :ref:`static files <Static Files>` in the ``app/`` directory.
 
 
 Directories
 -----------
 
+Any directory placed under the ``app/`` directory is used for file-based routing. Each directory represents one of the slash-separated segments in an HTTP request's URL path (see examples for each directory type).
+
+The behavior of certain special files like __index__.py is influenced by the paths of the segment directories they are under.
+
+Each directory type follows a specified pattern for directory name and has set behavior.
+
 **{**\ *literal_segment*\ **}**
-+++++++++++++++++++
++++++++++++++++++++++++++++++++
 
 ``^(?P<literal_segment>(?!_).\*[^_])$``
 
@@ -55,8 +65,10 @@ A dynamic route segment. Matches any path segment.
 
     <p>The slug value is: some-slug-value</p>
 
-Files
------
+Special Files
+-------------
+
+These files specify the behavior of your app. Some handle routes based on the location of the special file; others go at the top-level of the ``app/`` directory and specify app-wide behavior.
 
 __index__.py
 ++++++++++++
@@ -189,18 +201,16 @@ Top-level functions
 __settings__.py
 +++++++++++++++
 
-Configure your Blu app.
+Configuration for your Blu app.
+
+Should be placed in the root of the ``app/`` directory, i.e. the app directory should be the immediate parent directory of __settings__.py.
 
 .. code-block:: python
     :caption: app/__settings__.py
 
     CLIENT_REQUIREMENTS = ['arrr', 'aiohttp']
 
-**Location** - The root of the ``app/`` directory, i.e. the app directory should be the immediate parent directory of __settings__.py.
-
-**Matches** - n/a (doesn't handle requests).
-
-You can configure your Blu app by creating a __settings__.py file and assigning configuration values at the top level of the file. For example, the __settings__.py file at the beginning of this section sets the *CLIENT_REQUIREMENTS* configuration property to ``['arrr', 'aiohttp']``.
+You can configure your Blu app by creating a __settings__.py file and assigning configuration values at the top level of the file. For example, the __settings__.py file above sets the *CLIENT_REQUIREMENTS* configuration property to ``['arrr', 'aiohttp']``.
 
 A __settings__.py file is not required, and an app without a __settings__.py file will be treated the same as an app whose __settings__.py is empty.
 

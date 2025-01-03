@@ -95,6 +95,10 @@ Handle a request whose URL matches the path to this file from the ``app/`` direc
         <p>The slug value is: some-slug-value</p>
         <p>The query param value is: some-query-value</p>
 
+An __index__.py file should define the following top-level call signature:
+
+.. py:function:: __page__([path: str, /,] ***url: str) -> blu.Node | blu.Response | flask.Response
+
 
 **Location** - Under a segment directory.
 
@@ -154,6 +158,133 @@ A __settings__.py file is not required, and an app without a __settings__.py fil
 A __settings__.py file can have any of settings defined in the :class:`blu.Settings` protocol.
 
 
+.. _file-conventions/files/what-does-triple-start-url-mean:
+
+How to read function signatures in this section
++++++++++++++++++++++++++++++++++++++++++++++++
+
+Blu defines protocols for request handler functions. These protocols outline what functions *you* can define, rather than what functions Blu has defined for you. This makes the protocol more flexible, so we use slightly different conventions that usual to document them.
+
+\*\*\*url
+^^^^^^^^^
+
+Triple asterisks denote arguments captured from the URL.
+
+.. todo:: Explain...
+
+Square brackets
+^^^^^^^^^^^^^^^
+
+Square brackets denote arguments that don't have to be in the function call signature, but can. For example, the __default__.py *__page__()* function's arguments can optionally start with a positional-only argument of type string, followed by a slash:
+
+.. py:function:: __page__([path: str, /,] ***url) -> blu.Node | blu.Response | flask.Response
+
+.. code-block:: python
+
+    # Right.
+    def __page__(route_param_1, route_param_2):
+        ...
+
+    # Right.
+    def __page__(path, /, route_param_1, route_param_2):
+        ...
+
+    # Right.
+    def __page__(path_with_different_arg_name, /, route_param_1, route_param_2):
+        ...
+
+    # Wrong!
+    def __page__(/, route_param_1, route_param_2):
+        ...
+
+    # Probably wrong (forgot the slash before path). But if you meant to include a route param called "path", you're doing it right.
+    def __page__(path, route_param_1, route_param_2):
+        ...
+
+    # Right.
+    def __page__():
+        ...
+    
+    # Right.
+    def __page__(path, /):
+        ...
+
+    # Wrong!
+    def __page__(/)
+
+You can include type annotations in your function definition, but don't have to; the type annotations in the documentation just tell you what type Blu will pass in for each argument.
+
+.. code-block:: python
+
+    # Right.
+    def __page__(path, /):
+        ...
+
+    # Also right!
+    def __page__(path: str, /):
+        ...
+
+Return types
+^^^^^^^^^^^^
+
+The return type tells you what return type Blu is expecting.
+
+For example, the *__page__()* function in __index__.py has to return a :type:`blu.Node`, a :class:`blu.Response`, or a :class:`quart.Response`:
+
+.. py:function:: __page__(***url) -> blu.Node | blu.Response | flask.Response
+
+
+.. code-block:: python
+
+    from blu import Response
+    from blu.html import p
+    import quart
+
+    # Right.
+    def __page__():
+        return p['Hello World!']
+    
+    # Right.
+    def __page__():
+        return Response(p['Page not found.'], status=404)
+    
+    # Right.
+    def __page__():
+        return quart.make_response({'hello': 'world'})
+
+    # Wrong!
+    def __page__():
+        return {'hello': 'world'}
+
+You don't have to annotate the return type, but you can. Any return type that is a subset of that shown in the documentation is valid.
+
+.. code-block:: python
+
+    import blu
+    import quart
+
+
+    # Right.
+    def __page__():
+        ...
+
+    # Also right.
+    def __page__() -> blu.Node | blu.Response | quart.Response:
+        ...
+
+    # Also right!
+    def __page__() -> blu.Node:
+        ...
+
+    # Wrong!
+    def __page__() -> dict:
+        ...
+
+    # Right; strings are blu.Nodes.
+    def __page__() -> str:
+        ...
+
+
 Static Files
 ------------
 
@@ -166,3 +297,5 @@ For example, if you have a text file at ``app/path/to/file.txt``, you will be ab
     Static files are served statically even if they are under a dynamic route. So if you have a file at ``app/_id_/file.txt``, then sending a request to ``/some-id/file.txt`` will result in an HTTP 404 error. Instead, you would access the file at ``/_id_/file.txt``.
 
 Blu serves static files in production as well as in development, but if you want to serve static files from a separate service, you can access them in the ``static/`` directory (this will be in your project root, in the same parent directory as ``app/``) after :ref:`building your app <Building Your App>`.
+
+

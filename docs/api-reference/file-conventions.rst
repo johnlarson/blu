@@ -5,12 +5,9 @@ File Conventions
 
     Intro
 
-    Document the following:
+    Segments Intro
 
-    - __index__.py - explain
-        - __page__()
-    - __default__ - explain
-        - __page__()
+    Files intro
 
 
 
@@ -25,7 +22,7 @@ A static route segment.
 
 **Capture** *literal_segment* - A string that doesn't start or end with an underscore.
 
-**Matches** - A path segment that equals *literal_segment*.
+**Matches** - A URL path segment that equals *literal_segment*.
 
 .. code-block:: python
     :caption: app/hello/__index__.py

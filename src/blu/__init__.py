@@ -1,13 +1,25 @@
-from collections.abc import Callable
-from typing import Any
+from typing import Any, Protocol
 from blu import html
 from blu._react.types import HTMLElement
 
 
 __all__ = [
-    'ClientElement', 'HTMLElement', 'Node', 'Response', 'app', 'client',
-    'html', 'use_state', 'use_ref', 'use_effect',
+    'ClientDecorator',
+    'ClientElement',
+    'HTMLElement',
+    'Node',
+    'Response',
+    'Settings',
+    'app',
+    'client',
+    'html',
+    'use_effect',
+    'use_state',
+    'use_ref',
 ]
+
+class ClientDecorator:
+    ...
 
 
 class ClientElement:
@@ -21,12 +33,23 @@ class Response:
     ...
 
 
+class Settings(Protocol):
+    ...
+
+
 app = ...
 
 
+client = ...
 
 
-
-def client(fn: ) -> ClientElement:
+def use_effect():
     ...
 
+
+def use_state():
+    ...
+
+
+def use_ref():
+    ...

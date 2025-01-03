@@ -15,6 +15,7 @@
     - use_ref
     - use_effect
     - Settings
+    - ClientDecorator
 
 .. automodule:: blu
     :exclude-members: HTMLElement

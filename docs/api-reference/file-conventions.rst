@@ -1,28 +1,20 @@
 File Conventions
 ================
 
-.. todo::
-
-    Intro
-
-    Segments Intro
-
-    Files intro
+When you run a Blu app, Blu looks for certain filenames under the 
 
 
+Directories
+-----------
 
+**{**\ *literal_segment*\ **}**
++++++++++++++++++++
 
-Segments
---------
+``^(?P<literal_segment>(?!_).\*[^_])$``
 
-``{literal_segment}``
-+++++++++++++++++++++
+(no leading or trailing underscores; *literal_segment* is the full directory name)
 
-A static route segment.
-
-**Capture** *literal_segment* - A string that doesn't start or end with an underscore.
-
-**Matches** - A URL path segment that equals *literal_segment*.
+A static route segment. Matches a URL path segment that equals *literal_segment*.
 
 .. code-block:: python
     :caption: app/hello/__index__.py
@@ -38,14 +30,14 @@ A static route segment.
 
     <p>Hello, World!</p>
 
-``_{route_param_name}_``
-++++++++++++++++++++++++
+**_{**\ *route_param_name*\ **}_**
+++++++++++++++++++++++++++++++++++
 
-A dynamic route segment.
+``^_(?P<route_param_name>[^\\W\\d_]|[^\\W\\d_][\\w]*[^\\W_])_$``
 
-**Capture** *route_param_name* - A valid Python identifier that doesn't start or end with an underscore.
+(*route_param_name*, surrounded by single underscores, where *route_param_name* is a valid python identifier that doesn't start or end with an underscore)
 
-**Matches** - Any path segment.
+A dynamic route segment. Matches any path segment.
 
 *route_param_name* is passed down to the handler under this segment that matches the URL path, if any.
 
@@ -69,11 +61,7 @@ Files
 __index__.py
 ++++++++++++
 
-Handle a request whose URL matches the path to this file from the ``app/`` directory.
-
-**Location** - Under a segment directory.
-
-**Matches** - A URL path that matches every segment in the path from the app directory to this file, and has no extra, unmatched URL path segments.
+Handles a request whose full URL matches all directories in the path to this file from the ``app/`` directory.
 
 ::
 
@@ -96,8 +84,6 @@ Top-level functions
 
 .. py:function:: __page__(***url) -> blu.Node | blu.Response | flask.Response
 
-    (see :ref:`file-conventions/files/what-does-triple-start-url-mean`)
-
     Handle a request whose URL path is matched by this file.
 
     .. code-block:: python
@@ -117,6 +103,8 @@ Top-level functions
 
         <p>The slug value is: some-slug-value</p>
         <p>The query param value is: some-query-value</p>
+
+    :param url: (see :ref:`file-conventions/files/what-does-triple-start-url-mean`)
     
     :return: - If an instance of :type:`blu.Node`, the page that should be sent in the HTTP response.
 
@@ -126,11 +114,7 @@ Top-level functions
 __default__.py
 ++++++++++++++
 
-Handle a request whose URL matches a prefix of the path to this file from the ``app/`` directory, if no match is found at a lower level.            
-
-**Location** - Under a segment directory.
-
-**Matches** - A URL path that matches every segment in the path from the app directory to this file, but which has no matching __index__.py in or below the directory containing the __default__.py file.
+Handles a request for which the directories in the path to this file from the ``app/`` directory match a prefix of the URL path, if no other handler file at or below this level matches the URL.
 
 ::
 
@@ -157,8 +141,6 @@ Top-level functions
 
 .. py:function:: __page__([path: str, /, ]***url) -> blu.Node | blu.Response | flask.Response
 
-    (see :ref:`file-conventions/files/what-does-triple-start-url-mean`)
-
     Handle a request whose URL path is matched by this file.
 
     .. code-block:: python
@@ -182,6 +164,7 @@ Top-level functions
         <p>The query param value is: some-query-value</p>
 
     :param path: The remaining, unmatched portion of the URL, with no intial or trailing ``/``.
+    :param url: (see :ref:`file-conventions/files/what-does-triple-start-url-mean`)
 
     :return: - If an instance of :type:`blu.Node`, the page that should be sent in the HTTP response.
 

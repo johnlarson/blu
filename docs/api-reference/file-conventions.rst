@@ -160,129 +160,118 @@ A __settings__.py file can have any of settings defined in the :class:`blu.Setti
 
 .. _file-conventions/files/what-does-triple-start-url-mean:
 
-How to read function signatures in this section
-+++++++++++++++++++++++++++++++++++++++++++++++
+What does *\*\*\*url* mean?
++++++++++++++++++++++++++++
 
-Blu defines protocols for request handler functions. These protocols outline what functions *you* can define, rather than what functions Blu has defined for you. This makes the protocol more flexible, so we use slightly different conventions that usual to document them.
+Route handlers in Blu allow you to capture route parameters from dynamic path segments and query parameters from the query string by adding keyword-only and positional/keyword arguments to the function (positional-only arguments don't capture route or query parameters).
 
-\*\*\*url
-^^^^^^^^^
+In this document, ``***url`` at the end of a function signature acts as a placeholder for positional/keyword and keyword-only arguments, and indicates that these arguments can capture route and query parameters as follows:
 
-Triple asterisks denote arguments captured from the URL.
+Capturing route parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. todo:: Explain...
-
-Square brackets
-^^^^^^^^^^^^^^^
-
-Square brackets denote arguments that don't have to be in the function call signature, but can. For example, the __default__.py *__page__()* function's arguments can optionally start with a positional-only argument of type string, followed by a slash:
-
-.. py:function:: __page__([path: str, /,] ***url) -> blu.Node | blu.Response | flask.Response
+You can capture route parameters from dynamic route segments using positional/keyword arguments:
 
 .. code-block:: python
+    :caption: app/employees/_employee_id_/time_punch/_date_/__index__.py
 
-    # Right.
-    def __page__(route_param_1, route_param_2):
-        ...
-
-    # Right.
-    def __page__(path, /, route_param_1, route_param_2):
-        ...
-
-    # Right.
-    def __page__(path_with_different_arg_name, /, route_param_1, route_param_2):
-        ...
-
-    # Wrong!
-    def __page__(/, route_param_1, route_param_2):
-        ...
-
-    # Probably wrong (forgot the slash before path). But if you meant to include a route param called "path", you're doing it right.
-    def __page__(path, route_param_1, route_param_2):
-        ...
-
-    # Right.
-    def __page__():
-        ...
-    
-    # Right.
-    def __page__(path, /):
-        ...
-
-    # Wrong!
-    def __page__(/)
-
-You can include type annotations in your function definition, but don't have to; the type annotations in the documentation just tell you what type Blu will pass in for each argument.
-
-.. code-block:: python
-
-    # Right.
-    def __page__(path, /):
-        ...
-
-    # Also right!
-    def __page__(path: str, /):
-        ...
-
-Return types
-^^^^^^^^^^^^
-
-The return type tells you what return type Blu is expecting.
-
-For example, the *__page__()* function in __index__.py has to return a :type:`blu.Node`, a :class:`blu.Response`, or a :class:`quart.Response`:
-
-.. py:function:: __page__(***url) -> blu.Node | blu.Response | flask.Response
-
-
-.. code-block:: python
-
-    from blu import Response
     from blu.html import p
-    import quart
 
-    # Right.
-    def __page__():
-        return p['Hello World!']
-    
-    # Right.
-    def __page__():
-        return Response(p['Page not found.'], status=404)
-    
-    # Right.
-    def __page__():
-        return quart.make_response({'hello': 'world'})
 
-    # Wrong!
-    def __page__():
-        return {'hello': 'world'}
+    def __page__(employee_id, date):
+        return p[
+            'Time punch info for employee #',
+            employee_id,
+            ' on ',
+            date,
+        ]
 
-You don't have to annotate the return type, but you can. Any return type that is a subset of that shown in the documentation is valid.
+.. code-block:: html
+    :caption: GET /employees/2345820390/time_punch/2024-12-01
+
+    <p>Time punch info for employee #2345820390 on 2024-12-01</p>
+
+Capturing query parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can capture query parameters using keyword-only arguments:
 
 .. code-block:: python
+    :caption: app/greet-me/__index__.py
 
-    import blu
-    import quart
+    from blu.html import p
 
 
-    # Right.
-    def __page__():
-        ...
+    def __page__(*, my_name):
+        return p['Hello ', my_name, '!']
 
-    # Also right.
-    def __page__() -> blu.Node | blu.Response | quart.Response:
-        ...
+.. code-block:: html
+    :caption: GET /greet-me?my_name=Kevin
 
-    # Also right!
-    def __page__() -> blu.Node:
-        ...
+    <p>Hello Kevin!</p>
 
-    # Wrong!
-    def __page__() -> dict:
-        ...
+You can set default values for query parameters:
 
-    # Right; strings are blu.Nodes.
-    def __page__() -> str:
-        ...
+.. code-block:: python
+    :caption: app/greet-me/__index__.py
+
+    from blu.html import p
+
+
+    def __page__(*, my_name='World'):
+        return p['Hello ', my_name, '!']
+
+.. code-block:: html
+    :caption: GET /greet-me?my_name=Kevin
+
+    <p>Hello World!</p>
+
+You can also use ``**kwargs`` for query parameters:
+
+.. code-block:: python
+    :caption: app/greet-me/__index__.py
+
+    from blu.html import p
+
+
+    def __page__(*, my_name, **kwargs):
+        greeting = kwargs.get('greeting', 'Hello')
+        return p[greeting, ' ', my_name, '!']
+
+.. code-block:: html
+    :caption: GET /greet-me?my_name=Kevin&greeting=Hi
+
+    <p>Hi Kevin!</p>
+
+Handler-specific arguments
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Positional-only arguments are reserved for handler-specific arguments.
+
+For example, the *__page()__* function of __default__.py files allows you to get the remaining portion of the URL path using a positional-only argument (in Python, positional-only arguments are at the beginning of the argument list, separated from other arguments with a ``/``):
+
+.. code-block:: python
+    :caption: app/foo/__default__.py
+
+    from blu.html import p
+
+    def __page__(path, /):
+        return p['Remaining path: ', path]
+
+.. code-block:: html
+    :caption: Get /foo/bar/baz
+
+    <p>Remaining path: bar/baz</p>
+
+Blu passes these arguments in by position, so unlike route- and query-parameter-capturing arguments, they can have any name:
+
+.. code-block:: python
+    :caption: app/foo/__default__.py
+
+    from blu.html import p
+
+    def __page__(remaining_path, /):
+        return p['Remaining path: ', remaining_path]
 
 
 Static Files

@@ -1,0 +1,34 @@
+api reference
+get it working
+README (include info about issues reporting)
+----------------------
+MVP
+----------------------
+tutorial?
+change HTTP escape hatch?
+----------------------
+Ready
+----------------------
+Version it
+GitHub
+Docs
+PyPI
+Blog
+Social media accounts
+----------------------
+Next steps
+----------------------
+workshop
+get word out
+get feedback
+respond to feedback and issues
+add other stuff
+----------------------
+When Ready
+----------------------
+v1.0
+----------------------
+Then
+----------------------
+respond to feedback and issues
+add other stuff

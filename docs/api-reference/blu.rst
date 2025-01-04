@@ -16,11 +16,22 @@
     - use_effect
     - Settings
     - ClientDecorator
+    - Effect
+    - Ref
 
 .. automodule:: blu
-    :exclude-members: HTMLElement
+    :exclude-members: HTMLElement, ClientDecorator, ClientElement, Element
 
     .. autoclass:: HTMLElement()
+        :special-members: __call__, __getitem__
+
+    .. autoclass:: ClientDecorator
+        :special-members: __call__, __bool__
+
+    .. autoclass:: ClientElement
+        :special-members: __call__, __getitem__
+    
+    .. autoclass:: Element
         :special-members: __call__, __getitem__
 
 .. py:type:: Node

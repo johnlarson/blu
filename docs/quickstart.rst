@@ -8,13 +8,13 @@ Next, create a directory called ``app``. Inside this directory, create a file ca
 .. code-block:: python
   :caption: app/__index__.py
 
-   from blu.html import body, head, html
+  from blu.html import body, head, html
 
-   def __page__():
-       return html[
-           head,
-           body['Hello World!'],
-       ]
+  def __page__():
+      return html[
+          head,
+          body['Hello World!'],
+      ]
 
 Your project should look like this::
 

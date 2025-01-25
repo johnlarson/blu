@@ -1,8 +1,9 @@
 """A full stack React framework for Python."""
 
 from collections.abc import AsyncGenerator, Callable, Generator
-from typing import Any, Protocol, Self
+from typing import Any, Protocol
 from blu import html
+from blu._default_app import app
 from blu._react.types import HTMLElement
 
 
@@ -137,10 +138,6 @@ class Settings(Protocol):
     Interface for the app.__settings__ module (app/__settings__.py).
     """
     ...
-
-
-app = ...
-"""The ASGI app used to deploy your Blu app."""
 
 
 client = ...

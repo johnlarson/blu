@@ -1,50 +1,53 @@
-from collections.abc import AsyncIterable, AsyncIterator, Mapping
+from collections.abc import AsyncGenerator, AsyncIterable, AsyncIterator, Mapping
+from contextlib import asynccontextmanager
 from importlib import import_module
 from pathlib import Path
 import pkgutil
 from types import ModuleType, TracebackType
-from typing import Optional, cast
+from typing import Optional
 from quart import Quart, Response as QuartResponse
-from quart.typing import Headers
 
 from blu._react.types import Node
+from blu._utils import asgi
 
 
-class Blu(Quart):
-    _project_dir: Path
+class Blu:
+    app_dir: Path
+    project_root: Path
+    is_dev: bool
+
+    @property
+    def static_dir(self):
+        ...
+
+    @property
+    def build_dir(self):
+        ...
 
     def __init__(
         self,
-        module: ModuleType,
-        project_dir: Path | str,
-        *,
-        debug: Optional[bool] = None,
+        app: ModuleType,
+        project: Optional[Path | str],
+        debug: bool = False,
     ):
-        super().__init__('app')
-        self._project_dir = Path(project_dir)
-        self._add_routes(module, module)
-    
-    def _add_routes(self, module: ModuleType, root: ModuleType):
-        name = module.__name__
-        if name.endswith('__index__'):
-            self._add_index_route(module, root)
-        if hasattr(module, '__path__'):
-            for module_info in pkgutil.iter_modules(module.__path__):
-                child_name = name + '.' + module_info.name
-                child_module = import_module(child_name)
-                self._add_routes(child_module, root)
+        ...
 
-    def _add_index_route(self, module: ModuleType, root: ModuleType):
-        relative_to_root = module.__name__[:len(root.__name__)]
-        url_path = '/'.join(relative_to_root.split('.'))
-        blu_handler = module.__page__
-        def quart_handler(**kwargs: str) -> QuartResponse:
-            result = blu_handler(**kwargs)
-            if isinstance(result, QuartResponse):
-                return result
-            else:
-                return Response(result)
-        self.route(url_path)(quart_handler)
+    async def __call__(
+        self,
+        scope: asgi.Scope,
+        receive: asgi.Receiver,
+        send: asgi.Sender,
+    ):
+        ...
+
+    async def build(self):
+        ...
+
+    @asynccontextmanager
+    async def dev(self) -> AsyncGenerator[str]:
+        ...
+    
+    
 
 
 class Response(QuartResponse):

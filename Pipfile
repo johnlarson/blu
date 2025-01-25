@@ -16,8 +16,8 @@ sphinx = "*"
 sphinx-autobuild = "*"
 sphinx-copybutton = "*"
 requests = "*"
-blu = {file = ".", editable = true}
 quart = "*"
+blu = {file = ".", editable = true}
 
 [requires]
 python_version = "3.13"

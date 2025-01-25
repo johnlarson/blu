@@ -1,10 +1,10 @@
 [project]
 name = "blu"
 version = "0.0.1"
-dependencies = ["aiofiles", "uvicorn"]
+dependencies = ["aiofiles", "uvicorn", "click"]
 
 [project.scripts]
-blu = "blu._cli:main"
+blu = "blu._cli:cli"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

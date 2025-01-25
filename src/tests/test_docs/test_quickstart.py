@@ -1,9 +1,10 @@
 from collections.abc import AsyncGenerator
 
+from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright, Page, expect
 import pytest
 
-from tests.utils import Sender, background, dev_app, dev_server, get_app_url, projects, receive
+from tests.utils import Sender, background, dev_app, dev_server, get_app_url, projects, react_data, receive
 
 
 @pytest.fixture
@@ -60,5 +61,26 @@ async def test_quickstart__app():
             receive,
             send,
         )
-    
+    assert react_data(send.body()) == {
+        'type': 'html',
+        'tagname': 'html',
+        'attrs': {},
+        'children': [
+            {
+                'type': 'html',
+                'tagname': 'head',
+                'attrs': {},
+                'children': [],
+            },
+            {
+                'type': 'html',
+                'tagname': 'body',
+                'attrs': {},
+                'children': [
+                    'Hello World!',
+                ],
+            },
+        ],
+    }
+
 

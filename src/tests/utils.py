@@ -1,4 +1,4 @@
-from collections.abc import AsyncGenerator, Generator, Iterable
+from collections.abc import AsyncGenerator, Generator, Iterable, Mapping
 from contextlib import asynccontextmanager, contextmanager
 from importlib import import_module
 import os
@@ -8,7 +8,7 @@ from subprocess import PIPE, Popen
 import sys
 from threading import Thread
 from types import ModuleType
-from typing import Optional, cast
+from typing import Literal, Optional, TypedDict, cast
 from blu._app import Blu
 from blu._utils import asgi
 
@@ -102,3 +102,17 @@ def _get_app_url_target(
             ret_container[0] = int(re_match[1])
             return
     raise Exception('Process completed without specifying port in stderr.')
+
+
+class HTMLReactData(TypedDict):
+    type: Literal['html']
+    tagname: str
+    attrs: Mapping[str, str]
+    children: Iterable['ReactDataNode']
+
+
+type ReactDataNode = None | bool | int | float | str | HTMLReactData
+
+
+def react_data(body: str) -> ReactDataNode:
+    ...

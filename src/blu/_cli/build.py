@@ -1,9 +1,11 @@
+import os
 import click
 
-from blu._cli.utils import to_sync
+from blu._app import Blu
+from blu._utils.asyncio import syncify
 
 
 @click.command()
-@to_sync
+@syncify
 async def build():
-    ...
+    await Blu('app', os.getcwd()).build()

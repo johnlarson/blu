@@ -11,10 +11,9 @@ from tempfile import TemporaryDirectory
 from threading import Thread
 from typing import Any, AnyStr, Literal, Optional, TypedDict, cast
 from bs4 import BeautifulSoup
-from idna import valid_label_length
 import uvicorn
 from blu._app import Blu
-from blu._utils import asgi
+from blu._utils import asgi, get_available_port, watch_dev_app
 from blu._utils import json
 
 
@@ -30,42 +29,39 @@ def temp_dir() -> Generator[Path]:
 
 @asynccontextmanager
 async def dev_app(app_module: str) -> AsyncGenerator[Blu]:
-    app_def = import_module(app_module)
     with temp_dir() as project_dir:
-        app = Blu(app_def, project_dir, dev=True)
-        async with _watch_dev_app(app):
+        app = Blu(app_module, project_dir)
+        async with app.dev():
             yield app
 
 
 @asynccontextmanager
 async def prod_app(app_module: str) -> AsyncGenerator[Blu]:
-    app_def = import_module(app_module)
     with temp_dir() as project_dir:
-        app = Blu(app_def, project_dir)
+        app = Blu(app_module, project_dir)
         await app.build()
         yield app
 
 
 @asynccontextmanager
 async def dev_server(app_module: str) -> AsyncGenerator[str]:
-    app_def = import_module(app_module)
     with temp_dir() as project_dir:
-        async with Blu(app_def, project_dir).dev() as url:
-            yield url
+        async with Blu(app_module, project_dir).dev() as app:
+            async with _test_serve(app) as url:
+                yield url
 
 
 @asynccontextmanager
 async def prod_server(app_module: str) -> AsyncGenerator[str]:
-    app_def = import_module(app_module)
     with temp_dir() as project_dir:
-        app = Blu(app_def, project_dir)
-        async with _serve_prod(app) as url:
+        app = Blu(app_module, project_dir)
+        async with _test_serve(app) as url:
             yield url
 
 
 @asynccontextmanager
-async def _serve_prod(app: Blu) -> AsyncGenerator[str]:
-    port = 5000
+async def _test_serve(app: Blu) -> AsyncGenerator[str]:
+    port = get_available_port()
     config = uvicorn.Config(app, port=port)
     server = uvicorn.Server(config)
     task = asyncio.create_task(server.serve())
@@ -217,8 +213,3 @@ def mapping_get(mapping: Mapping[Any, Any], key: Any, default: Any = None) -> An
 
 class ValidationError(Exception):
     pass
-
-
-@asynccontextmanager
-async def _watch_dev_app(app: Blu) -> AsyncGenerator[None]:
-    ...

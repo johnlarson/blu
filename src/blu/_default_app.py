@@ -24,8 +24,7 @@ class DefaultApp:
     
     @functools.cache
     def _get_inner_app(self) -> asgi.App:
-        import app  # type: ignore
-        return Blu(app, self._project_dir)
+        return Blu('app', self._project_dir)
     
 
 app = DefaultApp()

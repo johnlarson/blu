@@ -26,7 +26,7 @@ class Blu:
 
     def __init__(
         self,
-        app: ModuleType,
+        app: str,
         project: Optional[Path | str],
         dev: bool = False,
     ):
@@ -44,7 +44,7 @@ class Blu:
         ...
 
     @asynccontextmanager
-    async def dev(self) -> AsyncGenerator[str]:
+    async def dev(self) -> AsyncGenerator['Blu']:
         ...
     
     

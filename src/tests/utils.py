@@ -1,5 +1,5 @@
 import asyncio
-from collections.abc import AsyncGenerator, Callable, Generator, Iterable, Mapping
+from collections.abc import AsyncGenerator, Generator, Iterable, Iterator, Mapping
 from contextlib import asynccontextmanager, contextmanager
 from importlib import import_module
 import os
@@ -9,11 +9,13 @@ from subprocess import PIPE, Popen
 import sys
 from tempfile import TemporaryDirectory
 from threading import Thread
-from typing import Literal, Optional, TypedDict, cast
-
+from typing import Any, AnyStr, Literal, Optional, TypedDict, cast
+from bs4 import BeautifulSoup
+from idna import valid_label_length
 import uvicorn
 from blu._app import Blu
 from blu._utils import asgi
+from blu._utils import json
 
 
 tests = Path(__file__).parent
@@ -76,18 +78,27 @@ async def receive() -> asgi.ReceiveEvent:
 
 
 class Sender(asgi.Sender):
+    _events: list[asgi.SendEvent]
 
     def __init__(self):
-        ...
+        self.events = []
 
     async def __call__(self, event: asgi.SendEvent):
-        ...
+        self._events.append(event)
 
-    def __next__(self):
-        ...
+    def __next__(self) -> asgi.SendEvent:
+        return self._events.pop(0)
 
+    def __iter__(self):
+        return self
+    
     def body(self) -> str:
-        ...
+        ret_bytes = b''
+        for event in self:
+            ret_bytes += event.get('body', b'')
+        return ret_bytes.decode('utf-8')
+
+
 
 @contextmanager
 def background(
@@ -144,8 +155,68 @@ class HTMLReactData(TypedDict):
 type ReactDataNode = None | bool | int | float | str | HTMLReactData
 
 
-def react_data(body: str) -> ReactDataNode:
-    ...
+async def react_data(body: str) -> ReactDataNode:
+    soup = BeautifulSoup(body)
+    react_data_tag = soup.select('script[type="react-data"]')[0]
+    react_data_text = react_data_tag.string
+    assert react_data_text is not None
+    react_data_not_validated = await json.loads(react_data_text)
+    return validate_react_data(react_data_not_validated)
+
+
+def validate_react_data(json_data: json.JsonData) -> ReactDataNode:
+    if json_data is None:
+        return json_data
+    if isinstance(json_data, (bool, int, float, str)):
+        return json_data
+    return assert_react_html_data(json_data)
+
+
+def assert_react_html_data(json_data: json.JsonData) -> HTMLReactData:
+    if not isinstance(json_data, Mapping):
+        raise ValidationError
+    try:
+        if json_data['type'] != 'html':
+            raise ValidationError
+    except KeyError:
+        raise ValidationError
+    try:
+        if not isinstance(json_data['tagname'], str):
+            raise ValidationError
+    except KeyError:
+        raise ValidationError
+    try:
+        attrs = cast(Any, json_data['attrs'])
+    except KeyError:
+        raise ValidationError
+    if not isinstance(attrs, Mapping):
+        raise ValidationError
+    for k in cast(Mapping[Any, Any], attrs):
+        v = cast(Any, attrs[k])
+        if not isinstance(k, str):
+            raise ValidationError
+        if not isinstance(v, str):
+            raise ValidationError
+    try:
+        children = cast(Any, json_data['children'])
+    except KeyError:
+        raise ValidationError
+    if not isinstance(children, Iterable):
+        raise ValidationError
+    for child in cast(Iterable[Any], children):
+        validate_react_data(child)
+    return cast(HTMLReactData, json_data)
+
+
+def mapping_get(mapping: Mapping[Any, Any], key: Any, default: Any = None) -> Any:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+
+
+class ValidationError(Exception):
+    pass
 
 
 @asynccontextmanager

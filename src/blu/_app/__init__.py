@@ -7,6 +7,8 @@ from types import ModuleType, TracebackType
 from typing import Optional
 from quart import Quart, Response as QuartResponse
 
+from .router import Router
+from .call import call_asgi
 from blu._react.types import Node
 from blu._utils import asgi
 
@@ -16,13 +18,11 @@ class Blu:
     project_root: Path
     is_dev: bool
 
-    @property
-    def static_dir(self):
-        ...
+    _router: Router
 
     @property
-    def build_dir(self):
-        ...
+    def static_dir(self):
+        return self.project_root / 'static'
 
     def __init__(
         self,
@@ -30,7 +30,7 @@ class Blu:
         project: Optional[Path | str],
         dev: bool = False,
     ):
-        ...
+        self._router = Router(app)
 
     async def __call__(
         self,
@@ -38,7 +38,7 @@ class Blu:
         receive: asgi.Receiver,
         send: asgi.Sender,
     ):
-        ...
+        await call_asgi(scope, receive, send)
 
     async def build(self):
         ...

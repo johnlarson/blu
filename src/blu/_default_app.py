@@ -1,6 +1,3 @@
-from blu._utils import asgi
-
-
 import functools
 import os
 from blu._app import Blu

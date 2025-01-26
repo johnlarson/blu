@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator
 from playwright.async_api import async_playwright, Page, expect
 import pytest
 
-from tests.utils import Sender, background, dev_app, dev_server, get_app_url, projects, react_data, receive
+from tests.utils import Sender, background, dev_app, dev_server, get_app_url, prod_app, prod_server, projects, react_data, receive
 
 
 @pytest.fixture
@@ -32,8 +32,8 @@ async def test_quickstart(page: Page):
         await expect(body).to_have_text('Hello World!')
 
 
-async def test_quickstart__server(page: Page):
-    """The example in the quickstart guide (Server)."""
+async def test_quickstart__dev_server(page: Page):
+    """The example in the quickstart guide (dev server)."""
 
     async with dev_server('testing.apps.quickstart') as url:
         await page.goto(url)
@@ -44,9 +44,62 @@ async def test_quickstart__server(page: Page):
         await expect(body).to_have_text('Hello World!')
 
 
-async def test_quickstart__app():
+async def test_quickstart__prod_server(page: Page):
+    """The example in the quickstart guide (production server)."""
+
+    async with prod_server('testing.apps.quickstart') as url:
+        await page.goto(url)
+        html = page.locator('html')
+        await html.wait_for(state='attached')
+        await expect(html.locator('> head nth-child(1)')).to_be_attached()
+        body = html.locator('> body nth-child(2)')
+        await expect(body).to_have_text('Hello World!')
+
+
+async def test_quickstart__dev_app():
     send = Sender()
     async with dev_app('testing.apps.quickstart') as app:
+        await app(
+            {
+                'type': 'http',
+                'http_version': '2',
+                'method': 'GET',
+                'query_string': b'',
+                'asgi': {'version': '1.0'},
+                'path': '/',
+                'headers': [],
+            },
+            receive,
+            send,
+        )
+    assert react_data(send.body()) == {
+        'type': 'html',
+        'tagname': 'html',
+        'attrs': {},
+        'children': [
+            {
+                'type': 'html',
+                'tagname': 'head',
+                'attrs': {},
+                'children': [],
+            },
+            {
+                'type': 'html',
+                'tagname': 'body',
+                'attrs': {},
+                'children': [
+                    'Hello World!',
+                ],
+            },
+        ],
+    }
+
+
+
+
+async def test_quickstart__prod_app():
+    send = Sender()
+    async with prod_app('testing.apps.quickstart') as app:
         await app(
             {
                 'type': 'http',

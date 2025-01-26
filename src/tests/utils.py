@@ -1,4 +1,5 @@
-from collections.abc import AsyncGenerator, Generator, Iterable, Mapping
+import asyncio
+from collections.abc import AsyncGenerator, Callable, Generator, Iterable, Mapping
 from contextlib import asynccontextmanager, contextmanager
 from importlib import import_module
 import os
@@ -9,6 +10,8 @@ import sys
 from tempfile import TemporaryDirectory
 from threading import Thread
 from typing import Literal, Optional, TypedDict, cast
+
+import uvicorn
 from blu._app import Blu
 from blu._utils import asgi
 
@@ -54,17 +57,22 @@ async def prod_server(app_module: str) -> AsyncGenerator[str]:
     app_def = import_module(app_module)
     with temp_dir() as project_dir:
         app = Blu(app_def, project_dir)
-        with _serve_prod(app) as url:
+        async with _serve_prod(app) as url:
             yield url
 
 
-@contextmanager
-def _serve_prod(app: Blu) -> Generator[str]:
-    ...
+@asynccontextmanager
+async def _serve_prod(app: Blu) -> AsyncGenerator[str]:
+    port = 5000
+    config = uvicorn.Config(app, port=port)
+    server = uvicorn.Server(config)
+    task = asyncio.create_task(server.serve())
+    yield f'http://localhost{port}'
+    await task
 
 
 async def receive() -> asgi.ReceiveEvent:
-    ...
+    return {'type': 'http.request'}
 
 
 class Sender(asgi.Sender):

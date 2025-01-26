@@ -1,6 +1,9 @@
 import click
 
+from blu._cli.utils import to_sync
+
 
 @click.command()
-def dev():
+@to_sync
+async def dev():
     ...

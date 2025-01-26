@@ -6,8 +6,8 @@ from pathlib import Path
 import re
 from subprocess import PIPE, Popen
 import sys
+from tempfile import TemporaryDirectory
 from threading import Thread
-from types import ModuleType
 from typing import Literal, Optional, TypedDict, cast
 from blu._app import Blu
 from blu._utils import asgi
@@ -17,27 +17,49 @@ tests = Path(__file__).parent
 projects = tests / 'projects'
 
 
-def apps(name: str) -> ModuleType:
-    return import_module(name, 'tests.apps')
+@contextmanager
+def temp_dir() -> Generator[Path]:
+    with TemporaryDirectory() as tempdir:
+        yield Path(tempdir)
 
 
 @asynccontextmanager
 async def dev_app(app_module: str) -> AsyncGenerator[Blu]:
-    ...
+    app_def = import_module(app_module)
+    with temp_dir() as project_dir:
+        app = Blu(app_def, project_dir, dev=True)
+        async with _watch_dev_app(app):
+            yield app
 
 
 @asynccontextmanager
 async def prod_app(app_module: str) -> AsyncGenerator[Blu]:
-    ...
+    app_def = import_module(app_module)
+    with temp_dir() as project_dir:
+        app = Blu(app_def, project_dir)
+        await app.build()
+        yield app
 
 
 @asynccontextmanager
 async def dev_server(app_module: str) -> AsyncGenerator[str]:
-    ...
+    app_def = import_module(app_module)
+    with temp_dir() as project_dir:
+        async with Blu(app_def, project_dir).dev() as url:
+            yield url
 
 
 @asynccontextmanager
 async def prod_server(app_module: str) -> AsyncGenerator[str]:
+    app_def = import_module(app_module)
+    with temp_dir() as project_dir:
+        app = Blu(app_def, project_dir)
+        with _serve_prod(app) as url:
+            yield url
+
+
+@contextmanager
+def _serve_prod(app: Blu) -> Generator[str]:
     ...
 
 
@@ -115,4 +137,9 @@ type ReactDataNode = None | bool | int | float | str | HTMLReactData
 
 
 def react_data(body: str) -> ReactDataNode:
+    ...
+
+
+@asynccontextmanager
+async def _watch_dev_app(app: Blu) -> AsyncGenerator[None]:
     ...

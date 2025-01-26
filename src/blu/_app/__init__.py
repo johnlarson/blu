@@ -28,7 +28,7 @@ class Blu:
         self,
         app: ModuleType,
         project: Optional[Path | str],
-        debug: bool = False,
+        dev: bool = False,
     ):
         ...
 

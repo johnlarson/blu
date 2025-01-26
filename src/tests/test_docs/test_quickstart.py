@@ -1,6 +1,5 @@
 from collections.abc import AsyncGenerator
 
-from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright, Page, expect
 import pytest
 

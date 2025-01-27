@@ -4,6 +4,7 @@ import pkgutil
 from typing import Any, Optional, Protocol, cast
 from blu._http import Request, Response
 from blu._react._types import Node
+from blu._utils.asyncio import awaitable
 
 
 class Handler(Protocol):
@@ -68,7 +69,7 @@ class Router:
             return None
         if path:
             return None
-        return self.index_page()
+        return await awaitable(self.index_page())
 
     async def _handle_static(
         self,
@@ -105,7 +106,7 @@ class Router:
     ) -> Optional[Response | Node]:
         if not self.default_page:
             return None
-        return self.default_page()
+        return await awaitable(self.default_page())
 
 
 def is_static_segment(name: str) -> bool:

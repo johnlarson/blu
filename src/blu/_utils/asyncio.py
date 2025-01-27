@@ -2,24 +2,31 @@ import asyncio
 from collections.abc import Awaitable, Callable, Coroutine
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 import functools
-from typing import Any
+from typing import Any, cast
 
 
-def syncify[**P, R](fn: Callable[P, Coroutine[Any, Any, R]]) -> Callable[P, R]:
+async def awaitable[T](input: T | Awaitable[T]) -> T:
+    if isinstance(input, Awaitable):
+        return await cast(Awaitable[T], input)
+    else:
+        return input
+
+
+def to_sync[**P, R](fn: Callable[P, Coroutine[Any, Any, R]]) -> Callable[P, R]:
     def ret(*args: P.args, **kwargs: P.kwargs) -> R:
         return asyncio.run(fn(*args, **kwargs))
     return ret
 
 
 def io_bound[**P, R](fn: Callable[P, R]) -> Callable[P, Awaitable[R]]:
-    return asyncify(fn, ThreadPoolExecutor)
+    return _asyncify(fn, ThreadPoolExecutor)
 
 
 def cpu_bound[**P, R](fn: Callable[P, R]) -> Callable[P, Awaitable[R]]:
-    return asyncify(fn, ProcessPoolExecutor)
+    return _asyncify(fn, ProcessPoolExecutor)
 
 
-def asyncify[**P, R](
+def _asyncify[**P, R](
     fn: Callable[P, R], executor: type[Executor]
 ) -> Callable[P, Awaitable[R]]:
     async def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:

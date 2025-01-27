@@ -42,7 +42,62 @@ class Router:
         module = import_module(module_name)
         return cast(AnyCallable, module.__page__)
 
-    def handle(self, request: Request) -> Response:
+    async def handle(
+        self,
+        request: Request,
+        path: list[str],
+    ) -> Optional[Response]:
+        return (
+            await self._handle_index_page(request, path) or
+            await self._handle_default_page(request, path)
+        )
+        
+    async def _handle_index_page(
+        self,
+        request: Request,
+        path: list[str],
+    ) -> Optional[Response]:
+        if not self.index_page:
+            return None
+        if path:
+            return None
+        ...
+
+    async def _handle_static(
+        self,
+        request: Request,
+        path: list[str],
+    ) -> Optional[Response]:
+        if not path:
+            return None
+        for name, segment in self.static_segments.items():
+            if name == path[0]:
+                response = await segment.handle(request, path[1:])
+                if response is not None:
+                    return response
+        return None
+
+    async def _handle_dynamic(
+        self,
+        request: Request,
+        path: list[str],
+    ) -> Optional[Response]:
+        if not path:
+            return None
+        for segment in self.dynamic_segments:
+            response = await segment.handle(request, path[1:])
+            if response is not None:
+                return response
+        return None
+
+
+    async def _handle_default_page(
+        self,
+        request: Request,
+        path: list[str],
+    ) -> Optional[Response]:
+        if not self.default_page:
+            return None
         ...
 
 

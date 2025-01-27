@@ -42,7 +42,7 @@ class ASGIApp(asgi.App):
         send: asgi.Sender
     ):
         request = await self._create_request(scope)
-        response = await self._router.handle(request)
+        response = await self._router.handle(request, '')
         await send({
             'type': 'http.response.start',
             'status': response.status,

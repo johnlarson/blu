@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from pathlib import Path
 from blu._app.asgi_app.router import Router
-from blu._http import Request, Response
+from blu._http import QueryParams, Request, Response
 from blu._react._render import Renderer
 from blu._utils import asgi
 
@@ -76,7 +76,13 @@ class ASGIApp(asgi.App):
         ]
 
     async def _create_request(self, scope: asgi.HTTPConnectionScope) -> Request:
-        ...
+        return Request(
+            scope['path'],
+            query=QueryParams.from_query_string(
+                scope['query_string'].decode(),
+            ),
+            headers={k.decode(): v.decode() for k, v in scope['headers']},
+        )
 
     async def _websocket(
         self,

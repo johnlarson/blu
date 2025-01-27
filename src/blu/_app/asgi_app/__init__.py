@@ -42,7 +42,19 @@ class ASGIApp(asgi.App):
         send: asgi.Sender
     ):
         request = await self._create_request(scope)
-        response = await self._router.handle(request, '')
+        path = request.path
+        segments: list[str] = [] if path == '' else path.strip('/').split('/')
+        response = await self._router.handle(request, segments)
+        if response is None:
+            await send({
+                'type': 'http.response.start',
+                'status': 404,
+            })
+            await send({
+                'type': 'http.response.body',
+                'body': b'Not Found: ' + scope['path'].encode('utf-8'),
+            })
+            return
         await send({
             'type': 'http.response.start',
             'status': response.status,

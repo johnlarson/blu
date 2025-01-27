@@ -3,10 +3,11 @@ from importlib import import_module
 import pkgutil
 from typing import Any, Optional, Protocol, cast
 from blu._http import Request, Response
+from blu._react._types import Node
 
 
-class AnyCallable(Protocol):
-    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
+class Handler(Protocol):
+    def __call__(self, *args: Any, **kwargs: Any) -> Response | Node: ...
 
 
 class RouteNotFound(Exception):
@@ -14,8 +15,8 @@ class RouteNotFound(Exception):
 
 
 class Router:
-    index_page: Optional[AnyCallable]
-    default_page: Optional[AnyCallable]
+    index_page: Optional[Handler]
+    default_page: Optional[Handler]
     static_segments: dict[str, 'Router']
     dynamic_segments: list['Router']
 
@@ -38,30 +39,36 @@ class Router:
                 elif is_dynamic_segment(name):
                     self.dynamic_segments.append(Router(full_name))
 
-    def _get_page_handler(self, module_name: str) -> AnyCallable:
+    def _get_page_handler(self, module_name: str) -> Handler:
         module = import_module(module_name)
-        return cast(AnyCallable, module.__page__)
+        return module.__page__
 
     async def handle(
         self,
         request: Request,
         path: list[str],
     ) -> Optional[Response]:
-        return (
+        response_ret = (
             await self._handle_index_page(request, path) or
+            await self._handle_static(request, path) or
+            await self._handle_dynamic(request, path) or
             await self._handle_default_page(request, path)
         )
+        if isinstance(response_ret, Response):
+            return response_ret
+        else:
+            return Response(response_ret)
         
     async def _handle_index_page(
         self,
         request: Request,
         path: list[str],
-    ) -> Optional[Response]:
+    ) -> Optional[Response | Node]:
         if not self.index_page:
             return None
         if path:
             return None
-        ...
+        return self.index_page()
 
     async def _handle_static(
         self,
@@ -81,7 +88,7 @@ class Router:
         self,
         request: Request,
         path: list[str],
-    ) -> Optional[Response]:
+    ) -> Optional[Response | Node]:
         if not path:
             return None
         for segment in self.dynamic_segments:
@@ -95,10 +102,10 @@ class Router:
         self,
         request: Request,
         path: list[str],
-    ) -> Optional[Response]:
+    ) -> Optional[Response | Node]:
         if not self.default_page:
             return None
-        ...
+        return self.default_page()
 
 
 def is_static_segment(name: str) -> bool:

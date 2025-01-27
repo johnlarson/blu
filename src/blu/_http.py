@@ -4,7 +4,7 @@ from typing import Literal, Optional
 
 import urllib.parse
 
-from blu._react.types import Node
+from blu._react._types import Node
     
 
 type QueryInit = Mapping[str, str | list[str]]
@@ -199,6 +199,3 @@ class Response:
         self.body = body
         self.status = status
         self.headers = {**headers}
-    
-    async def text(self):
-        ...

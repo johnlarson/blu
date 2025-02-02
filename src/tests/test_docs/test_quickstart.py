@@ -58,7 +58,7 @@ async def test_quickstart__prod_server(page: Page):
 
 async def test_quickstart__dev_app():
     send = Sender()
-    async with dev_app('testing.apps.quickstart') as app:
+    async with dev_app('tests.apps.quickstart') as app:
         await app(
             {
                 'type': 'http',
@@ -72,21 +72,21 @@ async def test_quickstart__dev_app():
             receive,
             send,
         )
-    assert react_data(send.body()) == {
-        'type': 'html',
+    assert await react_data(send.body()) == {
+        'type': 'native_element',
         'tagname': 'html',
-        'attrs': {},
+        'props': {},
         'children': [
             {
-                'type': 'html',
+                'type': 'native_element',
                 'tagname': 'head',
-                'attrs': {},
+                'props': {},
                 'children': [],
             },
             {
-                'type': 'html',
+                'type': 'native_element',
                 'tagname': 'body',
-                'attrs': {},
+                'props': {},
                 'children': [
                     'Hello World!',
                 ],

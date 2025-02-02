@@ -20,6 +20,7 @@ class Blu:
 
     _router: Router
     _asgi_app: asgi.App
+    _app_import_path: str
 
     @property
     def static_dir(self):
@@ -33,8 +34,10 @@ class Blu:
     ):
         if project is not None:
             project = Path(project)
+            self.project_root = project
         self._router = Router(app)
         self._asgi_app = ASGIApp(app, project)
+        self._app_import_path = app
 
     async def __call__(
         self,
@@ -49,7 +52,7 @@ class Blu:
 
     @asynccontextmanager
     async def dev(self) -> AsyncGenerator['Blu']:
-        ...
+        yield Blu(self._app_import_path, self.project_root, dev=True)
     
     
 

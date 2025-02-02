@@ -32,8 +32,8 @@ def temp_dir() -> Generator[Path]:
 async def dev_app(app_module: str) -> AsyncGenerator[Blu]:
     with temp_dir() as project_dir:
         app = Blu(app_module, project_dir)
-        async with app.dev():
-            yield app
+        async with app.dev() as dev_app:
+            yield dev_app
 
 
 @asynccontextmanager

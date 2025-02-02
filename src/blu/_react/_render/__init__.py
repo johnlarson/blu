@@ -6,7 +6,7 @@ from xml.etree import ElementTree as ET
 
 from blu._utils import json
 from blu._react._render.react_data import get_react_data
-from blu._react._types import Node
+from blu._react.types import Node
 
 js_root = Path(__file__).parent.parent / 'js'
 

@@ -99,7 +99,7 @@ async def test_quickstart__dev_app():
 
 async def test_quickstart__prod_app():
     send = Sender()
-    async with prod_app('testing.apps.quickstart') as app:
+    async with prod_app('tests.apps.quickstart') as app:
         await app(
             {
                 'type': 'http',
@@ -113,7 +113,7 @@ async def test_quickstart__prod_app():
             receive,
             send,
         )
-    assert react_data(send.body()) == {
+    assert await react_data(send.body()) == {
         'type': 'html',
         'tagname': 'html',
         'attrs': {},

@@ -5,7 +5,7 @@ from blu._context import (
 )
 from blu._http import Response
 from blu._react._render import Renderer
-from blu._react._types import Node
+from blu._react.types import Node
 
 
 class ReactResponse(Response):

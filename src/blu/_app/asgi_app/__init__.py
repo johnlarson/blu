@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from pathlib import Path
+from typing import Optional
 from blu._app.asgi_app.router import Router
 from blu._http import QueryParams, Request, Response
 from blu._react._render import Renderer
@@ -10,8 +11,9 @@ class ASGIApp(asgi.App):
     _router: Router
     _renderer: Renderer
     
-    def __init__(self, app: str, project: Path):
-        ...
+    def __init__(self, app: str, project: Optional[Path]):
+        self._router = Router(app)
+        self._renderer = Renderer(root_dir=project)
 
     async def __call__(
         self,

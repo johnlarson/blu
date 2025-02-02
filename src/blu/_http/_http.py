@@ -36,7 +36,7 @@ class QueryParams:
         :return: The :class:`QueryParams` representation of the query
             string.
         """
-        pair_strings = query_string.split('&') if query_string else []
+        pair_strings = query_string.split('&')
         pairs = [x.split('=') for x in pair_strings]
         query_params_init: dict[str, list[str]] = defaultdict(lambda: [])
         for k, v in pairs:

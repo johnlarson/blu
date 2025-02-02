@@ -1,10 +1,10 @@
 from pathlib import Path as _Path
 
-from blu._react._types import (
+from blu._react.types import (
     Node, Element, CustomElement, HTMLElement, is_node
 )
 from blu._react import html
-from ._http import ReactResponse
+# from ._http import ReactResponse
 
 
 def import_client(path: str | _Path, name: str = 'default') -> CustomElement:
@@ -29,7 +29,7 @@ __all__ = [
     'Element',
     'CustomElement',
     'HTMLElement',
-    'ReactResponse',
+    # 'ReactResponse',
     'is_node',
     'html',
     'import_client',

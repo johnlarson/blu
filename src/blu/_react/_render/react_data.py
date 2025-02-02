@@ -2,8 +2,25 @@ from collections.abc import Mapping, Sequence
 from numbers import Number
 from typing import Literal, TypedDict, cast
 
-from blu._http import JsonObject, Jsonable
-from blu._react._types import HTMLElement, Node, PropValue, CustomElement
+from blu._react.types import HTMLElement, Node, PropValue, CustomElement
+
+
+type Jsonable = (
+    None  |
+    bool  |
+    int   |
+    float |
+    str |
+    Sequence['Jsonable'] |
+    'JsonObject'
+)
+"""JSON-serializable object."""
+
+type JsonObject = Mapping[str, Jsonable]
+"""
+JSON-serializable :py:class:`collections.abc.Mapping` representing a
+JSON object.
+"""
 
 
 class ReactDict(TypedDict):

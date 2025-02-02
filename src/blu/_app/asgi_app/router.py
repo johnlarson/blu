@@ -3,7 +3,7 @@ from importlib import import_module
 import pkgutil
 from typing import Any, Optional, Protocol, cast
 from blu._http import Request, Response
-from blu._react._types import Node
+from blu._react.types import Node
 from blu._utils.asyncio import awaitable
 
 

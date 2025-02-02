@@ -14,5 +14,5 @@ def get_available_port() -> int:
 
 
 @asynccontextmanager
-async def watch_dev_app(app: Blu) -> AsyncGenerator[None]:
+async def watch_dev_app(app: 'Blu') -> AsyncGenerator[None]:
     ...

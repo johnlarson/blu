@@ -19,6 +19,7 @@ from blu._utils import json
 
 tests = Path(__file__).parent
 projects = tests / 'projects'
+test_projects = projects
 
 
 @contextmanager
@@ -77,13 +78,16 @@ class Sender(asgi.Sender):
     _events: list[asgi.SendEvent]
 
     def __init__(self):
-        self.events = []
+        self._events = []
 
     async def __call__(self, event: asgi.SendEvent):
         self._events.append(event)
 
     def __next__(self) -> asgi.SendEvent:
-        return self._events.pop(0)
+        try:
+            return self._events.pop(0)
+        except IndexError:
+            raise Exception('No more response body.')
 
     def __iter__(self):
         return self
@@ -91,7 +95,10 @@ class Sender(asgi.Sender):
     def body(self) -> str:
         ret_bytes = b''
         for event in self:
-            ret_bytes += event.get('body', b'')
+            if event['type'] == 'http.response.body':
+                ret_bytes += event.get('body', b'')
+                if not event.get('more_body', False):
+                    break
         return ret_bytes.decode('utf-8')
 
 

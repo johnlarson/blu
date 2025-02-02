@@ -5,10 +5,10 @@ from pathlib import Path
 import pkgutil
 from types import ModuleType, TracebackType
 from typing import Optional
-from quart import Quart, Response as QuartResponse
+# from quart import Quart, Response as QuartResponse
 
 from .asgi_app.router import Router
-from .asgi_app import call_asgi
+from .asgi_app import ASGIApp
 from blu._react.types import Node
 from blu._utils import asgi
 
@@ -19,6 +19,7 @@ class Blu:
     is_dev: bool
 
     _router: Router
+    _asgi_app: asgi.App
 
     @property
     def static_dir(self):
@@ -30,7 +31,10 @@ class Blu:
         project: Optional[Path | str],
         dev: bool = False,
     ):
+        if project is not None:
+            project = Path(project)
         self._router = Router(app)
+        self._asgi_app = ASGIApp(app, project)
 
     async def __call__(
         self,
@@ -38,7 +42,7 @@ class Blu:
         receive: asgi.Receiver,
         send: asgi.Sender,
     ):
-        await call_asgi(scope, receive, send)
+        await self._asgi_app(scope, receive, send)
 
     async def build(self):
         ...

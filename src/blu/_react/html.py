@@ -13,7 +13,7 @@ A module for generating React HTML elements.
 import sys as _sys
 import types as _types
 
-from ._types import HTMLElement as _HTMLElement
+from .types import HTMLElement as _HTMLElement
 from ._utils import py_to_html_name as _py_to_html_name
 
 

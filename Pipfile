@@ -10,7 +10,6 @@ pytest = "*"
 pytest-asyncio = "*"
 pytest-xdist = "*"
 pytest-playwright = "*"
-beautifulsoup4 = "*"
 pytest-unordered = "*"
 sphinx = "*"
 sphinx-autobuild = "*"
@@ -18,6 +17,7 @@ sphinx-copybutton = "*"
 requests = "*"
 quart = "*"
 blu = {file = ".", editable = true}
+beautifulsoup4 = "*"
 
 [requires]
 python_version = "3.13"

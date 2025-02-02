@@ -46,4 +46,4 @@ def __getattr__(import_name: str) -> _HTMLElement:
 
     :return: A :class:`blu.HTMLElement` whose tag name is **import_name**.
     """
-    ...
+    return _HTMLElement(import_name, {}, [])

@@ -45,7 +45,8 @@ class ASGIApp(asgi.App):
     ):
         request = await self._create_request(scope)
         path = request.path
-        segments: list[str] = [] if path == '' else path.strip('/').split('/')
+        stripped = path.strip('/')
+        segments: list[str] = [] if stripped == '' else stripped.split('/')
         response = await self._router.handle(request, segments)
         if response is None:
             await send({

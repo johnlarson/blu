@@ -49,41 +49,55 @@ class Router:
         request: Request,
         path: list[str],
     ) -> Optional[Response]:
-        response_ret = (
-            await self._handle_index_page(request, path) or
-            await self._handle_static(request, path) or
-            await self._handle_dynamic(request, path) or
-            await self._handle_default_page(request, path)
-        )
+        response_ret = await self._get_handler_ret(request, path)
         if isinstance(response_ret, Response):
             return response_ret
         else:
             return Response(response_ret)
         
+    async def _get_handler_ret(
+        self,
+        request: Request,
+        path: list[str],
+    ) -> Response | Node:
+        try:
+            return await self._handle_index_page(request, path)
+        except NotFound:
+            pass
+        try:
+            return await self._handle_static(request, path)
+        except NotFound:
+            pass
+        try:
+            return await self._handle_dynamic(request, path)
+        except NotFound:
+            pass
+        return await self._handle_default_page(request, path)
+        
     async def _handle_index_page(
         self,
         request: Request,
         path: list[str],
-    ) -> Optional[Response | Node]:
+    ) -> Response | Node:
         if not self.index_page:
-            return None
+            raise NotFound
         if path:
-            return None
+            raise NotFound
         return await awaitable(self.index_page())
 
     async def _handle_static(
         self,
         request: Request,
         path: list[str],
-    ) -> Optional[Response]:
+    ) -> Response | Node:
         if not path:
-            return None
+            raise NotFound
         for name, segment in self.static_segments.items():
             if name == path[0]:
                 response = await segment.handle(request, path[1:])
                 if response is not None:
                     return response
-        return None
+        raise NotFound
 
     async def _handle_dynamic(
         self,
@@ -91,12 +105,12 @@ class Router:
         path: list[str],
     ) -> Optional[Response | Node]:
         if not path:
-            return None
+            raise NotFound
         for segment in self.dynamic_segments:
             response = await segment.handle(request, path[1:])
             if response is not None:
                 return response
-        return None
+        raise NotFound
 
 
     async def _handle_default_page(
@@ -105,7 +119,7 @@ class Router:
         path: list[str],
     ) -> Optional[Response | Node]:
         if not self.default_page:
-            return None
+            raise NotFound
         return await awaitable(self.default_page())
 
 
@@ -121,3 +135,6 @@ def is_dynamic_segment(name: str) -> bool:
         name[-1] == '_' and
         name[-2] != '_'
     )
+
+class NotFound(Exception):
+    pass

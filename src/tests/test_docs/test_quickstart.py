@@ -114,20 +114,20 @@ async def test_quickstart__prod_app():
             send,
         )
     assert await react_data(send.body()) == {
-        'type': 'html',
+        'type': 'native_element',
         'tagname': 'html',
-        'attrs': {},
+        'props': {},
         'children': [
             {
-                'type': 'html',
+                'type': 'native_element',
                 'tagname': 'head',
-                'attrs': {},
+                'props': {},
                 'children': [],
             },
             {
-                'type': 'html',
+                'type': 'native_element',
                 'tagname': 'body',
-                'attrs': {},
+                'props': {},
                 'children': [
                     'Hello World!',
                 ],

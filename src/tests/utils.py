@@ -179,7 +179,7 @@ def assert_react_html_data(json_data: json.JsonData) -> HTMLReactData:
     if not isinstance(json_data, Mapping):
         raise ValidationError
     try:
-        if json_data['type'] != 'html':
+        if json_data['type'] != 'native_element':
             raise ValidationError
     except KeyError:
         raise ValidationError
@@ -189,7 +189,7 @@ def assert_react_html_data(json_data: json.JsonData) -> HTMLReactData:
     except KeyError:
         raise ValidationError
     try:
-        attrs = cast(Any, json_data['attrs'])
+        attrs = cast(Any, json_data['props'])
     except KeyError:
         raise ValidationError
     if not isinstance(attrs, Mapping):

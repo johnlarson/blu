@@ -5,6 +5,7 @@ from importlib import import_module
 import os
 from pathlib import Path
 import re
+import socket
 from subprocess import PIPE, Popen
 import sys
 from tempfile import TemporaryDirectory
@@ -61,13 +62,56 @@ async def prod_server(app_module: str) -> AsyncGenerator[str]:
 
 
 @asynccontextmanager
-async def _test_serve(app: Blu) -> AsyncGenerator[str]:
+async def _test_serve_old(app: Blu) -> AsyncGenerator[str]:
+    host = '127.0.0.1'
     port = get_available_port()
-    config = uvicorn.Config(app, port=port)
+    config = uvicorn.Config(app, host, port)
     server = uvicorn.Server(config)
     task = asyncio.create_task(server.serve())
-    yield f'http://localhost{port}'
+    yield f'http://{host}:{port}'
     await task
+
+
+@asynccontextmanager
+async def _test_serve(app: asgi.App,) -> AsyncGenerator[str]:
+    server_task: Optional[asyncio.Task[Any]] = None
+    try:
+        port = get_available_port()
+        host = '127.0.0.1'
+        location = f'{host}:{port}'
+        config = uvicorn.Config(app, host, port)
+        server = uvicorn.Server(config)
+        server_task = asyncio.create_task(server.serve())
+        while True:
+            if _ping_server(host, port):
+                break
+            else:
+                await asyncio.sleep(.1)
+        yield f'http://{location}'
+    except Exception as exc:
+        if server_task is not None:
+            server_task.cancel()
+            # await server_task
+            await asyncio.sleep(0)
+            raise exc
+    else:
+        assert server_task is not None
+        server_task.cancel()
+        await server.shutdown()
+        # await server_task
+        await asyncio.sleep(0)
+
+
+def _ping_server(address: str, port: int, timeout: int = 1):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(timeout)
+    try:
+        s.connect((address, port))
+    except OSError:
+        return False
+    else:
+        s.close()
+        return True
 
 
 async def receive() -> asgi.ReceiveEvent:

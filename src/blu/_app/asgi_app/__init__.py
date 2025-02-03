@@ -34,7 +34,12 @@ class ASGIApp(asgi.App):
         receive: asgi.Receiver,
         send: asgi.Sender
     ):
-        ...
+        event = await receive()
+        assert event['type'] == 'lifespan.startup'
+        await send({'type': 'lifespan.startup.complete'})
+        event = await receive()
+        assert event['type'] == 'lifespan.shutdown'
+        await send({'type': 'lifespan.shutdown.complete'})
 
 
     async def _http(

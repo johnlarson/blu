@@ -1,12 +1,12 @@
 import asyncio
 import click
 
-from blu._utils.asyncio import syncify
+from blu._utils.asyncio import to_sync
 from blu._utils import get_available_port
 
 
 @click.command()
-@syncify
+@to_sync
 async def dev():
     proc = await asyncio.create_subprocess_exec(
         'uvicorn',

@@ -27,8 +27,8 @@ async def test_quickstart(page: Page):
         await page.goto(url)
         html = page.locator('html')
         await html.wait_for(state='attached')
-        await expect(html.locator('> head nth-child(1)')).to_be_attached()
-        body = html.locator('> body nth-child(2)')
+        await page.locator('html > head:nth-child(1)').wait_for(state='attached', timeout=5000)
+        body = page.locator('html > body:nth-child(2)')
         await expect(body).to_have_text('Hello World!')
 
 

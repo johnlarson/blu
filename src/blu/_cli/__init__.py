@@ -9,5 +9,5 @@ def cli():
     pass
 
 
-cli.add_command(dev)
-cli.add_command(build)
+cli.add_command(dev, name='dev')
+cli.add_command(build, name='build')

@@ -182,12 +182,12 @@ def get_app_url(proc: Popen[str]) -> str:
 
 
 def _get_app_url_target(
-    proc: Popen[str], ret_container: list[int | None]
+    proc: Popen[str], ret_container: list[str | None]
 ) -> None:
     for line in cast(Iterable[str], proc.stderr):
         re_match = re.search(r'(http://127\.0\.0\.1:\d+)', line)
         if re_match is not None:
-            ret_container[0] = int(re_match[1])
+            ret_container[0] = re_match[1]
             return
     raise Exception('Process completed without specifying port in stderr.')
 

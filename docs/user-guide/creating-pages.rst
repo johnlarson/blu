@@ -28,7 +28,9 @@ You can import any HTML tag from :mod:`blu.html`:
 
 .. code-block:: python
 
-    from blu.html import div, span, select, canvas, mymadeuptagname
+    from blu.html import (
+        html, head, body, div, span, select, canvas, mymadeuptagname
+    )
 
     html[
         head,

@@ -5,6 +5,7 @@ from importlib import import_module
 import os
 from pathlib import Path
 import re
+import shutil
 import socket
 from subprocess import PIPE, Popen
 import sys
@@ -59,6 +60,38 @@ async def prod_server(app_module: str) -> AsyncGenerator[str]:
         app = Blu(app_module, project_dir)
         async with _test_serve(app) as url:
             yield url
+
+
+@asynccontextmanager
+async def dev_cli(app_module: str) -> AsyncGenerator[str]:
+    async with copy_app_dir(app_module) as temp_dir:
+        with background(['blu', 'dev'], temp_dir) as proc:
+            yield get_app_url(proc)
+
+
+
+@asynccontextmanager
+async def prod_cli(app_module: str, build: bool = True) -> AsyncGenerator[str]:
+    port = get_available_port()
+    async with copy_app_dir(app_module) as temp_dir:
+        if build:
+            run(['blu', 'build'], temp_dir)
+        with background(
+            ['uvicorn', 'blu:app', '--port', str(port)],
+            temp_dir,
+        ) as proc:
+            yield get_app_url(proc)
+
+
+@asynccontextmanager
+async def copy_app_dir(app_module: str) -> AsyncGenerator[Path]:
+    module = import_module(app_module)
+    assert hasattr(module, '__path__')
+    src_dir = Path(getattr(module, '__path__')[0])
+    with TemporaryDirectory() as temp_dir_str:
+        temp_dir = Path(temp_dir_str)
+        shutil.copytree(src_dir, temp_dir / 'app')
+        yield temp_dir
 
 
 @asynccontextmanager
@@ -166,7 +199,17 @@ def background(
         finally:
             proc.kill()
 
-\
+
+def run(
+    command: list[str],
+    cwd: Optional[str | Path] = None,
+    env: dict[str, str] = {},
+) -> Popen[str]:
+    with background(command, cwd, env) as proc:
+        pass
+    return proc
+
+
 def get_app_url(proc: Popen[str]) -> str:
     ret_container: list[None | int] = [None]
     thread = Thread(

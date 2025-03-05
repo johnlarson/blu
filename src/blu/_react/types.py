@@ -231,7 +231,7 @@ class HTMLElement:
         """
         all_props = {
             **self._rename_props(kwargs),
-            **self._rename_props(props),
+            **self._rename_props(attributes),
         }
         return HTMLElement(
             self.tagname,

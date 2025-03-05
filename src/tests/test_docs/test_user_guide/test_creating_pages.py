@@ -47,3 +47,27 @@ async def test_html_imports_getattr__server(page: Page):
         del_el = dashes_el.locator('del')
         await expect(del_el).to_be_attached()
         await expect(del_el).to_have_text('Hello, World!')
+
+
+async def test_html_attrs(page: Page):
+    """
+    You can set the HTML attributes of an element by calling it as a
+    function
+    """
+    async with prod_cli('tests.apps.html_attrs') as url:
+        await page.goto(url)
+        div = page.locator('div')
+        await div.wait_for(state='attached')
+        await expect(div).to_have_attribute('id', 'my-id')
+
+
+async def test_html_attrs__server(page: Page):
+    """
+    You can set the HTML attributes of an element by calling it as a
+    function (server)
+    """
+    async with prod_server('tests.apps.html_attrs') as url:
+        await page.goto(url)
+        div = page.locator('div')
+        await div.wait_for(state='attached')
+        await expect(div).to_have_attribute('id', 'my-id')

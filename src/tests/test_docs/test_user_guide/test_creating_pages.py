@@ -1,6 +1,6 @@
 from playwright.async_api import Page, expect
 
-from tests.utils import prod_cli
+from tests.utils import prod_cli, prod_server
 
 
 async def test_import_html_tags(page: Page):
@@ -17,3 +17,33 @@ async def test_import_html_tags(page: Page):
         await expect(page.locator(start + 'select')).to_be_attached()
         await expect(page.locator(start + 'canvas')).to_be_attached()
         await expect(page.locator(start + 'mymadeuptagname')).to_be_attached()
+
+
+async def test_html_imports_getattr(page: Page):
+    """
+    If the HTML tag name you want to import is not a valid Python
+    identifier or is a reserved word in Python, you can use the builtin
+    getattr() function.
+    """
+    async with prod_cli('tests.apps.import_html_tags_getattr') as url:
+        await page.goto(url)
+        dashes_el = page.locator('tag-name-with-dashes')
+        await dashes_el.wait_for(state='attached')
+        del_el = dashes_el.locator('del')
+        await expect(del_el).to_be_attached()
+        await expect(del_el).to_have_text('Hello, World!')
+
+
+async def test_html_imports_getattr__server(page: Page):
+    """
+    If the HTML tag name you want to import is not a valid Python
+    identifier or is a reserved word in Python, you can use the builtin
+    getattr() function. (server)
+    """
+    async with prod_server('tests.apps.import_html_tags_getattr') as url:
+        await page.goto(url)
+        dashes_el = page.locator('tag-name-with-dashes')
+        await dashes_el.wait_for(state='attached')
+        del_el = dashes_el.locator('del')
+        await expect(del_el).to_be_attached()
+        await expect(del_el).to_have_text('Hello, World!')

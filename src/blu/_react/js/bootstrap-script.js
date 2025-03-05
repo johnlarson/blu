@@ -6,6 +6,7 @@ const rootNodeJson = JSON.parse(jsonString);
 const importPromises = getImportPromises(rootNodeJson);
 const imports = await Promise.all(importPromises);
 const rootNode = getNode(rootNodeJson, imports);
+document.getElementsByTagName('html')[0].remove();
 createRoot(document).render(rootNode)
 
 function getImportPromises(json) {

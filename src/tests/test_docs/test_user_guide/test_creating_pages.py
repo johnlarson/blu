@@ -121,3 +121,15 @@ async def test_html_attrs_full_replace(page: Page):
         await expect(updated_div).not_to_have_attribute('b', any_attr)
         await expect(updated_div).to_have_attribute('c', '3')
         await expect(updated_div).to_have_attribute('d', '4')
+
+
+async def test_html_element_react_attrs(page: Page):
+    """
+    Blu HTML elements take the same attributes as React HTML elements,
+    not native HTML elements (see
+    https://react.dev/reference/react-dom/components for more
+    information)
+    """
+    async with prod_cli('tests.apps.html_react_attrs') as url:
+        await page.goto(url)
+        await expect(page.locator('div')).to_have_class('my-class')

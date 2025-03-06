@@ -1,6 +1,9 @@
 import re
 from playwright.async_api import Page, expect
+import pytest
 
+from blu import WrongEnvironmentError
+from blu.html import div
 from tests.utils import prod_cli, prod_server
 
 
@@ -133,3 +136,16 @@ async def test_html_element_react_attrs(page: Page):
     async with prod_cli('tests.apps.html_react_attrs') as url:
         await page.goto(url)
         await expect(page.locator('div')).to_have_class('my-class')
+
+
+async def test_server_side_event_handler_raises_exception():
+    """
+    Event-handling attributes like “onClick” are only supported in
+    client-side rendering
+    """
+
+    def log_clicked(e):  # type: ignore
+        print('Clicked!')
+    
+    with pytest.raises(WrongEnvironmentError):
+        div(onClick=log_clicked)  # type: ignore

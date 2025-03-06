@@ -139,7 +139,7 @@ You can set the HTML attributes of an element by calling it as a function:
         from blu.html import div
 
         def log_clicked(e):
-            print('Cicked!')
+            print('Clicked!')
 
         # Only allowed in client-side rendering.
         div(onClick=log_clicked)

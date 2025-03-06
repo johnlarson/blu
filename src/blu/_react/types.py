@@ -3,6 +3,8 @@ from pathlib import Path
 from types import EllipsisType
 from typing import Any, Mapping, Sequence, cast
 
+from blu._exceptions import WrongEnvironmentError
+
 from ._utils import py_to_html_name
 
 # """
@@ -233,6 +235,14 @@ class HTMLElement:
             **self._rename_props(kwargs),
             **self._rename_props(attributes),
         }
+        for prop_name in all_props:
+            if prop_name.startswith('on'):
+                raise WrongEnvironmentError(
+                    f'Could not add attribute "{prop_name}" to {self.tagname} '
+                    f'element. Event-handling attributes like "{prop_name}" '
+                    'can only be set in client-side rendering; this code was '
+                    'run server-side.'
+                )
         return HTMLElement(
             self.tagname,
             props=all_props,

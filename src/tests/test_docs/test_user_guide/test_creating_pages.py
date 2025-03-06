@@ -106,3 +106,18 @@ async def test_html_attrs_no_mutate_original__server(page: Page):
         with_attrs = page.locator('div#with-attributes')
         await expect(with_attrs).to_have_attribute('a', '1')
         await expect(with_attrs).to_have_attribute('b', '2')
+
+
+async def test_html_attrs_full_replace(page: Page):
+    """
+    When you set HTML attributes on an element, you completely replace
+    the existing attributes, rather than adding attributes on top
+    """
+    async with prod_cli('tests.apps.html_attrs_full_replace') as url:
+        await page.goto(url)
+        updated_div = page.locator('div')
+        any_attr = re.compile(r'.|')
+        await expect(updated_div).not_to_have_attribute('a', any_attr)
+        await expect(updated_div).not_to_have_attribute('b', any_attr)
+        await expect(updated_div).to_have_attribute('c', '3')
+        await expect(updated_div).to_have_attribute('d', '4')

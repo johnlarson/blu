@@ -149,3 +149,13 @@ async def test_server_side_event_handler_raises_exception():
     
     with pytest.raises(WrongEnvironmentError):
         div(onClick=log_clicked)  # type: ignore
+
+
+async def test_html_attrs_positional_arg(page: Page):
+    async with prod_cli('tests.apps.html_attrs_pos_arg') as url:
+        await page.goto(url)
+        label = page.locator('label')
+        await expect(label).to_have_attribute('for', 'value-input')
+        input = page.locator('input')
+        await expect(input).to_have_attribute('data-value', '23')
+        await expect(input).to_have_attribute('id', 'value-input')

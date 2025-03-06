@@ -159,3 +159,10 @@ async def test_html_attrs_positional_arg(page: Page):
         input = page.locator('input')
         await expect(input).to_have_attribute('data-value', '23')
         await expect(input).to_have_attribute('id', 'value-input')
+
+
+async def test_html_children(page: Page):
+    async with prod_cli('tests.apps.html_children') as url:
+        await page.goto(url)
+        await expect(page.locator('div p:nth-child(1)')).to_have_text('Hi.')
+        await expect(page.locator('div p:nth-child(2)')).to_have_text('Hello.')

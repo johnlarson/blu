@@ -173,7 +173,7 @@ You can add children to an html element using square bracket notation:
 
 .. code-block:: python
 
-    from blu.html import div, span, br
+    from blu.html import div, p
 
     div[
         p['Hi.'],

@@ -1,3 +1,4 @@
+import re
 from playwright.async_api import Page, expect
 
 from tests.utils import prod_cli, prod_server
@@ -71,3 +72,37 @@ async def test_html_attrs__server(page: Page):
         div = page.locator('div')
         await div.wait_for(state='attached')
         await expect(div).to_have_attribute('id', 'my-id')
+
+
+async def test_html_attrs_no_mutate_original(page: Page):
+    """
+    Calling an HTML element as a function does not mutate the original;
+    instead, it returns a copy with the new attributes.
+    """
+    async with prod_cli('tests.apps.html_attrs_no_mutate') as url:
+        await page.goto(url)
+        without_attrs = page.locator('div#without-attributes')
+        await expect(without_attrs).to_be_attached()
+        any_attr = re.compile(r'.|')
+        await expect(without_attrs).not_to_have_attribute('a', any_attr)
+        await expect(without_attrs).not_to_have_attribute('b', any_attr)
+        with_attrs = page.locator('div#with-attributes')
+        await expect(with_attrs).to_have_attribute('a', '1')
+        await expect(with_attrs).to_have_attribute('b', '2')
+
+
+async def test_html_attrs_no_mutate_original__server(page: Page):
+    """
+    Calling an HTML element as a function does not mutate the original;
+    instead, it returns a copy with the new attributes. (server)
+    """
+    async with prod_server('tests.apps.html_attrs_no_mutate') as url:
+        await page.goto(url)
+        without_attrs = page.locator('div#without-attributes')
+        await expect(without_attrs).to_be_attached()
+        any_attr = re.compile(r'.|')
+        await expect(without_attrs).not_to_have_attribute('a', any_attr)
+        await expect(without_attrs).not_to_have_attribute('b', any_attr)
+        with_attrs = page.locator('div#with-attributes')
+        await expect(with_attrs).to_have_attribute('a', '1')
+        await expect(with_attrs).to_have_attribute('b', '2')

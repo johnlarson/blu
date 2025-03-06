@@ -5,9 +5,21 @@ const jsonString = document.querySelector('script[type="react-data"]').textConte
 const rootNodeJson = JSON.parse(jsonString);
 const importPromises = getImportPromises(rootNodeJson);
 const imports = await Promise.all(importPromises);
+// resetRoot();
 const rootNode = getNode(rootNodeJson, imports);
-document.getElementsByTagName('html')[0].remove();
-createRoot(document).render(rootNode)
+if (rootNodeJson.tagname === 'html') {
+  createRoot(document).render(rootNode);
+} else {
+  createRoot(document.body).render(rootNode);
+}
+
+function resetRoot(rootNodeJson) {
+  const tagname = rootNodeJson.tagname;
+  if (tagname !== 'html') {
+    document.getElementsByTagName('html')[0].remove();
+    // document.appendChild(document.createElement('BODY'));
+  }
+}
 
 function getImportPromises(json) {
   if (json instanceof Array) {

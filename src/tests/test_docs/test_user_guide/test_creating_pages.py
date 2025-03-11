@@ -152,6 +152,11 @@ async def test_server_side_event_handler_raises_exception():
 
 
 async def test_html_attrs_positional_arg(page: Page):
+    """
+    For attribute names that are not valid Python identifiers or are
+    reserved words in python, pass in a Mapping as the first positional
+    argument
+    """
     async with prod_cli('tests.apps.html_attrs_pos_arg') as url:
         await page.goto(url)
         label = page.locator('label')
@@ -162,7 +167,24 @@ async def test_html_attrs_positional_arg(page: Page):
 
 
 async def test_html_children(page: Page):
+    """
+    You can add children to an html element using square bracket
+    notation
+    """
     async with prod_cli('tests.apps.html_children') as url:
         await page.goto(url)
         await expect(page.locator('div p:nth-child(1)')).to_have_text('Hi.')
         await expect(page.locator('div p:nth-child(2)')).to_have_text('Hello.')
+
+
+async def test_html_children_no_mutate(page: Page):
+    """
+    Using square bracket notation on an HTML element does not mutate th
+    original; instead, it returns a copy with the new attributes.
+    """
+    async with prod_cli('tests.apps.html_children_no_mutate') as url:
+        await page.goto(url)
+        await expect(page.locator('span div:nth-child(1)')).to_have_text('')
+        await expect(page.locator('span div:nth-child(2)')).to_have_text(
+            'Hello, World!',
+        )

@@ -219,8 +219,6 @@ A child of an HTML element can be any of the following types:
 - Another :class:`blu.HTMLElement`.
 - A :py:class:`str`. In this case, it will be rendered as an HTML text node.
 - :py:data:`None`. Nothing is rendered in the place where a :py:data:`None` value is found.
-- :py:data:`True`. This renders as a text node whose text is "true".
-- :py:data:`False`. This renders as a text node whose text is "false".
 - A :py:class:`int`. This renders as a text node whose text is the :py:class:`str` representation of the integer.
 - A :py:class:`float`. This renders as a text node whose text is the :py:class:`str` representation of the float.
 - An :py:class:`Iterable <collections.abc.Iterable>` of valid children. This renders as all the child nodes contained in the :py:class:`Iterable <collections.abc.Iterable>`.
@@ -233,16 +231,12 @@ A child of an HTML element can be any of the following types:
         span,
         'Hello!',
         None,
-        True,
-        False,
         1,
         1.0,
         (
             p,
             'Hello again!',
             None,
-            True,
-            False,
             2,
             2.0,
         )
@@ -252,9 +246,9 @@ A child of an HTML element can be any of the following types:
 
     <div>
         <span></span>
-        Hello!truefalse11.0
+        Hello!11
         <p></p>
-        Hello again!truefalse22.0
+        Hello again!22
     </div>
 
 
@@ -275,7 +269,7 @@ A child of an HTML element can be any of the following types:
 
         # Wrong!
         div[
-            [f'Hello, {person["name"]' for person in PEOPLE],
+            [f'Hello, {person["name"]}' for person in PEOPLE],
         ]
 
         # Right.

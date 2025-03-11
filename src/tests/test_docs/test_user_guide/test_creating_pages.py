@@ -236,3 +236,31 @@ async def test_html_children_replace(page: Page):
         await expect(page.locator('div.my-div')).to_have_text('CD')
 
 
+async def test_html_child_node_types(page: Page):
+    """
+    From docs:
+
+    A child of an HTML element can be any of the following types:
+
+    - Another blu.HTMLElement.
+    - A str. In this case, it will be rendered as an HTML text node.
+    - None. Nothing is rendered in the place where a None value is
+      found.
+    - A int. This renders as a text node whose text is the str
+      representation of the integer.
+    - A float. This renders as a text node whose text is the str
+      representation of the float.
+    - An Iterable of valid children. This renders as all the child nodes
+      contained in the Iterable.
+    """
+    async with prod_cli('tests.apps.html_child_node_types') as url:
+        await page.goto(url)
+        await expect(
+            page.locator('div.my-div > span:nth-child(1)'),
+        ).to_be_attached()
+        await expect(page.locator('div.my-div')).to_have_text(
+            'Hello!11Hello again!22',
+        )
+        await expect(
+            page.locator('div.my-div > p:nth-child(2)'),
+        ).to_be_attached()

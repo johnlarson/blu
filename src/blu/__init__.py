@@ -5,7 +5,7 @@ from typing import Any, Protocol
 from blu import html
 from blu._exceptions import WrongEnvironmentError
 from blu._default_app import app
-from blu._react.types import HTMLElement
+from blu._react.types import HTMLElement, Key
 
 
 __all__ = [
@@ -14,6 +14,7 @@ __all__ = [
     'Effect',
     'Element',
     'HTMLElement',
+    'Key',
     'Node',
     'Ref',
     'Response',

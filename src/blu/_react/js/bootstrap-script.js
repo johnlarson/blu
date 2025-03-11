@@ -59,7 +59,8 @@ function getNode(json, imports) {
       const importInfo = imports.find(x => x.module === json.module && x.name === json.name);
       return $(importInfo.import, getObj(json.props, imports), ...getArray(json.children, imports));
     } else if (json.type === 'fragment') {
-      return $(Fragment, getObj(json.props, imports), ...getArray(json.children, imports));
+      const props = 'key' in json ? {key: json['key']} : {}
+      return $(Fragment, getObj(props, imports), ...getArray(json.children, imports));
     } else if (json.type === 'native_element') {
       return $(json.tagname, getObj(json.props, imports), ...getArray(json.children, imports));
     } else {

@@ -264,3 +264,45 @@ async def test_html_child_node_types(page: Page):
         await expect(
             page.locator('div.my-div > p:nth-child(2)'),
         ).to_be_attached()
+
+
+async def test_html_keys(page: Page):
+    """
+    From docs:
+
+    Items in Iterable children (other than strs and tuples) must be
+    keyed
+    """
+    async with prod_cli('tests.apps.html_keys') as url:
+        await page.goto(url)
+        await expect(page.locator('.keyed')).to_have_text(
+            'Hello, Ana!Hello, Bill!Hello, Charlotte!',
+        )
+        await expect(page.locator('.tuple')).to_have_text(
+            'Hello, Ana!Hello, Bill!Hello, Charlotte!',
+        )
+        await expect(page.locator('.str')).to_have_text(
+            'Hello, Ana! Hello, Bill! Hello, Charlotte!',
+        )
+
+
+async def test_html_keys_server(page: Page):
+    """
+    From docs:
+
+    Items in Iterable children (other than strs and tuples) must be
+    keyed
+
+    (server)
+    """
+    async with prod_server('tests.apps.html_keys') as url:
+        await page.goto(url)
+        await expect(page.locator('.keyed')).to_have_text(
+            'Hello, Ana!Hello, Bill!Hello, Charlotte!',
+        )
+        await expect(page.locator('.tuple')).to_have_text(
+            'Hello, Ana!Hello, Bill!Hello, Charlotte!',
+        )
+        await expect(page.locator('.str')).to_have_text(
+            'Hello, Ana! Hello, Bill! Hello, Charlotte!',
+        )

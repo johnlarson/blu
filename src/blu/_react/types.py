@@ -1,7 +1,7 @@
 from numbers import Number
 from pathlib import Path
 from types import EllipsisType
-from typing import Any, Mapping, Sequence, cast
+from typing import Any, Iterable, Mapping, Sequence, cast
 
 from blu._exceptions import WrongEnvironmentError
 
@@ -560,3 +560,23 @@ def _index_to_children(
 
 
 type Element = CustomElement | HTMLElement
+
+
+class Key:
+    key: Any
+    children: list[Node]
+
+    def __init__(self, key: Any, children: list[Node] = []):
+        self.key = key
+        self.children = children
+
+    def __getitem__(self, children: Node | EllipsisType) -> 'Key':
+        actual_children: list[Node]
+        if isinstance(children, EllipsisType):
+            actual_children = []
+        elif isinstance(children, tuple):
+            actual_children = list(children)
+        else:
+            actual_children = [children]
+        return Key(self.key, actual_children)
+    

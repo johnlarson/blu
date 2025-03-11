@@ -1,8 +1,8 @@
 from collections.abc import Mapping, Sequence
 from numbers import Number
-from typing import Literal, TypedDict, cast
+from typing import Any, Literal, NotRequired, TypedDict, cast
 
-from blu._react.types import HTMLElement, Node, PropValue, CustomElement
+from blu._react.types import HTMLElement, Key, Node, PropValue, CustomElement
 
 
 type Jsonable = (
@@ -53,6 +53,7 @@ class NativeElementDict(ReactElementDict):
 
 class FragmentDict(ReactElementDict):
     type: Literal['fragment']  # type: ignore
+    key: NotRequired[Any]
 
 
 type ReactNodeJson = (
@@ -65,6 +66,12 @@ def get_react_data(node: Node | PropValue) -> ReactNodeJson:
         return node
     if isinstance(node, Sequence):
         return [get_react_data(x) for x in node]
+    if isinstance(node, Key):
+        return cast(FragmentDict, {  # type: ignore
+            'type': 'fragment',
+            'key': node.key,
+            'children': node.children,
+        })
     if isinstance(node, HTMLElement):
         return cast(ReactElementDict, {  # type: ignore
             'type': 'native_element',

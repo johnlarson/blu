@@ -8,7 +8,11 @@ from tests.utils import prod_cli, prod_server
 
 
 async def test_import_html_tags(page: Page):
-    """You can import any HTML tag from blu.html"""
+    """
+    From docs:
+
+    You can import any HTML tag from blu.html
+    """
 
     async with prod_cli('tests.apps.import_html_tags') as url:
         await page.goto(url)
@@ -25,6 +29,8 @@ async def test_import_html_tags(page: Page):
 
 async def test_html_imports_getattr(page: Page):
     """
+    From docs:
+
     If the HTML tag name you want to import is not a valid Python
     identifier or is a reserved word in Python, you can use the builtin
     getattr() function.
@@ -40,9 +46,13 @@ async def test_html_imports_getattr(page: Page):
 
 async def test_html_imports_getattr__server(page: Page):
     """
+    From docs:
+
     If the HTML tag name you want to import is not a valid Python
     identifier or is a reserved word in Python, you can use the builtin
-    getattr() function. (server)
+    getattr() function.
+    
+    (server)
     """
     async with prod_server('tests.apps.import_html_tags_getattr') as url:
         await page.goto(url)
@@ -55,6 +65,8 @@ async def test_html_imports_getattr__server(page: Page):
 
 async def test_html_attrs(page: Page):
     """
+    From docs:
+
     You can set the HTML attributes of an element by calling it as a
     function
     """
@@ -67,8 +79,12 @@ async def test_html_attrs(page: Page):
 
 async def test_html_attrs__server(page: Page):
     """
+    From docs:
+
     You can set the HTML attributes of an element by calling it as a
-    function (server)
+    function
+    
+    (server)
     """
     async with prod_server('tests.apps.html_attrs') as url:
         await page.goto(url)
@@ -79,6 +95,8 @@ async def test_html_attrs__server(page: Page):
 
 async def test_html_attrs_no_mutate_original(page: Page):
     """
+    From docs:
+
     Calling an HTML element as a function does not mutate the original;
     instead, it returns a copy with the new attributes.
     """
@@ -96,8 +114,12 @@ async def test_html_attrs_no_mutate_original(page: Page):
 
 async def test_html_attrs_no_mutate_original__server(page: Page):
     """
+    From docs:
+
     Calling an HTML element as a function does not mutate the original;
-    instead, it returns a copy with the new attributes. (server)
+    instead, it returns a copy with the new attributes.
+    
+    (server)
     """
     async with prod_server('tests.apps.html_attrs_no_mutate') as url:
         await page.goto(url)
@@ -113,6 +135,8 @@ async def test_html_attrs_no_mutate_original__server(page: Page):
 
 async def test_html_attrs_full_replace(page: Page):
     """
+    From docs:
+
     When you set HTML attributes on an element, you completely replace
     the existing attributes, rather than adding attributes on top
     """
@@ -128,6 +152,8 @@ async def test_html_attrs_full_replace(page: Page):
 
 async def test_html_element_react_attrs(page: Page):
     """
+    From docs:
+
     Blu HTML elements take the same attributes as React HTML elements,
     not native HTML elements (see
     https://react.dev/reference/react-dom/components for more
@@ -140,6 +166,8 @@ async def test_html_element_react_attrs(page: Page):
 
 async def test_server_side_event_handler_raises_exception():
     """
+    From docs:
+
     Event-handling attributes like “onClick” are only supported in
     client-side rendering
     """
@@ -153,6 +181,8 @@ async def test_server_side_event_handler_raises_exception():
 
 async def test_html_attrs_positional_arg(page: Page):
     """
+    From docs:
+
     For attribute names that are not valid Python identifiers or are
     reserved words in python, pass in a Mapping as the first positional
     argument
@@ -168,6 +198,8 @@ async def test_html_attrs_positional_arg(page: Page):
 
 async def test_html_children(page: Page):
     """
+    From docs:
+
     You can add children to an html element using square bracket
     notation
     """
@@ -179,6 +211,8 @@ async def test_html_children(page: Page):
 
 async def test_html_children_no_mutate(page: Page):
     """
+    From docs:
+
     Using square bracket notation on an HTML element does not mutate th
     original; instead, it returns a copy with the new attributes.
     """
@@ -188,3 +222,17 @@ async def test_html_children_no_mutate(page: Page):
         await expect(page.locator('span div:nth-child(2)')).to_have_text(
             'Hello, World!',
         )
+
+
+async def test_html_children_replace(page: Page):
+    """
+    From docs:
+
+    When you set children on an HTML element, you completely replace any
+    existing children, rather than appending to them
+    """
+    async with prod_cli('tests.apps.html_children_replace') as url:
+        await page.goto(url)
+        await expect(page.locator('div.my-div')).to_have_text('CD')
+
+

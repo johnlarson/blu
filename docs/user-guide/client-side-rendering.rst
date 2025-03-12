@@ -335,7 +335,7 @@ Breaking either of these rules will result in undefined behavior.
     # Right. Because this function's name starts with "use", it is a
     # valid custom hook and can call other hooks.
     def use_some_hook():
-        return some_ref()
+        return use_ref()
 
     
     # Wrong! Hook called in an conditional block.

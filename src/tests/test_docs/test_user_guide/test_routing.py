@@ -35,3 +35,35 @@ async def test_file_based_routing__server(page: Page):
     async with prod_server('tests.apps.file_based_routing') as url:
         await page.goto(url + '/path/to/page')
         await expect(page.locator('body')).to_have_text('Hello World!')
+
+
+async def test_dynamic_route_segment(page: Page):
+    """
+    From docs:
+
+    To add a dynamic route segment, create a directory whose name is
+    surrounded by single underscores, like the _employee_id_ directory
+    in this example
+    """
+    async with prod_cli('tests.apps.dynamic_route_segment') as url:
+        await page.goto(url + f'/employees/cheese')
+        await expect(page.locator('p')).to_have_text(
+            'This is an employee profile page.'
+        )
+
+
+async def test_dynamic_route_segment__server(page: Page):
+    """
+    From docs:
+
+    To add a dynamic route segment, create a directory whose name is
+    surrounded by single underscores, like the _employee_id_ directory
+    in this example
+
+    (server)
+    """
+    async with prod_server('tests.apps.dynamic_route_segment') as url:
+        await page.goto(url + f'/employees/cheese')
+        await expect(page.locator('p')).to_have_text(
+            'This is an employee profile page.'
+        )

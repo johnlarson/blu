@@ -53,9 +53,9 @@ To add a dynamic route segment, create a directory whose name is surrounded by s
 
 
     def __page__():
-        p[f'This is an employee profile page.']
+        return p['This is an employee profile page.']
 
-Now, if you go to ``/employees/325832``, or to ``/employees/839481``, or event to ``/employees/cheese``, you'll get something like this:
+Now, if you go to ``/employees/325832``, or to ``/employees/839481``, or even to ``/employees/cheese``, you'll get something like this:
 
     .. raw:: html
 

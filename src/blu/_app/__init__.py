@@ -18,7 +18,6 @@ class Blu:
     project_root: Path
     is_dev: bool
 
-    _router: Router
     _asgi_app: asgi.App
     _app_import_path: str
 
@@ -35,7 +34,6 @@ class Blu:
         if project is not None:
             project = Path(project)
             self.project_root = project
-        self._router = Router(app)
         self._asgi_app = ASGIApp(app, project)
         self._app_import_path = app
 

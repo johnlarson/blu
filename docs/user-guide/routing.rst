@@ -20,6 +20,7 @@ For example, if you want to serve the page in the :ref:`Quickstart` guide from `
 
     from blu.html import body, head, html
 
+
     def __page__():
         return html[
             head,
@@ -50,6 +51,7 @@ To add a dynamic route segment, create a directory whose name is surrounded by s
 
     from blu.html import p
 
+
     def __page__():
         p[f'This is an employee profile page.']
 
@@ -65,6 +67,7 @@ Dynamic route segments usually aren't that useful unless there's actual dyanmic 
     :caption: app/employees/_employee_id_/__index__.py
 
     from blu.html import p
+
 
     def __page__(employee_id):
         return p[f'This is the profile page for employee #{employee_id}.']
@@ -90,6 +93,7 @@ A route can have multiple dynamic segments::
     :caption: app/employees/_employee_id_/time_punch/_date_/__index__.py
 
     from blu.html import p
+
 
     def __page__(employee_id, date):
         return p[f'This is employee #{employee_id}\'s time card for {date}.']
@@ -118,6 +122,7 @@ You can add a catch-all handler to a route segment that handles a request if the
 
     from blu.html import p
 
+
     def __page__():
         return p['This is the default page.']
 
@@ -125,6 +130,7 @@ You can add a catch-all handler to a route segment that handles a request if the
     :caption: app/foo/bar/__index__.py
 
     from blu.html import p
+
 
     def __page__():
         return p['This is the page for /foo/bar.']
@@ -153,6 +159,9 @@ To read the remaining, unmatched portion of the URL in a default handler, you ca
 .. code-block:: python
     :caption: app/foo/__default__.py
 
+    from blu.html import p
+
+
     def __page__(path, /):
         return p[f'The remaining path is {path}.']
 
@@ -173,6 +182,7 @@ Any dynamic route arguments should come after the slash::
     :caption: app/_my_param_/__default__.py
 
     from blu.html import div, b, br
+
 
     def __page__(path, /, my_param):
         return div[
@@ -207,6 +217,7 @@ To access a request's query parameters in an ``__index__.py`` or ``__default__.p
 
     from blu.html import div, b, br
 
+
     def __page__(*, bar, baz):
         return div[
             b['bar:'], ' ', bar,
@@ -234,6 +245,7 @@ The *__page__()* function can also accept a keyword argument :py:class:`dict`::
     :caption: app/foo/__index__.py
 
     from blu.html import div, b, br
+
 
     def __page__(*, bar, **kwargs):
         return div[
@@ -264,6 +276,7 @@ If there are dynamic route arguments, those should come before the asterisk::
     
 .. code-block:: python
     :caption: app/_foo_/__index__.py
+
 
         def __page__(foo, *, bar, baz):
         return div[
@@ -296,6 +309,7 @@ A *__page__()* function can return any valid child of an HTML element (see the :
 
     from blu import Key
 
+
     # Wrong! All Iterables except strings and tuples must be keyed.
     def __page__():
         return ['A', 'B', 'C']
@@ -322,6 +336,7 @@ You can also return a :class:`blu.Response` to set the status code and/or respon
     
     from blu import Response
 
+
     def __page__():
         return Response(
             div['Hello.'],
@@ -346,6 +361,7 @@ The example below makes use of Quart's API to create a REST API endpoint.
     from quart import request, make_response
 
     from app.some_business_logic_module import create_item
+
 
     async def __page__():
         if request.method != 'POST':

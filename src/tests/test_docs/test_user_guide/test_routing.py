@@ -175,3 +175,19 @@ async def test_default_handler__server(page: Page):
         await expect(page.locator('p')).to_have_text(default_text)
         await page.goto(url + '/foo/bar/some/other/path')
         await expect(page.locator('p')).to_have_text(default_text)
+
+
+async def test_default_handler_remaining_path(page: Page):
+    """
+    From docs:
+
+    To read the remaining, unmatched portion of the URL in a default
+    handler, you can accept a positional-only argument in the __page__()
+    function. This is done by adding a slash to __page__()’s function
+    signature
+    """
+    async with prod_cli('tests.apps.default_handler_remaining_path') as url:
+        await page.goto(url + '/foo/a/b/c')
+        await expect(page.locator('p')).to_have_text(
+            'The remaining path is a/b/c.'
+        )

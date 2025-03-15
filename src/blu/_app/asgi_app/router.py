@@ -148,8 +148,20 @@ class Router:
     ) -> Optional[Response | Node]:
         if not self.default_page:
             raise NotFound
+        args = self._get_default_handler_args(self.default_page, path)
         kwargs = self._get_handler_kwargs(self.default_page, route_params)
-        return await awaitable(self.default_page(**kwargs))
+        return await awaitable(self.default_page(*args, **kwargs))
+    
+    def _get_default_handler_args[**P](
+        self,
+        default_handler: Callable[P, Response | Node],
+        path: list[str],
+    ) -> list[str]:
+        parameters = inspect.signature(default_handler).parameters
+        if len(parameters) >= 1:
+            return ['/'.join(path)]
+        else:
+            return []
 
 
 def is_static_segment(name: str) -> bool:

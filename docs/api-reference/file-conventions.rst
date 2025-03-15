@@ -22,7 +22,7 @@ Each directory type follows a specified pattern for directory name and has set b
 
 ``^(?P<literal_segment>(?!_).\*[^_])$``
 
-(no leading or trailing underscores; *literal_segment* is the full directory name)
+(no leading or trailing underscores; *literal_segment* is the directory name)
 
 A static route segment. Matches a URL path segment that equals *literal_segment*.
 

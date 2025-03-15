@@ -63,7 +63,39 @@ async def test_dynamic_route_segment__server(page: Page):
     (server)
     """
     async with prod_server('tests.apps.dynamic_route_segment') as url:
-        await page.goto(url + f'/employees/cheese')
+        await page.goto(url + '/employees/cheese')
         await expect(page.locator('p')).to_have_text(
             'This is an employee profile page.'
+        )
+
+
+async def test_route_param(page: Page):
+    """
+    From docs:
+
+    Dynamic route segments usually aren’t that useful unless there’s
+    actual dyanmic content, so let’s use that employee id from the URL
+    path in our page
+    """
+    async with prod_cli('tests.apps.route_param') as url:
+        await page.goto(url + '/employees/325832')
+        await expect(page.locator('p')).to_have_text(
+            'This is the profile page for employee #325832.'
+        )
+        
+
+async def test_route_param__server(page: Page):
+    """
+    From docs:
+
+    Dynamic route segments usually aren’t that useful unless there’s
+    actual dyanmic content, so let’s use that employee id from the URL
+    path in our page
+
+    (server)
+    """
+    async with prod_server('tests.apps.route_param') as url:
+        await page.goto(url + '/employees/325832')
+        await expect(page.locator('p')).to_have_text(
+            'This is the profile page for employee #325832.'
         )

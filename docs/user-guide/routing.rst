@@ -278,7 +278,7 @@ If there are dynamic route arguments, those should come before the asterisk::
     :caption: app/_foo_/__index__.py
 
 
-        def __page__(foo, *, bar, baz):
+    def __page__(foo, *, bar, baz):
         return div[
             b['foo:'], ' ', foo,
             br,

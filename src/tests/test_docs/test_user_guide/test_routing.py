@@ -237,3 +237,16 @@ async def test_query_params_dict(page: Page):
         await expect(page.locator('p.bar')).to_have_text('bar: A')
         await expect(page.locator('p.baz')).to_have_text('baz: B')
         await expect(page.locator('p.hello')).to_have_text('hello: C')
+
+
+async def test_route_params_and_query_params(page: Page):
+    """
+    From docs:
+
+    If there are dynamic route arguments, those should come before the asterisk
+    """
+    async with prod_cli('tests.apps.route_params_and_query_params') as url:
+        await page.goto(url + '/A?bar=B&baz=C')
+        await expect(page.locator('p.foo')).to_have_text('foo: A')
+        await expect(page.locator('p.bar')).to_have_text('bar: B')
+        await expect(page.locator('p.baz')).to_have_text('baz: C')

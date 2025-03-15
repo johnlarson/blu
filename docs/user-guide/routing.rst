@@ -291,27 +291,35 @@ If there are dynamic route arguments, those should come before the asterisk::
 .. code-block:: python
     :caption: app/_foo_/__index__.py
 
+    from blu.html import b, p
+
 
     def __page__(foo, *, bar, baz):
-        return div[
-            b['foo:'], ' ', foo,
-            br,
-            b['bar:'], ' ', bar,
-            br,
-            b['baz:'], ' ', baz,
-        ]
+        return (
+            p[
+                b['foo:'], ' ', foo,
+            ],
+            p[
+                b['bar:'], ' ', bar,
+            ],
+            p[
+                b['baz:'], ' ', baz,
+            ],
+        )
 
 In this example, visiting ``/A?bar=B&baz=C`` gives us:
 
     .. raw:: html
 
-        <div>
+        <p>
             <b>foo:</b> A
-            <br>
+        </p>
+        <p>
             <b>bar:</b> B
-            <br>
+        </p>
+        <p>
             <b>baz:</b> C
-        </div>
+        </p>
 
 
 Return Values

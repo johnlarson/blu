@@ -181,26 +181,30 @@ Any dynamic route arguments should come after the slash::
 .. code-block:: python
     :caption: app/_my_param_/__default__.py
 
-    from blu.html import div, b, br
+    from blu.html import b, p
 
 
     def __page__(path, /, my_param):
-        return div[
-            b['my_param value:'], ' ', my_param,
-            br,
-            b['remaining path:'], ' ', path,
-        ]
+        return (
+            p[
+                b['my_param value:'], ' ', my_param,
+            ],
+            p[
+                b['remaining path:'], ' ', path,
+            ],
+        )
 
 In this example, visiting ``/my-param-value/a/b/c`` gives us:
 
 
     .. raw:: html
 
-        <div>
+        <p>
             <b>my_param value:</b> my-param-value
-            <br>
+        </p>
+        <p>
             <b>remaining path:</b> a/b/c
-        </div>
+        </p>
 
 
 Query Parameters

@@ -191,3 +191,21 @@ async def test_default_handler_remaining_path(page: Page):
         await expect(page.locator('p')).to_have_text(
             'The remaining path is a/b/c.'
         )
+
+
+async def test_default_handler_mix_path_and_route_params(page: Page):
+    """
+    From docs:
+
+    Any dynamic route arguments should come after the slash
+    """
+    async with prod_cli(
+        'tests.apps.default_handler_path_and_route_params'
+    ) as url:
+        await page.goto(url + '/my-param-value/a/b/c')
+        await expect(page.locator('p.my-param')).to_have_text(
+            'my_param value: my-param-value'
+        )
+        await expect(page.locator('p.path')).to_have_text(
+            'remaining path: a/b/c'
+        )

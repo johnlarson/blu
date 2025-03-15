@@ -250,3 +250,23 @@ async def test_route_params_and_query_params(page: Page):
         await expect(page.locator('p.foo')).to_have_text('foo: A')
         await expect(page.locator('p.bar')).to_have_text('bar: B')
         await expect(page.locator('p.baz')).to_have_text('baz: C')
+
+
+async def test_return_values(page: Page):
+    """
+    From docs:
+
+    A __page__() function can return any valid child of an HTML element
+    (see the Children subsection of Creating Pages). The same rules
+    apply for Iterables (again, see the Children subsection of Creating
+    Pages)
+    """
+    async with prod_cli('tests.apps.route_return_values') as url:
+        await page.goto(url + '/unkeyed_list')
+        await expect(page.locator('p')).to_have_text('ABC')
+        await page.goto(url + '/keyed_list')
+        await expect(page.locator('p')).to_have_text('ABC')
+        await page.goto(url + '/string')
+        await expect(page.locator('p')).to_have_text('ABC')
+        await page.goto(url + '/tuple')
+        await expect(page.locator('p')).to_have_text('ABC')

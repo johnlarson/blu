@@ -27,6 +27,7 @@ type Serializable = (
 type Node = '''
     CustomElement |
     HTMLElement |
+    Key |
     Sequence[Node] |
     str |
     int |

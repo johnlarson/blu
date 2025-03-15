@@ -330,27 +330,34 @@ A *__page__()* function can return any valid child of an HTML element (see the :
 .. code-block:: python
 
     from blu import Key
+    from blu.html import p
 
 
     # Wrong! All Iterables except strings and tuples must be keyed.
     def __page__():
-        return ['A', 'B', 'C']
+        return p[
+            ['A', 'B', 'C'],
+        ]
     
     # Right. The list is keyed.
     def __page__():
-        return [
-            Key(0)['A'],
-            Key(1)['B'],
-            Key(2)['C'],
+        return p[
+            [
+                Key(0)['A'],
+                Key(1)['B'],
+                Key(2)['C'],
+            ],
         ]
 
     # Right. Strings don't have to be keyed, even though they are iterable.
     def __page__():
-        return 'ABC'
+        return p['ABC']
     
     # Right. Tuples don't have to be keyed, even though they are iterable.
     def __page__():
-        return ('A', 'B', 'C')
+        return p[
+            ('A', 'B', 'C'),
+        ]
 
 You can also return a :class:`blu.Response` to set the status code and/or response headers of the page:
 

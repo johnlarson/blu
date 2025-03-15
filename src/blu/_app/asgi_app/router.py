@@ -148,7 +148,7 @@ class Router:
     ) -> Optional[Response | Node]:
         if not self.default_page:
             raise NotFound
-        kwargs = self._get_handler_kwargs(self.default_page)
+        kwargs = self._get_handler_kwargs(self.default_page, route_params)
         return await awaitable(self.default_page(**kwargs))
 
 

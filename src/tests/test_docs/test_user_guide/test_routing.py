@@ -127,3 +127,51 @@ async def test_multiple_route_params__server(page: Page):
         await expect(page.locator('p')).to_have_text(
             'This is employee #325832\'s time card for 2024-12-10.'
         )
+
+
+async def test_default_handler(page: Page):
+    """
+    From docs:
+
+    You can add a catch-all handler to a route segment that handles a
+    request if the route is matched up to that point but no __index__.py
+    file is on a path that exactly matches the URL. You do this by
+    creating a __default__.py file with a __page__() function
+    """
+    async with prod_cli('tests.apps.default_handler') as url:
+        await page.goto(url + '/foo/bar')
+        await expect(page.locator('p')).to_have_text(
+            'This is the page for /foo/bar.'
+        )
+        default_text = 'This is the default page.'
+        await page.goto(url + '/foo')
+        await expect(page.locator('p')).to_have_text(default_text)
+        await page.goto(url + '/foo/some/other/path')
+        await expect(page.locator('p')).to_have_text(default_text)
+        await page.goto(url + '/foo/bar/some/other/path')
+        await expect(page.locator('p')).to_have_text(default_text)
+
+
+async def test_default_handler__server(page: Page):
+    """
+    From docs:
+
+    You can add a catch-all handler to a route segment that handles a
+    request if the route is matched up to that point but no __index__.py
+    file is on a path that exactly matches the URL. You do this by
+    creating a __default__.py file with a __page__() function
+
+    (server)
+    """
+    async with prod_server('tests.apps.default_handler') as url:
+        await page.goto(url + '/foo/bar')
+        await expect(page.locator('p')).to_have_text(
+            'This is the page for /foo/bar.'
+        )
+        default_text = 'This is the default page.'
+        await page.goto(url + '/foo')
+        await expect(page.locator('p')).to_have_text(default_text)
+        await page.goto(url + '/foo/some/other/path')
+        await expect(page.locator('p')).to_have_text(default_text)
+        await page.goto(url + '/foo/bar/some/other/path')
+        await expect(page.locator('p')).to_have_text(default_text)

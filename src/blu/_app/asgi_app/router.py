@@ -2,8 +2,7 @@ from collections.abc import Callable
 from importlib import import_module
 import inspect
 from pathlib import Path
-import pkgutil
-from typing import Any, Optional, Protocol, cast
+from typing import Any, Optional, Protocol
 from blu._http import Request, Response
 from blu._react.types import Node
 from blu._utils.asyncio import awaitable
@@ -87,20 +86,32 @@ class Router:
             raise NotFound
         if path:
             raise NotFound
-        kwargs = self._get_handler_kwargs(self.index_page, route_params)
+        kwargs = self._get_handler_kwargs(
+            self.index_page,
+            route_params,
+            request,
+        )
         return await awaitable(self.index_page(**kwargs))
     
     def _get_handler_kwargs[**P](
         self,
         handler: Callable[P, Response | Node],
         route_params: dict[str, str],
+        request: Request
     ) -> dict[str, str]:
-        signature = inspect.signature(handler)
-        return {
+        fn_params = inspect.signature(handler).parameters
+        route_params_kwargs = {
             fn_param.name: route_params[fn_param.name]
-            for fn_param in signature.parameters.values()
+            for fn_param in fn_params.values()
             if fn_param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
         }
+        query_params_kwargs: dict[str, str] = {}
+        for fn_param in fn_params.values():
+            if fn_param.kind == inspect.Parameter.KEYWORD_ONLY:
+                param_value = request.query.get(fn_param.name)
+                if param_value is not None:
+                    query_params_kwargs[fn_param.name] = param_value
+        return {**route_params_kwargs, **query_params_kwargs}
 
     async def _handle_static(
         self,
@@ -149,7 +160,11 @@ class Router:
         if not self.default_page:
             raise NotFound
         args = self._get_default_handler_args(self.default_page, path)
-        kwargs = self._get_handler_kwargs(self.default_page, route_params)
+        kwargs = self._get_handler_kwargs(
+            self.default_page,
+            route_params,
+            request,
+        )
         return await awaitable(self.default_page(*args, **kwargs))
     
     def _get_default_handler_args[**P](

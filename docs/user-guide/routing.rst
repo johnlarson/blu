@@ -219,15 +219,18 @@ To access a request's query parameters in an ``__index__.py`` or ``__default__.p
 .. code-block:: python
     :caption: app/foo/__index__.py
 
-    from blu.html import div, b, br
+    from blu.html import b, p
 
 
     def __page__(*, bar, baz):
-        return div[
-            b['bar:'], ' ', bar,
-            br,
-            b['baz:'], ' ', baz,
-        ]
+        return (
+            p[
+                b['bar:'], ' ', bar,
+            ],
+            p[
+                b['baz:'], ' ', baz,
+            ],
+        )
 
 In this example, visiting ``/foo?bar=A&baz=B`` gives us:
 

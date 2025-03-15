@@ -209,3 +209,18 @@ async def test_default_handler_mix_path_and_route_params(page: Page):
         await expect(page.locator('p.path')).to_have_text(
             'remaining path: a/b/c'
         )
+
+
+async def test_query_params(page: Page):
+    """
+    From docs:
+
+    To access a request’s query parameters in an __index__.py or
+    __default__.py handler, add keyword-only arguments to the __page__()
+    function. This is done by adding an asterisk to the function
+    signature:
+    """
+    async with prod_cli('tests.apps.query_params') as url:
+        await page.goto(url + '/foo?bar=A&baz=B')
+        await expect(page.locator('p.bar')).to_have_text('bar: A')
+        await expect(page.locator('p.baz')).to_have_text('baz: B')

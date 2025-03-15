@@ -376,36 +376,3 @@ You can also return a :class:`blu.Response` to set the status code and/or respon
                 'Last-Modified': 'Tue, 10 Dec 2024 10:00:00 GMT',
             },
         )
-
-Custom HTTP Behavior
---------------------
-
-Blu is built on top of a web framework called `Quart <https://quart.palletsprojects.com>`_, and each request is handled in a Quart context. As a result, any context you can access in a Quart request handler can also be accessed in a Blu handler.
-
-You can also return any Quart response object from a handler.
-
-The example below makes use of Quart's API to create a REST API endpoint.
-
-.. code-block:: python
-
-    from quart import request, make_response
-
-    from app.some_business_logic_module import create_item
-
-
-    async def __page__():
-        if request.method != 'POST':
-            response = make_response({'message': f'Expected a POST request; received a {request.method} request.')
-            response.status = 405
-            return response
-        new_item = await request.get_json()
-        new_item_id = await create_item(new_item)
-        return make_response({
-            **new_item,
-            'id': new_item_id,
-        })
-
-        
-If you've used Flask, Quart's APIs will feel familiar; Quart is an asynchronous version of Flask made by the development group behind Flask.
-
-For more information about Quart responses and the state you can access in a Quart context, see the `official Quart documentation <https://quart.palletsprojects.com>`_.

@@ -105,12 +105,16 @@ class Router:
             for fn_param in fn_params.values()
             if fn_param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
         }
-        query_params_kwargs: dict[str, str] = {}
-        for fn_param in fn_params.values():
-            if fn_param.kind == inspect.Parameter.KEYWORD_ONLY:
-                param_value = request.query.get(fn_param.name)
-                if param_value is not None:
-                    query_params_kwargs[fn_param.name] = param_value
+        # query_params_kwargs: dict[str, str] = {}
+        # for fn_param in fn_params.values():
+        #     if fn_param.kind == inspect.Parameter.KEYWORD_ONLY:
+        #         param_value = request.query.get(fn_param.name)
+        #         if param_value is not None:
+        #             query_params_kwargs[fn_param.name] = param_value
+        query_params_kwargs = {
+            name: query_list[0]
+            for name, query_list in request.query
+        }
         return {**route_params_kwargs, **query_params_kwargs}
 
     async def _handle_static(

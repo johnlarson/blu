@@ -224,3 +224,16 @@ async def test_query_params(page: Page):
         await page.goto(url + '/foo?bar=A&baz=B')
         await expect(page.locator('p.bar')).to_have_text('bar: A')
         await expect(page.locator('p.baz')).to_have_text('baz: B')
+
+
+async def test_query_params_dict(page: Page):
+    """
+    From docs:
+
+    The __page__() function can also accept a keyword argument dict
+    """
+    async with prod_cli('tests.apps.query_params_dict') as url:
+        await page.goto(url + '/foo?bar=A&baz=B&hello=C')
+        await expect(page.locator('p.bar')).to_have_text('bar: A')
+        await expect(page.locator('p.baz')).to_have_text('baz: B')
+        await expect(page.locator('p.hello')).to_have_text('hello: C')

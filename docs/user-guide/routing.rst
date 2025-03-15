@@ -236,11 +236,12 @@ In this example, visiting ``/foo?bar=A&baz=B`` gives us:
 
     .. raw:: html
 
-        <div>
+        <p>
             <b>bar:</b> A
-            <br>
+        </p>
+        <p>
             <b>baz:</b> B
-        </div>
+        </p>
 
 The *__page__()* function can also accept a keyword argument :py:class:`dict`::
 
@@ -251,29 +252,35 @@ The *__page__()* function can also accept a keyword argument :py:class:`dict`::
 .. code-block:: python
     :caption: app/foo/__index__.py
 
-    from blu.html import div, b, br
+    from blu.html import b, p
 
 
     def __page__(*, bar, **kwargs):
-        return div[
-            b['bar:'], ' ', bar,
-            br,
-            b['baz:'], ' ', kwargs['baz'],
-            br,
-            b['hello:'], ' ', kwargs['hello']
-        ]
+        return (
+            p[
+                b['bar:'], ' ', bar,
+            ],
+            p[
+                b['baz:'], ' ', kwargs['baz'],
+            ],
+            p[
+                b['hello:'], ' ', kwargs['hello']
+            ],
+        )
 
 In this example, visiting ``/foo?bar=A&baz=B&hello=C`` gives us:
 
     .. raw:: html
 
-        <div>
+        <p>
             <b>bar:</b> A
-            <br>
+        </p>
+        <p>
             <b>baz:</b> B
-            <br>
+        </p>
+        <p>
             <b>hello:</b> C
-        </div>
+        </p>
 
 If there are dynamic route arguments, those should come before the asterisk::
 

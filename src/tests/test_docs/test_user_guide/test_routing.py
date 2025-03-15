@@ -99,3 +99,31 @@ async def test_route_param__server(page: Page):
         await expect(page.locator('p')).to_have_text(
             'This is the profile page for employee #325832.'
         )
+
+
+async def test_multiple_route_params(page: Page):
+    """
+    From docs:
+
+    A route can have multiple dynamic segments
+    """
+    async with prod_cli('tests.apps.multiple_route_params') as url:
+        await page.goto(url + '/employees/325832/time_card/2024-12-10')
+        await expect(page.locator('p')).to_have_text(
+            'This is employee #325832\'s time card for 2024-12-10.'
+        )
+
+
+async def test_multiple_route_params__server(page: Page):
+    """
+    From docs:
+
+    A route can have multiple dynamic segments
+
+    (server)
+    """
+    async with prod_server('tests.apps.multiple_route_params') as url:
+        await page.goto(url + '/employees/325832/time_card/2024-12-10')
+        await expect(page.locator('p')).to_have_text(
+            'This is employee #325832\'s time card for 2024-12-10.'
+        )

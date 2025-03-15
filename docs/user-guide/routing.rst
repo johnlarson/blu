@@ -85,12 +85,12 @@ A route can have multiple dynamic segments::
     app/
       employees/
         _employee_id_/
-          time_punch/
+          time_card/
             _date_/
               __index__.py
 
 .. code-block:: python
-    :caption: app/employees/_employee_id_/time_punch/_date_/__index__.py
+    :caption: app/employees/_employee_id_/time_card/_date_/__index__.py
 
     from blu.html import p
 

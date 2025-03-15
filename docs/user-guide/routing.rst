@@ -364,11 +364,12 @@ You can also return a :class:`blu.Response` to set the status code and/or respon
 .. code-block:: python
     
     from blu import Response
+    from blu.html import p
 
 
     def __page__():
         return Response(
-            div['Hello.'],
+            p['Hello.'],
             status=404,
             headers={
                 'Cache-Control': 'no-cache',

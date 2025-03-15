@@ -1,4 +1,5 @@
 from playwright.async_api import Page, expect
+import requests
 
 from tests.utils import prod_cli, prod_server
 
@@ -270,3 +271,19 @@ async def test_return_values(page: Page):
         await expect(page.locator('p')).to_have_text('ABC')
         await page.goto(url + '/tuple')
         await expect(page.locator('p')).to_have_text('ABC')
+
+
+async def test_return_http_response(page: Page):
+    """
+    From docs:
+
+    You can also return a blu.Response to set the status code and/or
+    response headers of the page
+    """
+    async with prod_cli('tests.apps.route_return_response') as url:
+        await page.goto(url)
+        await expect(page.locator('p')).to_have_text('Hello.')
+        res = requests.get(url)
+        assert res.status_code == 404
+        assert res.headers['Cache-Control'] == 'no-cache'
+        assert res.headers['Last-Modified'] == 'Tue, 10 Dec 2024 10:00:00 GMT'

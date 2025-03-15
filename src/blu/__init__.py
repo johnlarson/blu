@@ -6,6 +6,7 @@ from blu import html
 from blu._exceptions import WrongEnvironmentError
 from blu._default_app import app
 from blu._react.types import HTMLElement, Key
+from blu._http import Response
 
 
 __all__ = [
@@ -127,13 +128,6 @@ class ClientElement[**P](Element[P]):
 
 type Node = Any
 """"""
-
-
-class Response:
-    """
-    An HTTP Response.
-    """
-    ...
 
 
 class Settings(Protocol):

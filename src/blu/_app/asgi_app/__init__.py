@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Optional
-from blu._app.asgi_app.router import Router, router_from_root_package_name
+from blu._app.asgi_app.router import NotFound, Router, router_from_root_package_name
 from blu._http import QueryParams, Request, Response
 from blu._react._render import Renderer
 from blu._utils import asgi
@@ -48,6 +48,12 @@ class ASGIApp(asgi.App):
         receive: asgi.Receiver,
         send: asgi.Sender
     ):
+        try:
+            await self._serve_static(scope, receive, send)
+        except NotFound:
+            pass
+        else:
+            return
         request = await self._create_request(scope)
         path = request.path
         stripped = path.strip('/')
@@ -73,6 +79,14 @@ class ASGIApp(asgi.App):
             'type': 'http.response.body',
             'body': body_str.encode('utf-8'),
         })
+    
+    async def _serve_static(
+        self,
+        scope: asgi.HTTPConnectionScope,
+        receive: asgi.Receiver,
+        send: asgi.Sender,
+    ):
+        raise NotFound
 
     def _get_headers(
         self,

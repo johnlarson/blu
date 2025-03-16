@@ -5,6 +5,9 @@ from pathlib import Path
 import pkgutil
 from types import ModuleType, TracebackType
 from typing import Optional
+
+from blu._app._build import build
+from blu._app._dev import watch_build
 # from quart import Quart, Response as QuartResponse
 
 from .asgi_app.router import Router
@@ -46,11 +49,12 @@ class Blu:
         await self._asgi_app(scope, receive, send)
 
     async def build(self):
-        ...
+        await build()
 
     @asynccontextmanager
     async def dev(self) -> AsyncGenerator['Blu']:
-        yield Blu(self._app_import_path, self.project_root, dev=True)
+        async with watch_build():
+            yield Blu(self._app_import_path, self.project_root, dev=True)
     
     
 

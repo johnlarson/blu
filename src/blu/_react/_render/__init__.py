@@ -13,6 +13,11 @@ js_root = Path(__file__).parent.parent / 'js'
 with open(js_root / 'bootstrap-script.js', 'r') as bootstrap_script_f:
     bootstrap_script_content = bootstrap_script_f.read()
 
+py_bootstrap_path = Path(__file__).parent / 'bootstrap_script.py'
+
+with open(py_bootstrap_path, 'r') as py_bootstrap_f:
+    py_bootstrap_content = py_bootstrap_f.read()
+
 
 type Renamer = dict[tuple[Optional[str], Path], Optional[str]]
 
@@ -63,6 +68,8 @@ class Renderer:
         document.extend([
             await self._get_react_data(root),
             self._get_script_tag(root),
+            self._get_pyscript_include(),
+            self._get_python_script(),
         ])
         return document
 
@@ -83,4 +90,18 @@ class Renderer:
     def _get_script_tag(self, root: Node) -> ET.Element:
         element = ET.Element('script', {'type': 'module'})
         element.text = bootstrap_script_content
+        return element
+
+    def _get_pyscript_include(self) -> ET.Element:
+        return ET.Element(
+            'script',
+            {
+                'type': 'module',
+                'src': 'https://pyscript.net/releases/2025.3.1/core.js',
+            },
+        )
+
+    def _get_python_script(self) -> ET.Element:
+        element = ET.Element('script', {'type': 'py'})
+        element.text = py_bootstrap_content
         return element

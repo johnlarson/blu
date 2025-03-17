@@ -56,8 +56,7 @@ async def dev_server(app_module: str) -> AsyncGenerator[str]:
 
 @asynccontextmanager
 async def prod_server(app_module: str) -> AsyncGenerator[str]:
-    with temp_dir() as project_dir:
-        app = Blu(app_module, project_dir)
+    async with prod_app(app_module) as app:
         async with _test_serve(app) as url:
             yield url
 
@@ -65,9 +64,9 @@ async def prod_server(app_module: str) -> AsyncGenerator[str]:
 @asynccontextmanager
 async def dev_cli(app_module: str) -> AsyncGenerator[str]:
     async with copy_app_dir(app_module) as temp_dir:
+
         with background(['blu', 'dev'], temp_dir) as proc:
             yield get_app_url(proc)
-
 
 
 @asynccontextmanager
@@ -75,7 +74,7 @@ async def prod_cli(app_module: str, build: bool = True) -> AsyncGenerator[str]:
     port = get_available_port()
     async with copy_app_dir(app_module) as temp_dir:
         if build:
-            run(['blu', 'build'], temp_dir)
+            await run(['blu', 'build'], temp_dir)
         with background(
             ['uvicorn', 'blu:app', '--port', str(port)],
             temp_dir,
@@ -200,7 +199,7 @@ def background(
             proc.kill()
 
 
-def run(
+def run_old(
     command: list[str],
     cwd: Optional[str | Path] = None,
     env: dict[str, str] = {},
@@ -208,6 +207,23 @@ def run(
     with background(command, cwd, env) as proc:
         pass
     return proc
+
+
+async def run(
+    command: list[str],
+    cwd: Optional[str | Path] = None,
+    env: dict[str, str] = {},
+) -> tuple[Iterable[str], Iterable[str]]:
+    proc = await asyncio.create_subprocess_exec(
+        *command,
+        cwd=cwd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+        env={**os.environ, 'PYTHONPATH': ':'.join(sys.path), **env},
+    )
+    stdout, stderr = await proc.communicate()
+    return stdout.decode(), stderr.decode()
+
 
 
 def get_app_url(proc: Popen[str]) -> str:

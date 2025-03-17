@@ -30,13 +30,13 @@ class Router:
         for path in dir.iterdir():
             name = path.stem
             full_name = package_name + '.' + name
-            if name == '__index__':
+            if path.name == '__index__.py':
                 self.index_page = self._get_page_handler(full_name)
-            elif name == '__default__':
+            elif path.name == '__default__.py':
                 self.default_page = self._get_page_handler(full_name)
-            elif is_static_segment(name):
+            elif is_static_segment(path):
                 self.static_segments[name] = Router(path, full_name)
-            elif is_dynamic_segment(name):
+            elif is_dynamic_segment(path):
                 nunder = name.strip('_')
                 self.dynamic_segments[nunder] = Router(path, full_name)
 
@@ -183,12 +183,20 @@ class Router:
             return []
 
 
-def is_static_segment(name: str) -> bool:
-    return len(name) > 0 and name[0] != '_' and name[-1] != '_'
-
-
-def is_dynamic_segment(name: str) -> bool:
+def is_static_segment(path: Path) -> bool:
+    name = path.stem
     return (
+        not path.is_dir() and
+        len(name) > 0 and
+        name[0] != '_' and
+        name[-1] != '_'
+    )
+
+
+def is_dynamic_segment(path: Path) -> bool:
+    name = path.stem
+    return (
+        not path.is_dir() and
         len(name) > 2 and
         name[0] == '_' and
         name[1] != '_' and

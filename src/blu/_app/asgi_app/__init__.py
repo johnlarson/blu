@@ -1,6 +1,9 @@
 from collections.abc import Iterable
+import mimetypes
 from pathlib import Path
 from typing import Optional
+
+import aiofiles
 from blu._app.asgi_app.router import NotFound, Router, router_from_root_package_name
 from blu._http import QueryParams, Request, Response
 from blu._react._render import Renderer
@@ -10,10 +13,12 @@ from blu._utils import asgi
 class ASGIApp(asgi.App):
     _router: Router
     _renderer: Renderer
+    _static_dir: Path
     
-    def __init__(self, app: str, project: Optional[Path]):
+    def __init__(self, app: str, static_dir: Path, project: Optional[Path]):
         self._router = router_from_root_package_name(app)
         self._renderer = Renderer(root_dir=project)
+        self._static_dir = static_dir
 
     async def __call__(
         self,
@@ -49,7 +54,7 @@ class ASGIApp(asgi.App):
         send: asgi.Sender
     ):
         try:
-            await self._serve_static(scope, receive, send)
+            await self._serve_static(scope, send)
         except NotFound:
             pass
         else:
@@ -83,10 +88,35 @@ class ASGIApp(asgi.App):
     async def _serve_static(
         self,
         scope: asgi.HTTPConnectionScope,
-        receive: asgi.Receiver,
         send: asgi.Sender,
     ):
-        raise NotFound
+        file_path = self._static_dir / scope['path'].strip('/')
+        content_type, _ = mimetypes.guess_type(file_path)
+        headers = (
+            [] if content_type is None
+            else [(b'Content-Type', content_type.encode('utf-8'))]
+        )
+        try:
+            async with aiofiles.open(file_path, 'rb') as file:
+                await send({
+                    'type': 'http.response.start',
+                    'status': 200,
+                    'headers': headers,
+                    'trailers': False,
+                })
+                async for chunk in file:
+                    await send({
+                        'type': 'http.response.body',
+                        'body': chunk,
+                        'more_body': True,
+                    })
+                await send({
+                    'type': 'http.response.body',
+                    'body': b'',
+                    'more_body': False,
+                })
+        except (FileNotFoundError, IsADirectoryError):
+            raise NotFound
 
     def _get_headers(
         self,

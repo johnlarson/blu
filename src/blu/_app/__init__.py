@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator, AsyncIterable, AsyncIterator, Mapping
 from contextlib import asynccontextmanager
+import functools
 from importlib import import_module
 from pathlib import Path
 import pkgutil
@@ -17,7 +18,6 @@ from blu._utils import asgi
 
 
 class Blu:
-    app_dir: Path
     project_root: Path
     is_dev: bool
 
@@ -25,8 +25,14 @@ class Blu:
     _app_import_path: str
 
     @property
-    def static_dir(self):
+    def static_dir(self) -> Path:
         return self.project_root / 'static'
+
+    @property
+    @functools.cache
+    def app_dir(self) -> Path:
+        app_module = import_module(self._app_import_path)
+        return Path(app_module.__path__[0])
 
     def __init__(
         self,
@@ -37,7 +43,7 @@ class Blu:
         if project is not None:
             project = Path(project)
             self.project_root = project
-        self._asgi_app = ASGIApp(app, project)
+        self._asgi_app = ASGIApp(app, self.static_dir, project)
         self._app_import_path = app
 
     async def __call__(
@@ -49,11 +55,11 @@ class Blu:
         await self._asgi_app(scope, receive, send)
 
     async def build(self):
-        await build()
+        await build(self.app_dir, self.static_dir)
 
     @asynccontextmanager
     async def dev(self) -> AsyncGenerator['Blu']:
-        async with watch_build():
+        async with watch_build(self.app_dir, self.static_dir):
             yield Blu(self._app_import_path, self.project_root, dev=True)
     
     

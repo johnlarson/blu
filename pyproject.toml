@@ -1,7 +1,7 @@
 [project]
 name = "blu"
 version = "0.0.1"
-dependencies = ["aiofiles", "uvicorn", "click"]
+dependencies = ["aiofiles", "uvicorn", "click", "watchdog"]
 
 [project.scripts]
 blu = "blu._cli:cli"

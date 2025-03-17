@@ -16,8 +16,10 @@ sphinx-autobuild = "*"
 sphinx-copybutton = "*"
 requests = "*"
 quart = "*"
-blu = {file = ".", editable = true}
 beautifulsoup4 = "*"
+blu = {file = ".", editable = true}
 
 [requires]
 python_version = "3.13"
+
+[dev-packages]

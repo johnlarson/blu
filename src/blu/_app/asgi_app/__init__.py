@@ -63,8 +63,9 @@ class ASGIApp(asgi.App):
         path = request.path
         stripped = path.strip('/')
         segments: list[str] = [] if stripped == '' else stripped.split('/')
-        response = await self._router.handle(request, segments)
-        if response is None:
+        try:
+            response = await self._router.handle(request, segments)
+        except NotFound:
             await send({
                 'type': 'http.response.start',
                 'status': 404,
@@ -74,6 +75,7 @@ class ASGIApp(asgi.App):
                 'body': b'Not Found: ' + scope['path'].encode('utf-8'),
             })
             return
+        assert response is not None
         await send({
             'type': 'http.response.start',
             'status': response.status,

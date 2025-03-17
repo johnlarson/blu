@@ -11,8 +11,13 @@ from blu._app.build_utils import FileBuildProcessor
 
 
 @asynccontextmanager
-async def watch_build(src: Path, dest: Path) -> AsyncGenerator[None]:
-    async with watch_copy(src, dest):
+async def watch_build(
+    app_dir: Path,
+    static_dir: Path,
+    build_dir: Path,
+) -> AsyncGenerator[None]:
+    build_dir.mkdir()
+    async with watch_copy(app_dir, static_dir):
         yield
 
 

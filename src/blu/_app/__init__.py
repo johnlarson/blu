@@ -29,6 +29,10 @@ class Blu:
         return self.project_root / 'static'
 
     @property
+    def build_dir(self) -> Path:
+        return self.project_root / '.build'
+
+    @property
     @functools.cache
     def app_dir(self) -> Path:
         app_module = import_module(self._app_import_path)
@@ -55,11 +59,11 @@ class Blu:
         await self._asgi_app(scope, receive, send)
 
     async def build(self):
-        await build(self.app_dir, self.static_dir)
+        await build(self.app_dir, self.static_dir, self.build_dir)
 
     @asynccontextmanager
     async def dev(self) -> AsyncGenerator['Blu']:
-        async with watch_build(self.app_dir, self.static_dir):
+        async with watch_build(self.app_dir, self.static_dir, self.build_dir):
             yield Blu(self._app_import_path, self.project_root, dev=True)
     
     

@@ -1,6 +1,4 @@
 from aiohttp import ClientSession as Client
-from playwright.async_api import Page, expect
-import requests
 
 from tests.utils import prod_cli, prod_server
 

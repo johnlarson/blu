@@ -3,7 +3,7 @@ import aiofiles
 from aiohttp import ClientSession as Client
 from playwright.async_api import Page, expect
 from blu._utils import get_available_port
-from tests.utils import background, copy_app_dir, run, temp_dir
+from tests.utils import background, copy_app_dir, run
 
 
 async def test_deploy_app(page: Page, client: Client):

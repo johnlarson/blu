@@ -1,0 +1,22 @@
+from blu import client
+from blu.html import html, head, body, button
+
+
+
+def __page__():
+    return html[
+        head,
+        body[
+            HelloButton,
+        ],
+    ]
+
+
+@client
+def HelloButton():
+    return button(onClick=say_hello)
+
+
+def say_hello():
+    from js import alert  # type: ignore
+    alert('Hello!')

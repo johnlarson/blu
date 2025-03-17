@@ -36,4 +36,9 @@ async def test_client_element(page: Page):
         page.once('dialog', handle_dialog)  # type: ignore
         await page.click('button')
         assert dialog_message == 'Hello!'
-        
+
+
+async def test_frontend_python(page: Page):
+    async with prod_server('tests.apps.quickstart') as url:
+        await page.goto(url)
+        pass

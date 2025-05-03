@@ -40,7 +40,7 @@ async def _watch(
 @asynccontextmanager
 async def watch_copy(src: Path, dest: Path) -> AsyncGenerator[None, None]:
     processor = FileBuildProcessor(src, dest)
-    async with _watch(src, processor.copy_file):
+    async with _watch(src, processor.build_file):
         yield
 
 
@@ -53,17 +53,17 @@ class WatchEventHandler(FileSystemEventHandler):
     
     def on_created(self, event: FileCreatedEvent | DirCreatedEvent):  # type: ignore
         if isinstance(event, FileCreatedEvent):
-            self._copy_file(event.src_path)
+            self._handle_file(event.src_path)
 
     def on_modified(self, event: FileModifiedEvent | DirModifiedEvent):  # type: ignore
         if isinstance(event, FileModifiedEvent):
-            self._copy_file(event.src_path)
+            self._handle_file(event.src_path)
 
     def on_moved(self, event: FileMovedEvent | DirMovedEvent):  # type: ignore
         if isinstance(event, FileMovedEvent):
-            self._copy_file(event.dest_path)
+            self._handle_file(event.dest_path)
 
-    def _copy_file(self, src_path_str: str | bytes):
+    def _handle_file(self, src_path_str: str | bytes):
         if isinstance(src_path_str, bytes):
             src_path_str = src_path_str.decode()
         src_path_str = cast(str, src_path_str)

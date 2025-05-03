@@ -8,4 +8,4 @@ async def build(app_root: Path, static_out: Path, build_dir: Path):
     build_dir.mkdir()
     p = FileBuildProcessor(app_root, static_out)
     for path in await walk_dir_files(app_root):
-        await p.copy_file(path)
+        await p.build_file(path)

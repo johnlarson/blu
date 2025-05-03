@@ -85,7 +85,7 @@ def get_react_data(node: Node | PropValue) -> ReactNodeJson:
     if isinstance(node, CustomElement):
         return cast(RenderedElementDict, {  # type: ignore
             'type': 'rendered_element',
-            'module': str(node.path),
+            'module': str(node.module),
             'name': node.name,
             'props': {
                 k: get_react_data(v) for k, v in node.props.items()

@@ -331,7 +331,7 @@ class CustomElement:
         MyComponent = import_client('/path/to/module', 'MyComponent')
     """
 
-    path: Path
+    module: Path
     """
     The path portion of the URL of the module containing the element's
     component type.

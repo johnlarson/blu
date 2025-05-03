@@ -1,7 +1,8 @@
+from collections.abc import AsyncGenerator, Callable, Generator
 from numbers import Number
 from pathlib import Path
 from types import EllipsisType
-from typing import Any, Iterable, Mapping, Sequence, cast
+from typing import Any, Iterable, Mapping, Protocol, Sequence, cast
 
 from blu._exceptions import WrongEnvironmentError
 
@@ -560,9 +561,6 @@ def _index_to_children(
     return children
 
 
-type Element = CustomElement | HTMLElement
-
-
 class Key:
     key: Any
     children: list[Node]
@@ -580,4 +578,74 @@ class Key:
         else:
             actual_children = [children]
         return Key(self.key, actual_children)
+
+
+type ElementRenderer[**P = ...] = Callable[
+    P,
+    Node | Generator[None, Node, Node] | AsyncGenerator[None | Node, Node]
+]
+
+
+class Element[**P](Protocol):
+
+    args: P.args
+    kwargs: P.kwargs
+    children: list['Node']
     
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> 'Element[P]':
+        ...
+    
+    def __getitem__(self, *children: 'Node') -> 'Element[P]':
+        ...
+
+
+class ClientElement[**P](Element[P]):
+    """
+    A custom element to be rendered client-side. Created using the
+    :func:`blu.client` decorator.
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import b, span
+
+        
+        @client
+        def ColorfulText(color, bold):
+            colorful_span = span(style={'color': color})[
+                (yield)
+            ]
+            if bold:
+                return b[colorful_span]
+            else:
+                return colorful_span
+
+                
+        ColoredText('red', bold=True)[
+            'Danger! The world said hello back.',
+        ]
+
+    .. code-block:: html
+
+        <b>
+            <span style="color: red">
+                Danger! The world said hello back.
+            </span>
+        </b>
+    """
+    
+    args: P.args
+    kwargs: P.kwargs
+    children: list['Node']
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> 'ClientElement[P]':
+        ...
+
+    def __getitem__(self, *children: 'Node') -> 'ClientElement[P]':
+        ...
+
+
+type Node = Any
+""""""
+
+

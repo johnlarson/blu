@@ -28,6 +28,16 @@ def copy_file(src: Path, dest: Path):
 
 
 @io_bound
+def copy_tree(src: Path, dest: Path):
+    shutil.copytree(src, dest)
+
+
+@io_bound
+def ensure_dir(path: Path):
+    path.mkdir(exist_ok=True, parents=True)
+
+
+@io_bound
 def list_dir(dir: Path) -> list[Path]:
     return list(dir.iterdir())
 
@@ -40,3 +50,6 @@ def walk_dir_files(dir: Path) -> list[Path]:
             file_path = subdir / filename
             ret.append(file_path)
     return ret
+
+
+blu_package_root = Path(__file__).parent.parent

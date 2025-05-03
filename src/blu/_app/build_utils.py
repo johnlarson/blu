@@ -1,7 +1,8 @@
 from pathlib import Path
+from shutil import copytree
 from typing import Optional
 
-from blu._utils import copy_file, json
+from blu._utils import copy_file, json, copy_tree, blu_package_root, ensure_dir
 
 
 class FileBuildProcessor:
@@ -11,6 +12,13 @@ class FileBuildProcessor:
     def __init__(self, src_root: Path, dest_root: Path):
         self.src_root = src_root.resolve()
         self.dest_root = dest_root.resolve()
+    
+    async def copy_blu_static(self):
+        src = blu_package_root / '_static_files'
+        blu_internal = self.dest_root / '_blu_internal'
+        dest = blu_internal / 'blu_static_files'
+        await ensure_dir(blu_internal)
+        await copy_tree(src, dest)
     
     async def build_file(self, src: Path):
         if src.suffix == 'py':

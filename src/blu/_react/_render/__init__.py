@@ -67,7 +67,7 @@ class Renderer:
         document.append(self._get_placeholder())
         document.extend([
             await self._get_react_data(root),
-            self._get_script_tag(root),
+            # self._get_script_tag(root),
             self._get_pyscript_include(),
             self._get_python_script(),
         ])
@@ -102,6 +102,7 @@ class Renderer:
         )
 
     def _get_python_script(self) -> ET.Element:
-        element = ET.Element('script', {'type': 'py'})
-        element.text = py_bootstrap_content
-        return element
+        return ET.Element(
+            'script',
+            {'type': 'py', 'src': '/_blu_internal/blu_static_files/main.py'},
+        )

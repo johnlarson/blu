@@ -1,13 +1,13 @@
 print('Hello, World!')
 
 
-# import asyncio
+import asyncio
 
-# from js import document, JSON  # type: ignore
-# from pyscript import js_import  # type: ignore
+from js import document, JSON  # type: ignore
+from pyscript import js_import  # type: ignore
 
-# react_dom = js_import('https://esm.sh/react-dom/client')
-# react = js_import('https://esm.sh/react')
+react_dom = js_import('https://esm.sh/react-dom/client')
+react = js_import('https://esm.sh/react')
 
 # json_str = document.querySelector('script[type="react-data"]').textContent
 # root_node_json = JSON.parse(json_str)

@@ -24,8 +24,6 @@ def import_client(path: str | _Path, name: str = 'default') -> CustomElement:
     return CustomElement(path, name, props={}, children=[])
 
 
-def client(renderer:)
-
 
 __all__ = [
     'Node',

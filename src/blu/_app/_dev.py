@@ -40,6 +40,7 @@ async def _watch(
 @asynccontextmanager
 async def watch_copy(src: Path, dest: Path) -> AsyncGenerator[None, None]:
     processor = FileBuildProcessor(src, dest)
+    await processor.copy_blu_static()
     async with _watch(src, processor.build_file):
         yield
 

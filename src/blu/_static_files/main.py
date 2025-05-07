@@ -11,40 +11,28 @@ react_dom = cast(Any, js_import('https://esm.sh/react-dom/client'))
 react = cast(Any, js_import('https://esm.sh/react'))
 
 async def main():
-    json_str = document.querySelector('script[type="react-data"]').textContent  # typing: ignore
-    root_node_json = JSON.parse(json_str)
+    json_str = document.querySelector('script[type="react-data"]').textContent  # type: ignore
+    root_node_json = JSON.parse(json_str)  # type: ignore
     root_node = get_node(root_node_json)
     # import_promises = get_import_promises(root_node_json)
     # imports = await asyncio.gather(import_promises)
     # root_node = get_node(root_node_json, imports)
-    # if root_node_json['tagname'] == 'html':
-    #     react_dom.createRoot(document).render(root_node)
-    # else:
-    #     react_dom.createRoot(document.body).render(root_node)
+    if root_node_json['tagname'] == 'html':
+        react_dom.createRoot(document).render(root_node)
+    else:
+        react_dom.createRoot(document.body).render(root_node)  # type: ignore
 
 
-def get_import_promises(json):
+def get_node(json: Any):
     ...
 
 
-def get_import(module, name):
+def get_obj(obj: Any):
     ...
 
 
-def get_child_imports(element_json):
+def get_array(array: Any):
     ...
-
-
-def get_node(json, imports):
-    ...
-
-
-def get_obj(obj, imports):
-    ...
-
-
-def get_array(array, imports):
-#     ...
 
 
 await main()

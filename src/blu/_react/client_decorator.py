@@ -1,3 +1,4 @@
+import platform
 from blu._react.types import ClientElement, ElementRenderer
 
 
@@ -22,17 +23,17 @@ class ClientDecorator:
             return p['Hello World!']
     """
     
-    def __call__(
+    def __call__[**P](
         self,
-        render_function: ElementRenderer[...],
-    ) -> ClientElement[object]:
-        ...
+        renderer: ElementRenderer[P],
+    ) -> ClientElement[P]:
+        return ClientElement(renderer, (), {}, [])
     
     def __bool__(self) -> bool:
-        ...
+        return platform.system() == 'Emscripten'
 
 
-client = ...
+client = ClientDecorator()
 """
 Creates client-rendered custom components.
 

@@ -27,6 +27,7 @@ type Serializable = (
 
 type Node = '''
     CustomElement |
+    ClientElement[...] |
     HTMLElement |
     Key |
     Sequence[Node] |
@@ -588,8 +589,8 @@ type ElementRenderer[**P = ...] = Callable[
 
 class Element[**P](Protocol):
 
-    args: P.args
-    kwargs: P.kwargs
+    args: tuple[Any, ...]
+    kwargs: tuple[Any, ...]
     children: list['Node']
     
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> 'Element[P]':
@@ -599,7 +600,7 @@ class Element[**P](Protocol):
         ...
 
 
-class ClientElement[**P](Element[P]):
+class ClientElement:
     """
     A custom element to be rendered client-side. Created using the
     :func:`blu.client` decorator.
@@ -634,18 +635,35 @@ class ClientElement[**P](Element[P]):
         </b>
     """
     
-    args: P.args
-    kwargs: P.kwargs
+    args: tuple[Any, ...]
+    kwargs: dict[str, Any]
     children: list['Node']
+    renderer: ElementRenderer
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> 'ClientElement[P]':
-        ...
+    def __init__(
+        self,
+        renderer: ElementRenderer,
+        args: tuple[Any, ...],
+        kwargs: dict[str, Any],
+        children: Sequence[Node],
+    ):
+        self.renderer = renderer
+        self.args = args
+        self.kwargs = kwargs
+        self.children = list(children)
 
-    def __getitem__(self, *children: 'Node') -> 'ClientElement[P]':
-        ...
+    def __call__(self, *args: tuple[Any, ...], **kwargs: dict[str, Any]) -> 'ClientElement':
+        return ClientElement(
+            self.renderer,
+            args,
+            kwargs,
+            self.children,
+        )
 
-
-type Node = Any
-""""""
-
-
+    def __getitem__(self, *children: 'Node') -> 'ClientElement':
+        return ClientElement(
+            self.renderer,
+            self.args,
+            self.kwargs,
+            _index_to_children(children),
+        )

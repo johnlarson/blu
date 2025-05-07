@@ -2,7 +2,7 @@ from collections.abc import Mapping, Sequence
 from numbers import Number
 from typing import Any, Literal, NotRequired, TypedDict, cast
 
-from blu._react.types import HTMLElement, Key, Node, PropValue, CustomElement
+from blu._react.types import ClientElement, HTMLElement, Key, Node, PropValue, CustomElement
 
 
 type Jsonable = (
@@ -24,7 +24,7 @@ JSON object.
 
 
 class ReactDict(TypedDict):
-    type: Literal['rendered_element', 'native_element', 'fragment', 'object']
+    type: Literal['rendered_element', 'native_element', 'fragment', 'client_element', 'object']
 
 
 class ReactJsObject(ReactDict):
@@ -44,6 +44,15 @@ class RenderedElementDict(ReactElementDict):
     type: Literal['rendered_element']  # type: ignore
     module: str
     name: str
+
+
+class ClientElementDict(ReactDict):
+    type: Literal['client_element']  # type: ignore
+    module: str
+    name: str
+    args: list[Jsonable]
+    kwargs: dict[str, Jsonable]
+    children: list['ReactNodeJson']
 
 
 class NativeElementDict(ReactElementDict):
@@ -91,6 +100,14 @@ def get_react_data(node: Node | PropValue) -> ReactNodeJson:
                 k: get_react_data(v) for k, v in node.props.items()
             },
             'children': [get_react_data(x) for x in node.children],
+        })
+    if isinstance(node, ClientElement):
+        return cast(ClientElementDict, {  # type: ignore
+            'type': 'client_element',
+            'module': node.renderer.__module__,
+            'name': node.renderer.__name__,
+            'kwargs': {k: get_react_data(v) for k, v in node.kwargs.items()},
+            'children': [get_react_data(x) for x in node.children]
         })
     if isinstance(node, Mapping):
         return cast(ReactJsObject, {  # type: ignore

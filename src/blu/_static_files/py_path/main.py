@@ -88,7 +88,16 @@ def PythonElement(props: PythonElementProps):
 
 
 def py_to_js_node(py_node: Node):
-    ...
+    if isinstance(py_node, ClientElement):
+        return react.createElement(
+            PythonElement,
+            {
+                'renderer': py_node.renderer,
+                'args': py_node.args,
+                'kwargs': py_node.kwargs,
+                'py_children': py_node.children,
+            },
+        )
 
 
 def parse_py_element(data: ClientElementDict):

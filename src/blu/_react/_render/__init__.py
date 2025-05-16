@@ -15,8 +15,8 @@ with open(js_root / 'bootstrap-script.js', 'r') as bootstrap_script_f:
 
 py_bootstrap_path = Path(__file__).parent / 'bootstrap_script.py'
 
-with open(py_bootstrap_path, 'r') as py_bootstrap_f:
-    py_bootstrap_content = py_bootstrap_f.read()
+# with open(py_bootstrap_path, 'r') as py_bootstrap_f:
+#     py_bootstrap_content = py_bootstrap_f.read()
 
 
 type Renamer = dict[tuple[Optional[str], Path], Optional[str]]

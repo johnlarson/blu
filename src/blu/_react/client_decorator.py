@@ -26,7 +26,7 @@ class ClientDecorator:
     def __call__[**P](
         self,
         renderer: ElementRenderer[P],
-    ) -> ClientElement[P]:
+    ) -> ClientElement:
         return ClientElement(renderer, (), {}, [])
     
     def __bool__(self) -> bool:

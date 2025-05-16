@@ -3,8 +3,11 @@ print('Hello, World!')
 
 import asyncio
 from collections.abc import AsyncGenerator, Callable, Generator, Sequence
+import importlib
 from typing import Any, Protocol, TypedDict, cast
+from xml.dom.minidom import Element
 
+from blu._react._render.react_data import ClientElementDict, ReactDict, ReactJsObject
 from js import document  # type: ignore
 import json
 from pyscript import js_import  # type: ignore
@@ -31,6 +34,7 @@ def get_node(data: Any):
     if isinstance(data, list):
         return get_array(data)
     elif isinstance(data, dict):
+        data = cast(ReactDict, data)
         if 'type' not in data:
             raise TypeError('Data dict should have key "type"')
         elif data['type'] == 'object':
@@ -53,7 +57,7 @@ def get_node(data: Any):
         return data
 
 
-def get_obj(obj: Any):
+def get_obj(obj: ReactJsObject):
     return {k: get_node(v) for k, v in obj['data'].items()}
 
 
@@ -87,8 +91,18 @@ def py_to_js_node(py_node: Node):
     ...
 
 
-def parse_py_element(data: Any):
-    ...
+def parse_py_element(data: ClientElementDict):
+    return ClientElement(
+        get_renderer(data),
+        get_array(data['args']),
+        get_obj(data['kwargs']),
+        get_node(data['children']),
+    )
+
+
+def get_renderer(data: Any) -> ElementRenderer:
+    module = importlib.import_module(data['module'])
+    return getattr(module, data['name'])
 
 
 await main()

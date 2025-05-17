@@ -550,7 +550,7 @@ def _index_to_children(
     for child in children:
         if child is not None and not isinstance(
             child,
-            (HTMLElement, CustomElement, Sequence, str, Number, bool),
+            (HTMLElement, CustomElement, ClientElement, Sequence, str, Number, bool),
         ):
             raise TypeError(
                 'HTMLElement\'s children must be valid nodes, i.e. they '

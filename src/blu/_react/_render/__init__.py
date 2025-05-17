@@ -69,8 +69,7 @@ class Renderer:
             await self._get_react_data(root),
             # self._get_script_tag(root),
             self._get_pyscript_include(),
-            await self._get_pyscript_config(),
-            self._get_python_script(),
+            await self._get_python_script(),
         ])
         return document
 
@@ -101,19 +100,19 @@ class Renderer:
                 'src': 'https://pyscript.net/releases/2025.3.1/core.js',
             },
         )
-    
-    async def _get_pyscript_config(self) -> ET.Element:
+
+    async def _get_python_script(self) -> ET.Element:
         config = {
             'files': {
-                '/_blu_internal/py_path/*': './py_path/*',
-                '/_blu_internal/blu_lib/*': './blu_lib/*',
-                '/_blu_internal/build/*': './build/*',
+                '/_blu_internal/blu_path/*': './blu_path/*',
+                '/_blu_internal/app_path/*': './app_path/*',
             }
         }
-        return ET.Element('script', type='mpy', config=(await json.dumps(config)))
-
-    def _get_python_script(self) -> ET.Element:
         return ET.Element(
             'script',
-            {'type': 'py', 'src': '/_blu_internal/blu_static_files/main.py'},
+            {
+                'type': 'mpy',
+                'config': await json.dumps(config),
+                'src': '/_blu_internal/python_path/blu/_client/main.py',
+            },
         )

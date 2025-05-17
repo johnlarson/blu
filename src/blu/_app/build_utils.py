@@ -12,22 +12,22 @@ class FileBuildProcessor:
     def __init__(self, src_root: Path, dest_root: Path):
         self.src_root = src_root.resolve()
         self.dest_root = dest_root.resolve()
-    
-    async def copy_blu_static(self):
-        src = blu_package_root / '_static_files'
+
+    async def copy_blu_lib(self):
+        src = blu_package_root
         blu_internal = self.dest_root / '_blu_internal'
-        dest = blu_internal / 'blu_static_files'
+        dest = blu_internal / 'python_path' / 'blu'
         await ensure_dir(blu_internal)
         await copy_tree(src, dest)
     
     async def build_file(self, src: Path):
-        if src.suffix == 'py':
+        if src.suffix == '.py':
             await self._build_python_file(src)
         else:
             await self._copy_file(src)
         
     async def _build_python_file(self, src: Path):
-        client_python_path = self.dest_root / '_blu_internal/python_path'
+        client_python_path = self.dest_root / '_blu_internal/python_path/app'
         dest = client_python_path / self._relative(src)
         await self._copy(src, dest)
 

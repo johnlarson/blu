@@ -1,5 +1,5 @@
 from tempfile import TemporaryDirectory
-from typing import Optional
+from blu._utils.typing import Optional
 
 from blu._app import Blu
 from blu._utils import asgi

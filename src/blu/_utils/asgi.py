@@ -3,7 +3,7 @@ Types based on https://asgi.readthedocs.io/en/latest/specs/www.html
 """
 
 from collections.abc import Iterable
-from typing import Any, Literal, NotRequired, Optional, Protocol, TypedDict
+from blu._utils.typing import Any, Literal, NotRequired, Optional, Protocol, TypedDict
 
 
 class LifespanScopeASGIInfo(TypedDict):

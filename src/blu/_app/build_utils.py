@@ -1,6 +1,6 @@
 from pathlib import Path
 from shutil import copytree
-from typing import Optional
+from blu._utils.typing import Optional
 
 from blu._utils import copy_file, json, copy_tree, blu_package_root, ensure_dir
 

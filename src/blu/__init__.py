@@ -1,7 +1,6 @@
 """A full stack React framework for Python."""
 
-from collections.abc import AsyncGenerator, Callable, Generator
-from typing import Any, Protocol
+from blu._utils.typing import Protocol
 from blu import html
 from blu._exceptions import WrongEnvironmentError
 from blu._default_app import app

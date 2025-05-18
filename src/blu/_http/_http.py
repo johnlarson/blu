@@ -1,6 +1,6 @@
 from collections import defaultdict
-from collections.abc import Iterator, Mapping
-from typing import Literal, Optional
+from blu._utils.typing import Iterator, Mapping
+from blu._utils.typing import Literal, Optional
 
 import urllib.parse
 

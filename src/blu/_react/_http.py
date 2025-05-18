@@ -1,5 +1,5 @@
 from types import EllipsisType
-from typing import Any, Mapping, Optional
+from blu._utils.typing import Any, Mapping, Optional
 from blu._context import (
     DependencyMapContext, DependencyMapJSONContext, ImportMapContext
 )

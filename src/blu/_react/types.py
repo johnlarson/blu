@@ -2,7 +2,7 @@ from collections.abc import AsyncGenerator, Callable, Generator
 from numbers import Number
 from pathlib import Path
 from types import EllipsisType
-from typing import Any, Iterable, Mapping, Protocol, Sequence, cast
+from blu._utils.typing import Any, Mapping, Protocol, Sequence, cast
 
 from blu._exceptions import WrongEnvironmentError
 

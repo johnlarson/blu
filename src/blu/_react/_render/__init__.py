@@ -1,7 +1,7 @@
 from io import StringIO
 import os
 from pathlib import Path
-from typing import Optional
+from blu._utils.typing import Optional
 from xml.etree import ElementTree as ET
 
 from blu._utils import json, walk_dir_files

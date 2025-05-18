@@ -1,7 +1,7 @@
 print('Hello, World!')
 
 from collections import defaultdict
-from typing import Generator
+from blu._utils.typing import Generator
 
 print('defaultdic:', defaultdict)
 

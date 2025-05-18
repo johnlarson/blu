@@ -2,7 +2,7 @@ import asyncio
 from collections.abc import Awaitable, Callable, Coroutine
 from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 import functools
-from typing import Any, cast
+from blu._utils.typing import Any, cast
 
 
 async def awaitable[T](input: T | Awaitable[T]) -> T:

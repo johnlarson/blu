@@ -1,6 +1,6 @@
 from collections.abc import Mapping, Sequence
 from numbers import Number
-from typing import Any, Literal, NotRequired, TypedDict, cast
+from blu._utils.typing import Any, Literal, NotRequired, TypedDict, cast
 
 from blu._react.types import ClientElement, HTMLElement, Key, Node, PropValue, CustomElement
 

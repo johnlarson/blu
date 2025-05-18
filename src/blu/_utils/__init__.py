@@ -1,35 +1,31 @@
-from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
 from pathlib import Path
-import shutil
-import socket
-import typing
+from . import typing
+from blu._react.client_decorator import client
 
 from blu._utils.asyncio import io_bound
 
 if typing.TYPE_CHECKING:
     from blu._app import Blu
 
+if not client:
+    import shutil
+    import socket
+
 
 def get_available_port() -> int:
-    s = socket.socket()
+    s = socket.socket()  # type: ignore
     s.bind(('', 0))
     return s.getsockname()[1]
 
 
-@asynccontextmanager
-async def watch_dev_app(app: 'Blu') -> AsyncGenerator[None]:
-    ...
-
-
 @io_bound
 def copy_file(src: Path, dest: Path):
-    shutil.copyfile(src, dest)
+    shutil.copyfile(src, dest)  # type: ignore
 
 
 @io_bound
 def copy_tree(src: Path, dest: Path):
-    shutil.copytree(src, dest)
+    shutil.copytree(src, dest)  # type: ignore
 
 
 @io_bound

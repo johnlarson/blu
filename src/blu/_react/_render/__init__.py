@@ -110,13 +110,13 @@ class Renderer:
                 for file_path in file_paths
             },
             # 'packages': ['typing'],
-            'packages': ['github:josverl/micropython-stubs/mip/typing.py'],
+            # 'packages': ['github:josverl/micropython-stubs/mip/typing.py'],
 
         }
         return ET.Element(
             'script',
             {
-                'type': 'mpy',
+                'type': 'py',
                 'config': await json.dumps(config),
                 'src': '/_blu_internal/python_path/blu/_client/main.py',
             },

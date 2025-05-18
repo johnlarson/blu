@@ -30,5 +30,5 @@ except ImportError:
         TypedDict,
     ) = type_place_holder_generator()
 
-    def cast[T](_, x: T) -> T:
-        return x
+    def cast(_, x):  # type: ignore
+        return x  # type: ignore

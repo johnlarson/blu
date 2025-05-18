@@ -1,22 +1,25 @@
 import asyncio
-from collections.abc import AsyncGenerator, Generator, Iterable, Iterator, Mapping
+from blu._utils.typing import AsyncGenerator, Generator, Iterable, Mapping
 from contextlib import asynccontextmanager, contextmanager
 from importlib import import_module
 import os
 from pathlib import Path
 import re
-import shutil
-import socket
 from subprocess import PIPE, Popen
 import sys
 from tempfile import TemporaryDirectory
 from threading import Thread
-from typing import Any, AnyStr, Literal, Optional, TypedDict, cast
+from typing import Any, Literal, Optional, TypedDict, cast
 from bs4 import BeautifulSoup
 import uvicorn
 from blu._app import Blu
-from blu._utils import asgi, get_available_port, watch_dev_app
+from blu._utils import asgi, get_available_port
 from blu._utils import json
+from blu._react.client_decorator import client
+
+if not client:
+    import shutil
+    import socket
 
 
 tests = Path(__file__).parent
@@ -89,7 +92,7 @@ async def copy_app_dir(app_module: str) -> AsyncGenerator[Path]:
     src_dir = Path(getattr(module, '__path__')[0])
     with TemporaryDirectory() as temp_dir_str:
         temp_dir = Path(temp_dir_str)
-        shutil.copytree(src_dir, temp_dir / 'app')
+        shutil.copytree(src_dir, temp_dir / 'app')  # type: ignore
         yield temp_dir
 
 
@@ -135,7 +138,7 @@ async def _test_serve(app: asgi.App,) -> AsyncGenerator[str]:
 
 
 def _ping_server(address: str, port: int, timeout: int = 1):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # type: ignore
     s.settimeout(timeout)
     try:
         s.connect((address, port))

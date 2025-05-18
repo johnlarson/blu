@@ -4,9 +4,9 @@ from pathlib import Path
 from typing import Optional
 from xml.etree import ElementTree as ET
 
-from blu._utils import json
+from blu._utils import json, walk_dir_files
 from blu._react._render.react_data import get_react_data
-from blu._react.types import Node
+from blu._react.types import Jsonable, Node
 
 js_root = Path(__file__).parent.parent / 'js'
 
@@ -25,20 +25,21 @@ type Renamer = dict[tuple[Optional[str], Path], Optional[str]]
 class Renderer:
     _react_location: str
     _react_dom_location: str
-    _root_dir: Path
+    _static_dir: Path
+
+    @property
+    def _python_path(self):
+        return self._static_dir / '_blu_internal/python_path'
     
     def __init__(
         self,
+        static_dir: Path | str,
         react_location: str = 'https://esm.sh/react',
         react_dom_location: str = 'https://esm.sh/react-dom',
-        root_dir: Optional[Path | str] = None,
     ):
-        if root_dir is None:
-            root_dir = os.getcwd()
-        
         self._react_location = react_location
         self._react_dom_location = react_dom_location
-        self._root_dir = Path(root_dir)
+        self._static_dir = Path(static_dir)
     
     async def render_to_str(self, root: Node) -> str:
         """
@@ -102,11 +103,15 @@ class Renderer:
         )
 
     async def _get_python_script(self) -> ET.Element:
-        config = {
+        file_paths = await self._gather_python_files()
+        config: dict[str, Jsonable] = {
             'files': {
-                '/_blu_internal/blu_path/*': './blu_path/*',
-                '/_blu_internal/app_path/*': './app_path/*',
-            }
+                str(Path('/_blu_internal/python_path/') / file_path): './' + str(file_path)
+                for file_path in file_paths
+            },
+            # 'packages': ['typing'],
+            'packages': ['github:josverl/micropython-stubs/mip/typing.py'],
+
         }
         return ET.Element(
             'script',
@@ -116,3 +121,10 @@ class Renderer:
                 'src': '/_blu_internal/python_path/blu/_client/main.py',
             },
         )
+    
+    async def _gather_python_files(self) -> list[Path]:
+        return [
+            x.relative_to(self._python_path)
+            for x in await walk_dir_files(self._python_path)
+            if x.suffix == '.py'
+        ]

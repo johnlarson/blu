@@ -17,7 +17,7 @@ class ASGIApp(asgi.App):
     
     def __init__(self, app: str, static_dir: Path, project: Optional[Path]):
         self._router = router_from_root_package_name(app)
-        self._renderer = Renderer(root_dir=project)
+        self._renderer = Renderer(static_dir=static_dir)
         self._static_dir = static_dir
 
     async def __call__(
@@ -82,6 +82,7 @@ class ASGIApp(asgi.App):
             'headers': self._get_headers(response)
         })
         body_str = await self._renderer.render_to_str(response.body)
+        # await send({'type': 'http.response.body', 'body': b'Hello!'})
         await send({
             'type': 'http.response.body',
             'body': body_str.encode('utf-8'),
@@ -125,8 +126,11 @@ class ASGIApp(asgi.App):
         response: Response,
     ) -> Iterable[tuple[bytes, bytes]]:
         return [
-            (k.encode('utf-8'), v.encode('utf-8'))
-            for k, v in response.headers.items()
+            (b'Access-Control-Allow-Origin', b'https://micropython.org'),
+            *[
+                (k.encode('utf-8'), v.encode('utf-8'))
+                for k, v in response.headers.items()
+            ],
         ]
 
     async def _create_request(self, scope: asgi.HTTPConnectionScope) -> Request:

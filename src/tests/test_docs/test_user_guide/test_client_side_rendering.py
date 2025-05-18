@@ -1,3 +1,4 @@
+from asyncio import sleep
 from typing import cast
 from aiohttp import ClientSession as Client
 from playwright.async_api import Page, expect
@@ -56,6 +57,7 @@ async def test_client_element__server(page: Page):
     
     async with prod_server('tests.apps.client_element') as url:
         await page.goto(url)
+        await sleep(3600)
         page.once('dialog', handle_dialog)  # type: ignore
         await page.click('button')
         assert dialog_message == 'Hello!'

@@ -10,8 +10,8 @@ from blu._react.types import Jsonable, Node
 
 js_root = Path(__file__).parent.parent / 'js'
 
-with open(js_root / 'bootstrap-script.js', 'r') as bootstrap_script_f:
-    bootstrap_script_content = bootstrap_script_f.read()
+# with open(js_root / 'bootstrap-script.js', 'r') as bootstrap_script_f:
+#     bootstrap_script_content = bootstrap_script_f.read()
 
 py_bootstrap_path = Path(__file__).parent / 'bootstrap_script.py'
 
@@ -88,10 +88,10 @@ class Renderer:
         element.text = react_data_str
         return element
 
-    def _get_script_tag(self, root: Node) -> ET.Element:
-        element = ET.Element('script', {'type': 'module'})
-        element.text = bootstrap_script_content
-        return element
+    # def _get_script_tag(self, root: Node) -> ET.Element:
+    #     element = ET.Element('script', {'type': 'module'})
+    #     element.text = bootstrap_script_content
+    #     return element
 
     def _get_pyscript_include(self) -> ET.Element:
         return ET.Element(
@@ -108,6 +108,12 @@ class Renderer:
             'files': {
                 str(Path('/_blu_internal/python_path/') / file_path): './' + str(file_path)
                 for file_path in file_paths
+            },
+            'js_modules': {
+                'main': {
+                    'https://esm.sh/react-dom/client': '_blu_react_dom',
+                    'https://esm.sh/react': '_blu_react',
+                },
             },
             # 'packages': ['typing'],
             # 'packages': ['github:josverl/micropython-stubs/mip/typing.py'],

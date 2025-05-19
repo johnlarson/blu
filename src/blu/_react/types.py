@@ -581,7 +581,7 @@ class Key:
         return Key(self.key, actual_children)
 
 
-type ElementRenderer[**P = ...] = Callable[
+type ElementRenderer[**P] = Callable[
     P,
     Node | Generator[None, Node, Node] | AsyncGenerator[None | Node, Node]
 ]

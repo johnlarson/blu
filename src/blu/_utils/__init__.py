@@ -1,6 +1,6 @@
 from pathlib import Path
 from . import typing
-from blu._react.client_decorator import client
+from blu._utils.client import client
 
 from blu._utils.asyncio import io_bound
 

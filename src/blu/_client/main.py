@@ -121,8 +121,9 @@ def py_to_js_node(py_node: Node):
     elif isinstance(py_node, HTMLElement):
         return react.createElement(
             py_node.tagname,
+            to_js({}),
             # to_js(py_node.props),
-            # py_node.children,
+            *py_node.children,
         )
 
 

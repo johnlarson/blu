@@ -14,7 +14,7 @@ def __page__():
 
 @client
 def HelloButton():
-    return button(onClick=say_hello)
+    return button(onClick=say_hello)['Click me!']
 
 
 def say_hello():

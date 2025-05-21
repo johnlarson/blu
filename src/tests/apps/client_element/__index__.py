@@ -19,4 +19,5 @@ def HelloButton():
 
 def say_hello(e):  # type: ignore
     from js import alert  # type: ignore
+    print('Clicked!')
     alert('Hello!')

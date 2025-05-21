@@ -16,7 +16,7 @@ from typing import Any, Protocol, TypedDict, cast
 from xml.dom.minidom import Element
 
 from blu._react._render.react_data import ClientElementDict, ReactDict, ReactJsObject
-from js import console, document  # type: ignore
+from js import alert, console, document  # type: ignore
 import json
 from pyscript import js_import  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
@@ -30,6 +30,7 @@ from pyscript.js_modules import _blu_react_dom as react_dom
 from pyscript.js_modules import _blu_react as react
 
 async def main():
+    alert('HELLO.')
     json_str = document.querySelector('script[type="react-data"]').textContent  # type: ignore
     root_node_json = json.loads(json_str)  # type: ignore
     root_node = get_node(root_node_json)

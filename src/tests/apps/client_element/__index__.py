@@ -17,6 +17,6 @@ def HelloButton():
     return button(onClick=say_hello)['Click me!']
 
 
-def say_hello():
+def say_hello(e):  # type: ignore
     from js import alert  # type: ignore
     alert('Hello!')

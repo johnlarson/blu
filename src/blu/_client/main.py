@@ -21,7 +21,7 @@ import json
 from pyscript import js_import  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
 
-from blu._react.types import ElementRenderer, ClientElement, Jsonable, Node
+from blu._react.types import ElementRenderer, ClientElement, HTMLElement, Jsonable, Node
 
 # react_dom = await js_import('https://esm.sh/react-dom/client')
 # react = await js_import('https://esm.sh/react')
@@ -99,10 +99,14 @@ def PythonElement(props: PythonElementProps, extra: Any = None):
     elif isinstance(result, AsyncGenerator):
         raise TypeError('ClientElements cannot be created from async rendering functions.')
     else:
-        return py_to_js_node(result)
+        ret = py_to_js_node(result)
+        console.log('RET:', ret)
+        return ret
+        # return py_to_js_node(result)
 
 
 def py_to_js_node(py_node: Node):
+    print('PY NODE:', py_node)
     if isinstance(py_node, ClientElement):
         console.log('RENDERER?', py_node, py_node.renderer)
         return react.createElement(
@@ -113,6 +117,12 @@ def py_to_js_node(py_node: Node):
                 'kwargs': py_node.kwargs,
                 'py_children': py_node.children,
             }),
+        )
+    elif isinstance(py_node, HTMLElement):
+        return react.createElement(
+            py_node.tagname,
+            # to_js(py_node.props),
+            # py_node.children,
         )
 
 

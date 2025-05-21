@@ -19,7 +19,7 @@ from blu._react._render.react_data import ClientElementDict, ReactDict, ReactJsO
 from js import console, document  # type: ignore
 import json
 from pyscript import js_import  # type: ignore
-from pyscript.ffi import create_proxy  # type: ignore
+from pyscript.ffi import create_proxy, to_js  # type: ignore
 
 from blu._react.types import ElementRenderer, ClientElement, Jsonable, Node
 
@@ -86,10 +86,10 @@ class PythonElementProps(TypedDict):
 
 @create_proxy
 def PythonElement(props: PythonElementProps, extra: Any = None):
-    result = props['renderer'](*props['args'], children=props['py_children'], **props['kwargs'])
+    result = props.renderer(*props.args, **props.kwargs.as_object_map())
     if isinstance(result, Generator):
         next(result)
-        result.send(props['py_children'])
+        result.send(props.py_children)
         try:
             next(result)
         except StopIteration as e:
@@ -104,12 +104,12 @@ def py_to_js_node(py_node: Node):
     if isinstance(py_node, ClientElement):
         return react.createElement(
             PythonElement,
-            {
-                # 'renderer': create_proxy(py_node.renderer),
-                # 'args': py_node.args,
-                # 'kwargs': py_node.kwargs,
-                # 'py_children': py_node.children,
-            },
+            to_js({
+                'renderer': create_proxy(py_node.renderer),
+                'args': py_node.args,
+                'kwargs': py_node.kwargs,
+                'py_children': py_node.children,
+            }),
         )
 
 

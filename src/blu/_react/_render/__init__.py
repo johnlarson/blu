@@ -115,6 +115,7 @@ class Renderer:
                     'https://esm.sh/react': '_blu_react',
                 },
             },
+            'experimental_create_proxy': 'auto',
             # 'packages': ['typing'],
             # 'packages': ['github:josverl/micropython-stubs/mip/typing.py'],
 

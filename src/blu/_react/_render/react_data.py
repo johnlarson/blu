@@ -106,6 +106,7 @@ def get_react_data(node: Node | PropValue) -> ReactNodeJson:
             'type': 'client_element',
             'module': node.renderer.__module__,
             'name': node.renderer.__name__,
+            'args': [get_react_data(x) for x in node.args],
             'kwargs': {k: get_react_data(v) for k, v in node.kwargs.items()},
             'children': [get_react_data(x) for x in node.children]
         })

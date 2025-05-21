@@ -1,7 +1,7 @@
 import platform
 
 
-client = platform.system() == 'Emscripten'
+client: bool = platform.system() == 'Emscripten'
 
 
 class WrongEnvironmentError(Exception):

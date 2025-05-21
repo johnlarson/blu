@@ -16,9 +16,10 @@ from typing import Any, Protocol, TypedDict, cast
 from xml.dom.minidom import Element
 
 from blu._react._render.react_data import ClientElementDict, ReactDict, ReactJsObject
-from js import document  # type: ignore
+from js import console, document  # type: ignore
 import json
 from pyscript import js_import  # type: ignore
+from pyscript.ffi import create_proxy  # type: ignore
 
 from blu._react.types import ElementRenderer, ClientElement, Jsonable, Node
 
@@ -32,9 +33,8 @@ async def main():
     json_str = document.querySelector('script[type="react-data"]').textContent  # type: ignore
     root_node_json = json.loads(json_str)  # type: ignore
     root_node = get_node(root_node_json)
-    # import_promises = get_import_promises(root_node_json)
-    # imports = await asyncio.gather(import_promises)
-    # root_node = get_node(root_node_json, imports)
+    console.log('ROOT NODE:', root_node)
+
     if root_node_json['tagname'] == 'html':
         react_dom.createRoot(document).render(root_node)
     else:
@@ -42,6 +42,7 @@ async def main():
 
 
 def get_node(data: Any):
+    print('DATA:', data)
     if isinstance(data, list):
         return get_array(data)
     elif isinstance(data, dict):
@@ -49,7 +50,7 @@ def get_node(data: Any):
         if 'type' not in data:
             raise TypeError('Data dict should have key "type"')
         elif data['type'] == 'object':
-            return get_obj(data)
+            return get_obj(data['data'])
         elif data['type'] == 'client_element':
             py_element = parse_py_element(data)
             return py_to_js_node(py_element)
@@ -59,7 +60,7 @@ def get_node(data: Any):
         elif data['type'] == 'native_element':
             return react.createElement(
                 data['tagname'],
-                get_obj(data['props']),
+                data['props'],
                 *get_array(data['children']),
             )
         else:
@@ -69,12 +70,11 @@ def get_node(data: Any):
 
 
 def get_obj(obj: ReactJsObject):
-    print('OBJ:', obj)
-    return {k: get_node(v) for k, v in obj['data'].items()}
+    return {k: get_node(v) for k, v in obj.items()}
 
 
 def get_array(array: Any):
-    [get_node(x) for x in array]
+    return [get_node(x) for x in array]
 
 
 class PythonElementProps(TypedDict):
@@ -84,7 +84,8 @@ class PythonElementProps(TypedDict):
     py_children: list[Node]
 
 
-def PythonElement(props: PythonElementProps):
+@create_proxy
+def PythonElement(props: PythonElementProps, extra: Any = None):
     result = props['renderer'](*props['args'], children=props['py_children'], **props['kwargs'])
     if isinstance(result, Generator):
         next(result)
@@ -104,15 +105,16 @@ def py_to_js_node(py_node: Node):
         return react.createElement(
             PythonElement,
             {
-                'renderer': py_node.renderer,
-                'args': py_node.args,
-                'kwargs': py_node.kwargs,
-                'py_children': py_node.children,
+                # 'renderer': create_proxy(py_node.renderer),
+                # 'args': py_node.args,
+                # 'kwargs': py_node.kwargs,
+                # 'py_children': py_node.children,
             },
         )
 
 
 def parse_py_element(data: ClientElementDict):
+    print('CLIENT ELEMENT:', data)
     return ClientElement(
         get_renderer(data),
         get_array(data['args']),

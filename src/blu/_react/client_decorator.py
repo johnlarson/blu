@@ -1,5 +1,9 @@
 import platform
 from blu._react.types import ClientElement, ElementRenderer
+from blu._utils.client import client as is_client
+
+if is_client:
+    from pyscript.ffi import create_proxy  # type: ignore
 
 
 class ClientDecorator:
@@ -27,10 +31,13 @@ class ClientDecorator:
         self,
         renderer: ElementRenderer[P],
     ) -> ClientElement:
-        return ClientElement(renderer, (), {}, [])
+        element = ClientElement(renderer, (), {}, [])
+        if is_client:
+            create_proxy(element)  # type: ignore
+        return element
     
     def __bool__(self) -> bool:
-        return platform.system() == 'Emscripten'
+        return is_client
 
 
 client = ClientDecorator()

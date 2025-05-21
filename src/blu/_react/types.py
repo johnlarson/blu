@@ -3,6 +3,7 @@ from numbers import Number
 from pathlib import Path
 from types import EllipsisType
 from blu._utils.typing import Any, Mapping, Protocol, Sequence, cast
+from blu._utils.client import client as is_client
 
 from blu._exceptions import WrongEnvironmentError
 
@@ -239,7 +240,7 @@ class HTMLElement:
             **self._rename_props(attributes),
         }
         for prop_name in all_props:
-            if prop_name.startswith('on'):
+            if not is_client and prop_name.startswith('on'):
                 raise WrongEnvironmentError(
                     f'Could not add attribute "{prop_name}" to {self.tagname} '
                     f'element. Event-handling attributes like "{prop_name}" '

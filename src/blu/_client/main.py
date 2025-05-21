@@ -86,7 +86,9 @@ class PythonElementProps(TypedDict):
 
 @create_proxy
 def PythonElement(props: PythonElementProps, extra: Any = None):
+    print('A')
     result = props.renderer(*props.args, **props.kwargs.as_object_map())
+    print('B')
     if isinstance(result, Generator):
         next(result)
         result.send(props.py_children)
@@ -102,6 +104,7 @@ def PythonElement(props: PythonElementProps, extra: Any = None):
 
 def py_to_js_node(py_node: Node):
     if isinstance(py_node, ClientElement):
+        console.log('RENDERER?', py_node, py_node.renderer)
         return react.createElement(
             PythonElement,
             to_js({

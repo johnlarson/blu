@@ -30,7 +30,6 @@ from pyscript.js_modules import _blu_react_dom as react_dom
 from pyscript.js_modules import _blu_react as react
 
 async def main():
-    alert('HELLO.')
     json_str = document.querySelector('script[type="react-data"]').textContent  # type: ignore
     root_node_json = json.loads(json_str)  # type: ignore
     root_node = get_node(root_node_json)

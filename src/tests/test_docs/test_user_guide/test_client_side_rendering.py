@@ -27,16 +27,20 @@ async def test_client_element(page: Page):
     """
     dialog_message: str | None = None
 
-    def handle_dialog(dialog):  # type: ignore
+    async def handle_dialog(dialog):  # type: ignore
         nonlocal dialog_message
         dialog_message = cast(str, dialog.message)  # type: ignore
-        dialog.dismiss()  # type: ignore
+        await dialog.accept()  # type: ignore
     
     async with prod_cli('tests.apps.client_element') as url:
         await page.goto(url)
-        await sleep(3600)
-        page.once('dialog', handle_dialog)  # type: ignore
+        # async with page.expect_console_message() as msg_info:
+        page.on('dialog', handle_dialog)  # type: ignore
         await page.click('button')
+        # value = await msg_info.value
+        # message = str(value.args[0])
+        # assert any(x == 'Clicked!' for x in )
+        # assert message == 'Clicked!'
         assert dialog_message == 'Hello!'
 
 

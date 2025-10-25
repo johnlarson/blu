@@ -34,6 +34,8 @@ To solve this, you create a *client element*. A client element is an custom elem
     from blu import client
     from blu.html import html, head, body, button
 
+    __client__ = True
+
 
     def __page__():
         return html[
@@ -74,6 +76,16 @@ So your page renders as:
 with an event listener attached to the button that prints "Hello!" to the web browser's developer console when the button is clicked.
 
 .. note::
+
+    Why does the code in the previous example include the line ``__client__ = True``?
+    
+    By default, none of the `.py` files in your app will be sent to the user's web browser and therefore cannot be run client-side. To allow a module to run client-side, you must explicitly mark it by setting the module-level attribute ``__client__`` to ``True``.
+
+    In order for the client element to be rendered client-side, the code to do so must be available to the user's web browser, so the module where the client element is found, as well as any of its dependencies, must include ``__client__ = True``.
+
+    If you're familiar with full stack React frameworks for JavaScript, note that this is *not* the same as the ``"use client"`` directive in JavaScript React applications.
+
+.. note::
     
     Client elements cannot be created from asynchronous functions.
 
@@ -108,6 +120,8 @@ with an event listener attached to the button that prints "Hello!" to the web br
         import arrr
         from blu import client
 
+        __client__ = True
+
 
         def __page__():
             return MyClientElement
@@ -139,6 +153,8 @@ with an event listener attached to the button that prints "Hello!" to the web br
         
         from pyscript import window
 
+        __client__ = True
+
 
         def __page__():
             return GoToPyPIButton
@@ -161,6 +177,8 @@ with an event listener attached to the button that prints "Hello!" to the web br
         
         if client:
             from pyscript import window
+
+        __client__ = True
 
 
         def __page__():
@@ -187,6 +205,8 @@ Client elements can take arguments:
     from blu import client
     from blu.html import span
 
+    __client__ = True
+
 
     def __page__():
         ColoredText('red', text='This should be red.')
@@ -200,12 +220,15 @@ Client elements can take arguments:
 
 .. note::
     
-    Calling a client element as a function does it mutate the original client element; instead, it returns a copy of the original client element with the new render arguments.
+    Calling a client element as a function does not mutate the original client element; instead, it returns a copy of the original client element with the new render arguments.
 
     .. code-block:: python
 
         from blu import client
         from blu.html import p
+
+        __client__ = True
+
 
         @client
         Greeting(name):
@@ -225,6 +248,8 @@ Client elements can take arguments:
 
         from blu import client
         from blu.html import p
+
+        __client__ = True
 
 
         @client
@@ -249,6 +274,8 @@ You can also pass child nodes to client elements using square bracket notation a
     from blu import client
     from blu.html import span
 
+    __client__ = True
+
 
     def __page__():
         ColoredText('red')[
@@ -271,6 +298,9 @@ You can also pass child nodes to client elements using square bracket notation a
         from blu import client
         from blu.html import div
 
+        __client__ = True
+
+
         @client
         ClientDiv():
             return div[(yield)]
@@ -289,6 +319,8 @@ You can also pass child nodes to client elements using square bracket notation a
 
         from blu import client
         from blu.html import p
+
+        __client__ = True
 
 
         @client
@@ -396,6 +428,8 @@ Use :func:`blu.use_state` to specify UI state and change that state in response 
 
     from blu import use_state
 
+    __client__ = True
+
 
     @client
     def MyClientElement():
@@ -437,6 +471,8 @@ Most of the time, you will be able to get the interactive behavior you want by c
 
     from blu import client, use_ref
     from blu.html import div, button, input
+
+    __client__ = True
 
 
     @client
@@ -487,6 +523,8 @@ Sometimes, you'll want to perform some action immediately after rendering, witho
     if client:
         from js import alert
 
+    __client__ = True
+
 
     @client
     def MyClientElement():
@@ -529,6 +567,8 @@ What's happening here:
             # Blu client-side code. See https://docs.pyscript.net
             # for details on this module.
             from pyscript import window
+        
+        __client__ = True
         
 
         @client

@@ -7,6 +7,7 @@ API Reference
 
    blu
    blu.html
+   js
+   pyscript
    file-conventions
    cli
-   external-packages

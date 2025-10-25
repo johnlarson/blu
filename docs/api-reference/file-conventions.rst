@@ -333,6 +333,54 @@ Blu passes these arguments in by position, so unlike route- and query-parameter-
         return p['Remaining path: ', remaining_path]
 
 
+All Python Modules
+------------------
+
+The following module-level attribute has special meaning in any Python module under the ``app`` module:
+
+.. py:data:: __client__
+    :type: bool
+
+
+.. code-block:: python
+
+    from blu import client
+
+    __client__ = True
+
+
+    @client
+    def Hello():
+        return 'Hello, World!'
+
+
+Set a module's ``__client__`` attribute to ``True`` in order to make the module available client-side.
+
+If a module does not have a ``__client__`` attribute set to ``True``, it will not be available to run client-side. For example, trying to use the :func:`ClientElement <blu.ClientElement>` ``Hello`` shown in the following example will fail, because the user's browser will attempt to render ``Hello``, but will raise an :class:`ImportError` when trying to import ``Hello`` because the module it is in doesn't exist in the client environment:
+
+.. code-block:: python
+
+    from blu import client
+
+
+    @client
+    def Hello():
+        return 'Hello, World!'
+
+To fix this, use the ``__client__`` module attribute:
+
+.. code-block:: python
+
+    from blu import client
+
+    __client__ = True
+
+
+    @client
+    def Hello():
+        return 'Hello, World!'
+
+
 Static Files
 ------------
 

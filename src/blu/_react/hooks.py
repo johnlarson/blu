@@ -1,10 +1,9 @@
 from collections.abc import AsyncGenerator, Callable, Generator
 
 
-type Effect = Callable[[], Generator[None] | AsyncGenerator[None]]
-
-
-def use_effect(callback: Effect):
+def use_effect(
+    callback: Callable[[], Generator[None] | AsyncGenerator[None]],
+):
     ...
 
 

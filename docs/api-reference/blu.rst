@@ -14,11 +14,10 @@
     - use_state
     - use_ref
     - use_effect
-    - Effect
     - Ref 
 
 .. automodule:: blu
-    :exclude-members: HTMLElement, ClientDecorator, ClientElement, Element
+    :exclude-members: HTMLElement, ClientElement
 
     .. autoclass:: HTMLElement()
         :special-members: __call__, __getitem__

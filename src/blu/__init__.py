@@ -4,9 +4,9 @@ from blu._utils.client import is_client
 from blu._utils.typing import Protocol, Any
 from blu import html
 from blu._exceptions import WrongEnvironmentError
-from blu._react.types import HTMLElement, Key, ClientElement, Element, Node
+from blu._react.types import HTMLElement, Key, ClientElement, Node
 from blu._react.client_decorator import client
-from blu._react.hooks import Effect, Ref, use_effect, use_ref, use_state
+from blu._react.hooks import Ref, use_effect, use_ref, use_state
 
 
 class ServerOnlyClientInterface:
@@ -32,7 +32,6 @@ else:
 
 __all__ = [
     'ClientElement',
-    'Effect',
     'HTMLElement',
     'Key',
     'Node',

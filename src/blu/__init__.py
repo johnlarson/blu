@@ -5,7 +5,7 @@ from blu._utils.typing import Protocol, Any
 from blu import html
 from blu._exceptions import WrongEnvironmentError
 from blu._react.types import HTMLElement, Key, ClientElement, Element, Node
-from blu._react.client_decorator import ClientDecorator, client
+from blu._react.client_decorator import client
 from blu._react.hooks import Effect, Ref, use_effect, use_ref, use_state
 
 
@@ -31,7 +31,6 @@ else:
 
 
 __all__ = [
-    'ClientDecorator',
     'ClientElement',
     'Effect',
     'Element',

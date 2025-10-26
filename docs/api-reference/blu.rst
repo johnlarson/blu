@@ -15,18 +15,14 @@
     - use_ref
     - use_effect
     - Settings
-    - ClientDecorator
     - Effect
-    - Ref
+    - Ref 
 
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientDecorator, ClientElement, Element
 
     .. autoclass:: HTMLElement()
         :special-members: __call__, __getitem__
-
-    .. autoclass:: ClientDecorator
-        :special-members: __call__, __bool__
 
     .. autoclass:: ClientElement
         :special-members: __call__, __getitem__

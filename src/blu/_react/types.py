@@ -110,7 +110,7 @@ class HTMLElement:
         ]
     """
 
-    tagname: str
+    _tagname: str
     """
     The tag name of the element.
 
@@ -121,7 +121,7 @@ class HTMLElement:
         span.tagname == 'span'
     """
 
-    props: Props
+    _attrs: Props
     """
     The element's props, minus children.
 
@@ -132,7 +132,7 @@ class HTMLElement:
         div(id='my-id')['Hello!'].props == {'id': 'my-id'}
     """
 
-    children: list[Node]
+    _children: list[Node]
     """
     The element's children.
 
@@ -144,9 +144,9 @@ class HTMLElement:
     """
 
     def __init__(self, tagname: str, props: Props, children: Children):
-        self.tagname = tagname
-        self.props = props
-        self.children = children
+        self._tagname = tagname
+        self._attrs = props
+        self._children = children
 
     def __call__(
         self, /, attributes: Props = {}, **kwargs: PropValue
@@ -248,9 +248,9 @@ class HTMLElement:
                     'run server-side.'
                 )
         return HTMLElement(
-            self.tagname,
+            self._tagname,
             props=all_props,
-            children=self.children,
+            children=self._children,
         )
 
     def __getitem__(
@@ -313,8 +313,8 @@ class HTMLElement:
         # children passed into the index operator.
         # """
         return HTMLElement(
-            self.tagname,
-            props=self.props,
+            self._tagname,
+            props=self._attrs,
             children=_index_to_children(index),
         )
     
@@ -590,10 +590,6 @@ type ElementRenderer[**P] = Callable[
 
 class Element[**P](Protocol):
 
-    args: tuple[Any, ...]
-    kwargs: tuple[Any, ...]
-    children: list['Node']
-    
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> 'Element[P]':
         ...
     
@@ -636,10 +632,10 @@ class ClientElement:
         </b>
     """
     
-    args: tuple[Any, ...]
-    kwargs: dict[str, Any]
-    children: list['Node']
-    renderer: ElementRenderer
+    _args: tuple[Any, ...]
+    _kwargs: dict[str, Any]
+    _children: list['Node']
+    _renderer: ElementRenderer
 
     def __init__(
         self,
@@ -648,23 +644,23 @@ class ClientElement:
         kwargs: dict[str, Any],
         children: Sequence[Node],
     ):
-        self.renderer = renderer
-        self.args = args
-        self.kwargs = kwargs
-        self.children = list(children)
+        self._renderer = renderer
+        self._args = args
+        self._kwargs = kwargs
+        self._children = list(children)
 
     def __call__(self, *args: tuple[Any, ...], **kwargs: dict[str, Any]) -> 'ClientElement':
         return ClientElement(
-            self.renderer,
+            self._renderer,
             args,
             kwargs,
-            self.children,
+            self._children,
         )
 
     def __getitem__(self, *children: 'Node') -> 'ClientElement':
         return ClientElement(
-            self.renderer,
-            self.args,
-            self.kwargs,
+            self._renderer,
+            self._args,
+            self._kwargs,
             _index_to_children(children),
         )

@@ -520,7 +520,7 @@ Sometimes, you'll want to perform some action immediately after rendering, witho
     from blu import running_on_client, use_effect
     from blu.html import p
 
-    if running_on_client:
+    if is_client:
         from js import alert
 
     __client__ = True

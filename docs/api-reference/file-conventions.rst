@@ -214,7 +214,30 @@ You can configure your Blu app by creating a __settings__.py file and assigning 
 
 A __settings__.py file is not required, and an app without a __settings__.py file will be treated the same as an app whose __settings__.py is empty.
 
-A __settings__.py file can have any of settings defined in the :class:`blu.Settings` protocol.
+A __settings__.py file can have any of the following settings:
+
+.. data:: CLIENT_REQUIREMENTS
+    :type: list[str]
+    :value: []
+    
+    .. code-block:: python
+
+        CLIENT_REQUIREMENTS = ['arrr', 'aiohttp']
+
+    The Python libraries that Blu should install in the client environment. For example, if you have code running client-side that uses `aiohttp <https://pypi.org/project/aiohttp/>`_, you must add aiohttp to the client-side requirements:
+
+    .. code-block:: python
+
+        CLIENT_REQUIREMENTS = ['aiohttp']
+
+    
+    .. note::
+        
+        Blu uses a tool called PyScript to run Python client-side. PyScript gives the option of a more feature-complete but less-efficient Python interpreter called Pyodide, or a faster interpreter called MicroPython.
+
+        Blu is configured to use MicroPython, so many PyPI packages are not compatible with Blu's client-side environment.
+
+        For more information, see https://docs.pyscript.net/2024.11.1/user-guide/architecture/#interpreters.
 
 
 .. _file-conventions/files/what-does-triple-start-url-mean:

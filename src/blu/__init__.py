@@ -33,13 +33,11 @@ else:
 __all__ = [
     'ClientElement',
     'Effect',
-    'Element',
     'HTMLElement',
     'Key',
     'Node',
     'Ref',
     'Response',
-    'Settings',
     'WrongEnvironmentError',
     'app',
     'client',
@@ -54,4 +52,5 @@ class Settings(Protocol):
     """
     Interface for the app.__settings__ module (app/__settings__.py).
     """
-    ...
+    
+    CLIENT_REQUIREMENTS: list[str]

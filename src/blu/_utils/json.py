@@ -3,7 +3,7 @@ import json
 
 from blu._utils.asyncio import io_bound
 
-from blu._react.client_decorator import client
+from blu._utils.client import is_client
 
 
 type JsonData = (
@@ -17,7 +17,7 @@ type JsonData = (
 )
 
 
-if client:
+if is_client:
 
     from js import JSON  # type: ignore
 

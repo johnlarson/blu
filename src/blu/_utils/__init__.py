@@ -1,13 +1,13 @@
 from pathlib import Path
 from . import typing
-from blu._utils.client import client
+from blu._utils.client import is_client
 
 from blu._utils.asyncio import io_bound
 
 if typing.TYPE_CHECKING:
     from blu._app import Blu
 
-if not client:
+if not is_client:
     import shutil
     import socket
 

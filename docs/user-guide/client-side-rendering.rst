@@ -172,10 +172,10 @@ with an event listener attached to the button that prints "Hello!" to the web br
         :caption: Right.
         :emphasize-lines: 4-5
 
-        from blu import client
+        from blu import running_on_client
         from blu.html import button
         
-        if client:
+        if is_client:
             from pyscript import window
 
         __client__ = True
@@ -517,10 +517,10 @@ Sometimes, you'll want to perform some action immediately after rendering, witho
 
 .. code-block:: python
 
-    from blu import client, use_effect
+    from blu import running_on_client, use_effect
     from blu.html import p
 
-    if client:
+    if running_on_client:
         from js import alert
 
     __client__ = True
@@ -559,10 +559,10 @@ What's happening here:
 
     .. code-block:: python
 
-        from blu import client, use_effect
+        from blu import running_on_client, use_effect
         from blu.html import p
 
-        if client:
+        if running_on_client:
             # The pyscript module is automatically made available in
             # Blu client-side code. See https://docs.pyscript.net
             # for details on this module.

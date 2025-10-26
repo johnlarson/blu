@@ -2,9 +2,9 @@ import asyncio
 from collections.abc import Awaitable, Callable, Coroutine
 import functools
 from blu._utils.typing import Any, cast
-from blu._utils.client import client, WrongEnvironmentError
+from blu._utils.client import is_client, WrongEnvironmentError
 
-if not client:
+if not is_client:
     from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 else:
     from blu._utils.typing import type_place_holder
@@ -38,7 +38,7 @@ def _asyncify[**P, R](
     fn: Callable[P, R], executor: type[Executor]  # type: ignore
 ) -> Callable[P, Awaitable[R]]:
     async def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:
-        if client:
+        if is_client:
             raise WrongEnvironmentError(
                 f'{fn} can only be called in a server environment.'
             )

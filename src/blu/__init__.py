@@ -1,5 +1,6 @@
 """A full stack React framework for Python."""
 
+from blu._utils.client import is_client
 from blu._utils.typing import Protocol, Any
 from blu import html
 from blu._exceptions import WrongEnvironmentError
@@ -21,7 +22,7 @@ class ServerOnlyClientInterface:
         raise WrongEnvironmentError(f'Cannot use {self.name} in client environment.')
 
 
-if client:
+if is_client:
     Response = ServerOnlyClientInterface('Response')
     app = ServerOnlyClientInterface('app')
 else:

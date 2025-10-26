@@ -7,14 +7,14 @@ The ``pyscript`` package provides Python utilities for working within a browser 
 
 .. code-block:: python
 
-    from blu import client
+    from blu import is_client
 
     
     def handle_click(e):
         print('Clicked!')
     
 
-    if client:
+    if is_client:
         from pyscript import window
 
         window.addEventListener('click', handle_click)
@@ -25,13 +25,13 @@ The ``pyscript`` package provides Python utilities for working within a browser 
 
     .. code-block:: python
 
-        from blu import client
+        from blu import is_client
 
         # Wrong!
         from pyscript import window
 
         # Right.
-        if client:
+        if is_client:
             from pyscript import window
 
 

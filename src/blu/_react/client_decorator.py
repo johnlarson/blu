@@ -1,6 +1,6 @@
 import platform
 from blu._react.types import ClientElement, ElementRenderer
-from blu._utils.client import client as is_client
+from blu._utils.client import is_client
 
 if is_client:
     from pyscript.ffi import create_proxy  # type: ignore

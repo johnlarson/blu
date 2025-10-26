@@ -7,7 +7,10 @@ This module allows access to the JavaScript environment's global namespace:
 
 .. code-block:: python
 
-    if client:
+    from blu import is_client
+
+
+    if is_client:
         from js import Promise, addEventListener, alert, document
 
 
@@ -17,13 +20,13 @@ This module allows access to the JavaScript environment's global namespace:
 
     .. code-block:: python
 
-        from blu import client
+        from blu import is_client
 
         # Wrong!
         from js import document
 
         # Right.
-        if client:
+        if is_client:
             from js import document
 
 

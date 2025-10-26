@@ -14,7 +14,6 @@
     - use_state
     - use_ref
     - use_effect
-    - Settings
     - Effect
     - Ref 
 
@@ -24,11 +23,9 @@
     .. autoclass:: HTMLElement()
         :special-members: __call__, __getitem__
 
-    .. autoclass:: ClientElement
+    .. autoclass:: ClientElement()
         :special-members: __call__, __getitem__
-    
-    .. autoclass:: Element
-        :special-members: __call__, __getitem__
+
 
 .. py:type:: Node
     :canonical: HTMLElement | str

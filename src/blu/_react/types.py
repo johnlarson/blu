@@ -607,6 +607,8 @@ class ClientElement:
         from blu import client
         from blu.html import b, span
 
+        __client__ = True
+
         
         @client
         def ColorfulText(color, bold):
@@ -630,6 +632,8 @@ class ClientElement:
                 Danger! The world said hello back.
             </span>
         </b>
+
+    .. include:: /_includes/client-side-rendering-notes.rst
     """
     
     _args: tuple[Any, ...]
@@ -650,6 +654,38 @@ class ClientElement:
         self._children = list(children)
 
     def __call__(self, *args: tuple[Any, ...], **kwargs: dict[str, Any]) -> 'ClientElement':
+        """
+        Create a copy of self with the given call args.
+
+        .. code-block:: python
+
+            from blu import client
+            from blu.html import div
+
+            __client__ = True
+
+
+            @client
+            def Greeting(name = 'World'):
+                return div[f'Hello, {name}!']
+
+            
+            div[
+                Greeting('Arnold'),
+                Greeting(name='Hailey'),
+                Greeting,
+            ]
+
+        .. code-block:: html
+
+            <div>
+                <div>Hello, Arnold!</div>
+                <div>Hello, Hailey!</div>
+                <div>Hello, World!</div>
+            </div>
+        
+        .. include:: /_includes/client-element-call-notes.rst
+        """
         return ClientElement(
             self._renderer,
             args,

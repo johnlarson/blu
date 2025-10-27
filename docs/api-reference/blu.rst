@@ -23,10 +23,10 @@
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement
 
-    .. autoclass:: HTMLElement()
+    .. autoclass:: ClientElement()
         :special-members: __call__, __getitem__
 
-    .. autoclass:: ClientElement()
+    .. autoclass:: HTMLElement()
         :special-members: __call__, __getitem__
 
 

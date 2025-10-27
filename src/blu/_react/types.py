@@ -653,7 +653,7 @@ class ClientElement:
         self._kwargs = kwargs
         self._children = list(children)
 
-    def __call__(self, *args: tuple[Any, ...], **kwargs: dict[str, Any]) -> 'ClientElement':
+    def __call__(self, *args: Any, **kwargs: Any) -> 'ClientElement':
         """
         Create a copy of self with the given call args.
 
@@ -684,6 +684,14 @@ class ClientElement:
                 <div>Hello, World!</div>
             </div>
         
+        :param *args: The positional arguments to pass into the
+            element's render function when it is rendered.
+        :param **kwargs: The keyword arguments to pass into the
+            element's render function when it is rendered.
+
+        :return: A copy of ``self`` with call arguments set to ``*args``
+            and ``**kwargs``.
+        
         .. include:: /_includes/client-element-call-notes.rst
         """
         return ClientElement(
@@ -694,6 +702,8 @@ class ClientElement:
         )
 
     def __getitem__(self, *children: 'Node') -> 'ClientElement':
+        """
+        """
         return ClientElement(
             self._renderer,
             self._args,

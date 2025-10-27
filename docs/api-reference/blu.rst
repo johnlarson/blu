@@ -17,7 +17,7 @@
     - create_rare_html_element
     - html
     - use_effect
-    - use_state
+    - use_state 
     - use_ref
 
 .. automodule:: blu

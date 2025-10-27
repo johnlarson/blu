@@ -24,6 +24,10 @@ def import_client(path: str | _Path, name: str = 'default') -> CustomElement:
     return CustomElement(path, name, props={}, children=[])
 
 
+def create_html_element(tagname: str) -> HTMLElement:
+    ...
+
+
 
 __all__ = [
     'Node',
@@ -31,6 +35,7 @@ __all__ = [
     'CustomElement',
     'HTMLElement',
     # 'ReactResponse',
+    'create_html_element',
     'is_node',
     'html',
     'import_client',

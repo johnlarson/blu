@@ -5,16 +5,20 @@
 
     Document the following:
 
-    - HTMLElement
-    - app
-    - Node
-    - Response
-    - client
     - ClientElement
+    - HTMLElement
+    - Key
+    - Node
+    - Ref
+    - Response
+    - WrongEnvironmentError
+    - app
+    - client
+    - create_rare_html_element
+    - html
+    - use_effect
     - use_state
     - use_ref
-    - use_effect
-    - Ref 
 
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement

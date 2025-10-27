@@ -56,24 +56,32 @@ You can import any HTML tag from :mod:`blu.html`:
         </body>
     </html>
 
-If the HTML tag name you want to import is not a valid Python identifier or is a reserved word in Python, you can use the builtin :py:func:`getattr` function:
+
+If the HTML tag name you want to import is a reserved word in Python, add a trailing underscore to the import name:
 
 .. code-block:: python
 
-    import blu.html
+    from blu.html import del_
 
-    del_ = getattr(blu.html, 'del')
-    tag_name_with_dashes = getattr(blu.html, 'tag-name-with-dashes')
-
-    tag_name_with_dashes[
-        del_['Hello, World!'],
-    ]
+    del_['Hello, World!']
 
 .. code-block:: html
 
-    <tag-name-with-dashes>
-        <del>Hello, World!</del>
-    </tag-name-with-dashes>
+    <del>Hello, World!</del>
+
+All non-trailing underscores will be converted to dashes:
+
+.. code-block:: python
+
+    from blu.html import tag_name_with_dashes
+
+    tag_name_with_dashes['Hello!']
+
+.. code-block:: html
+
+    <tag-name-with-dashes>Hello!</tag-name-with-dashes>
+
+In the rare case your desired tagname cannot be imported from the :mod:`blu.html` module, use :func:`blu.create_rare_html_element`. 
 
 
 HTML Attributes
@@ -145,24 +153,55 @@ You can set the HTML attributes of an element by calling it as a function:
         div(onClick=log_clicked)
 
 
-For attribute names that are not valid Python identifiers or are reserved words in python, pass in a :py:class:`Mapping <collections.abc.Mapping>` as the first positional argument:
+To include an attribute name that is a reserved word in Python, add a trailing underscore:
+
 
 .. code-block:: python
 
-    from blu.html import form, input, label
+    from html import form, input, label
 
     form[
-        label({'for': 'value-input'})['Value:'],
-        input({'data-value': '23'}, id='value-input'),
+        label(for_='email-address-input')['Name:'],
+        input(id='email-address-input'),
     ]
 
 
 .. code-block:: html
 
     <form>
-        <label for="value-input">Value:</label>
-        <input data-value="23" id="value-input"></input>
+        <label for="email-address-input">Value:</label>
+        <input id="email-address-input"></input>
     </form>
+
+
+All non-trailing underscores will be converted to dashes:
+
+
+.. code-block:: python
+
+    from html import input
+
+    input(data_value=23)
+
+
+.. code-block:: html
+
+    <input data-value="23"></input>
+
+
+You can also directly set an attribute name by passing a :py:class:`Mapping <collections.abc.Mapping>` as the first positional argument:
+
+
+.. code-block:: python
+
+    from html import div
+
+    div({'attr_1_': 'value 1'}, attr_2_='value 2')
+
+
+.. code-block:: html
+
+    <div attr_1_="value 1" attr-2="value 2"></div>
 
 
 

@@ -42,6 +42,37 @@ def __getattr__(import_name: str) -> _HTMLElement:
             <p>Hi.</p>
         </div>
 
+
+    Use a trailing underscore to import tag names that are reserved
+    words in Python (the trailing underscore won't show up in the
+    resulting html):
+
+    .. code-block:: python
+
+        from blu.html import del_
+
+        del_['Hello, World!']
+
+    .. code-block:: html
+
+        <del>Hello, World!</del>
+
+    Non-trailing underscores will be converted to dashes:
+
+    .. code-block:: python
+
+        from blu.html import my_custom_element
+
+        my_custom_element['Hello!']
+
+    .. code-block:: html
+
+        <my-custom-element>Hello!</my-custom-element>
+
+    For the rare case where your desired HTML tag name cannot be
+    imported from :mod:`blu.html`, use
+    :func:`blu.create_rare_html_element`.
+
     :param import_name: An HTML tag name.
 
     :return: A :class:`blu.HTMLElement` whose tag name is **import_name**.

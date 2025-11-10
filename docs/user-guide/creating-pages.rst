@@ -308,6 +308,22 @@ A child of an HTML element can be any of the following types:
 
         # Wrong!
         div[
+            [
+                div[f'Hello, {person["name"]}!']
+                for person in PEOPLE
+            ],
+        ]
+
+        # Right.
+        div[
+            [
+                div(key=person['id'])[f'Hello, {person["name"]}!']
+                for person in PEOPLE
+            ],
+        ]
+
+        # Wrong!
+        div[
             [f'Hello, {person["name"]}!' for person in PEOPLE],
         ]
 

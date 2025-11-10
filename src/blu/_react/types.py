@@ -703,6 +703,9 @@ class ClientElement:
 
     def __getitem__(self, *children: 'Node') -> 'ClientElement':
         """
+        Create a copy of self with given children.
+
+        
         """
         return ClientElement(
             self._renderer,

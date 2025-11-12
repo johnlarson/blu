@@ -16,6 +16,7 @@
     - client
     - create_rare_html_element
     - html
+    - is_client
     - use_effect
     - use_state 
     - use_ref

@@ -277,12 +277,12 @@ class HTMLElement:
             - If :data:`index` is :py:data:`... <ellipsis>`: A copy of
               :data:`self` with :data:`children` set to :data:`[]`
         
-        .. note Using the index operator (:data:`[]`) on an
+        .. note:: Using the index operator (:data:`[]`) on an
             :data:`HTMLComponent` does not mutate the original
             :data`HTMLComponent; insteadd, it returns a copy of the
             :data:`HTMLComponent` with the given *children*.
         
-        .. note:: 
+        .. include:: /_includes/iterables-must-use-keys-note.rst
         """
 
         # For example, to generate a div with two spans in it:
@@ -632,8 +632,6 @@ class ClientElement:
                 Danger! The world said hello back.
             </span>
         </b>
-
-    .. include:: /_includes/client-side-rendering-notes.rst
     """
     
     _args: tuple[Any, ...]
@@ -653,7 +651,7 @@ class ClientElement:
         self._kwargs = kwargs
         self._children = list(children)
 
-    def __call__(self, *args: Any, **kwargs: Any) -> 'ClientElement':
+    def __call__(self, *args: Any, key: Any, **kwargs: Any) -> 'ClientElement':
         """
         Create a copy of self with the given call args.
 
@@ -683,9 +681,36 @@ class ClientElement:
                 <div>Hello, Hailey!</div>
                 <div>Hello, World!</div>
             </div>
+
+        
         
         :param *args: The positional arguments to pass into the
             element's render function when it is rendered.
+        :param key: A key that uniquely identifies this element.
+            Usually, you won't need this, but it's required for any
+            :py:class:`ClientElement <blu.ClientElement>` that is
+            rendered as an item in an
+            :py:class:`Iterable <collections.abc.Iterable>` (unless that
+            :py:class:`Iterable <collections.abc.Iterable>` is a
+            :py:class:str or a :py:class:tuple):
+
+            .. code:: python
+
+                from blu.html import div
+
+                PEOPLE = [
+                    {'id': 1, 'name': 'Amy'},
+                    {'id': 2, 'name': 'Bill'},
+                    {'id': 3, 'name': 'Carrie' },
+                ]
+
+                @client
+                def 
+
+                div[
+
+                ]
+
         :param **kwargs: The keyword arguments to pass into the
             element's render function when it is rendered.
 
@@ -703,9 +728,11 @@ class ClientElement:
 
     def __getitem__(self, *children: 'Node') -> 'ClientElement':
         """
-        Create a copy of self with given children.
+        .. include:: /_includes/client-element-children.rst
 
-        
+        :param children: Any valid :type:`blu.Node`\s.
+        :return: A copy of the ``self``, with the children replaced by
+            ``children``.
         """
         return ClientElement(
             self._renderer,

@@ -1,0 +1,84 @@
+You can add children to an html element using square bracket notation:
+
+.. code-block:: python
+
+    from blu.html import div, p
+
+    div[
+        p['Hi.'],
+        p['Hello.']
+    ]
+
+.. code-block:: html
+
+    <div>
+        <p>Hi.</p>
+        <p>Hello.</p>
+    </div>
+
+.. note::
+
+    Using square bracket notation on an HTML element does not mutate the original; instead, it returns a copy with the new attributes.
+
+    .. code-block:: python
+
+        from blu.html import div
+
+        without_children = div
+        with_children = div['Hello, World!']
+
+        without_children  # <div></div>
+        with_children  # <div>Hello, World!</div>
+
+.. note::
+
+    When you set children on an HTML element, you completely replace any existing children, rather than appending to them:
+
+    .. code-block:: python
+
+        from blu.html import div
+
+        original = div['A', 'B']
+        
+        original['C', 'D']  # <div>CD</div>
+
+
+A child of an HTML element can be any of the following types:
+
+- Another :class:`blu.HTMLElement`.
+- A :py:class:`str`. In this case, it will be rendered as an HTML text node.
+- :py:data:`None`. Nothing is rendered in the place where a :py:data:`None` value is found.
+- A :py:class:`int`. This renders as a text node whose text is the :py:class:`str` representation of the integer.
+- A :py:class:`float`. This renders as a text node whose text is the :py:class:`str` representation of the float.
+- An :py:class:`Iterable <collections.abc.Iterable>` of valid children. This renders as all the child nodes contained in the :py:class:`Iterable <collections.abc.Iterable>`.
+
+.. code-block:: python
+
+    from blu.html import div, span, p
+
+    div[
+        span,
+        'Hello!',
+        None,
+        1,
+        1.0,
+        (
+            p,
+            'Hello again!',
+            None,
+            2,
+            2.0,
+        )
+    ]
+
+.. code-block:: html
+
+    <div>
+        <span></span>
+        Hello!11
+        <p></p>
+        Hello again!22
+    </div>
+
+
+.. include:: /_includes/iterables-must-use-keys-note.rst

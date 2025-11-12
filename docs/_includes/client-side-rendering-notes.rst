@@ -95,7 +95,7 @@
         :caption: Right.
         :emphasize-lines: 4-5
 
-        from blu import running_on_client
+        from blu import is_client
         from blu.html import button
         
         if is_client:

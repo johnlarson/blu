@@ -5,7 +5,6 @@
 
     Document the following:
 
-    - HTMLElement
     - Key
     - Node
     - Ref
@@ -14,7 +13,6 @@
     - app
     - client
     - create_rare_html_element
-    - html
     - is_client
     - use_effect
     - use_state

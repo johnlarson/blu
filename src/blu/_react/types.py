@@ -93,21 +93,20 @@ type Children = list[Node]
 
 class HTMLElement:
     """
-    Server-side representation of a React html element, i.e. a React
-    element whose type is a string. Created using the :mod:`blu.html`
-    module.
+    A React html element, i.e. a React element whose type is a string.
+    Created using the :mod:`blu.html` module.
 
     .. code-block:: python
 
-        from blu import html
+        from blu.html import div
 
-        html.div(id='my-id')[
+        div(id='my-id')[
             'Hello World!',
         ]
+    
+    .. code-block:: html
 
-        html('div')(id='my-id')[
-            'Hello World!',
-        ]
+        <div id="my-id">Hello World!</div>
     """
 
     _tagname: str
@@ -152,14 +151,18 @@ class HTMLElement:
         self, /, attributes: Props = {}, **kwargs: PropValue
     ) -> 'HTMLElement':
         """
-        Create a copy of :data:`self` with the same :data:`children` but
-        with :data:`props` set based on the given keyword arguments.
+        Create a copy of ``self`` with React props set based on the
+        given keyword arguments.
 
         .. code-block:: python
 
             from blu.html import div
 
-            div(id='my-div')  # <div id="my-div" />
+            div(id='my-div')
+        
+        .. code-block:: html
+
+            <div id="my-div"></div>
 
         :param attributes: A mapping of prop names to prop values. This
             is an escape hatch for cases when the prop name can't be
@@ -198,40 +201,6 @@ class HTMLElement:
                results in the React element
                ``<div props-only="props" shared="props kw-only="kw" />``
         
-        .. note:: Calling an :class:`HTMLElement` does not mutate the
-            original :class:`HTMLElement`; it instead returns a copy
-            with the given props.
-
-            .. code-block:: python
-
-                from blu.html import div
-
-                div  # <div />
-
-                div(id='my-id')  # <div id="my-id" />
-
-                div  # Still <div />
-
-        .. note:: When calling an :class:`HTMLElement`, the copy
-            returned does not keep any of the original's non-children
-            props except those explicity specified in the call:
-
-            .. code-block:: python
-
-                from blu.html import div
-
-                first = div(a=1, b=2, c=3)  # <div a={1} b={2} c={3} />
-
-                second = div(c=3, d=4, e=5)  # <div c={3} d={4} e={5} />
-
-        .. note:: When calling an :class:`HTMLElement`, the copy's
-            :attr:`children` are unchanged
-            from the original's.
-        
-        .. note:: A prop value must either be a :type:`blu.Node` or a
-            :type:`blu.Jsonable`; they will be sent from the server to
-            the client and so need to be serializable.
-        
         .. note:: ``children`` is not a valid prop name in Blu. To set
             React children, use the index operator (:data:`[]`).
         """
@@ -257,14 +226,18 @@ class HTMLElement:
         self, index: Node | EllipsisType | tuple[Node, ...]
     ) -> 'HTMLElement':
         """
-        Return a copy of `self` with the same props, but with child
+        Create a copy of ``self`` with the same props, but with child
         nodes set to the items passed in.
 
         .. code-block:: python
 
             from blu.html import div
 
-            div['Hello World!']  # <div>Hello World!</div>
+            div['Hello World!']
+
+        .. code-block:: html
+
+            <div>Hello World!</div>
         
         :param index: A :type:`blu.Node`, a :py:class:`tuple` of
             :type:`blu.Node`\\ s, or :py:data:`... <ellipsis>`.
@@ -281,8 +254,6 @@ class HTMLElement:
             :data:`HTMLComponent` does not mutate the original
             :data`HTMLComponent; insteadd, it returns a copy of the
             :data:`HTMLComponent` with the given *children*.
-        
-        .. include:: /_includes/iterables-must-use-keys-note.rst
         """
 
         # For example, to generate a div with two spans in it:

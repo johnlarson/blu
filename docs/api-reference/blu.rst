@@ -5,7 +5,6 @@
 
     Document the following:
 
-    - ClientElement
     - HTMLElement
     - Key
     - Node
@@ -19,7 +18,7 @@
     - is_client
     - use_effect
     - use_state
-    - use_ref
+    - use_ref 
 
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement

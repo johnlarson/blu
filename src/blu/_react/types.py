@@ -597,6 +597,9 @@ class Element[**P](Protocol):
         ...
 
 
+UNSET = object()
+
+
 class ClientElement:
     """
     A custom element to be rendered client-side. Created using the
@@ -651,9 +654,14 @@ class ClientElement:
         self._kwargs = kwargs
         self._children = list(children)
 
-    def __call__(self, *args: Any, key: Any, **kwargs: Any) -> 'ClientElement':
+    def __call__(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> 'ClientElement':
         """
-        Create a copy of self with the given call args.
+        Create a copy of ``self`` that will be rendered with the given
+        arguments.
 
         .. code-block:: python
 
@@ -676,48 +684,55 @@ class ClientElement:
 
         .. code-block:: html
 
-            <div>
                 <div>Hello, Arnold!</div>
                 <div>Hello, Hailey!</div>
                 <div>Hello, World!</div>
-            </div>
-
-        
         
         :param *args: The positional arguments to pass into the
             element's render function when it is rendered.
-        :param key: A key that uniquely identifies this element.
-            Usually, you won't need this, but it's required for any
-            :py:class:`ClientElement <blu.ClientElement>` that is
+        :param **kwargs: The keyword arguments to pass into the
+            element's render function when it is rendered, as well as an
+            optional keyword argument ``key``, which will be used by
+            React to uniquely identify the element when it is rendered.
+            Usually, you won't need to pass in a ``key``, but it's
+            required for any :py:class:`ClientElement <blu.ClientElement>` that is
             rendered as an item in an
             :py:class:`Iterable <collections.abc.Iterable>` (unless that
             :py:class:`Iterable <collections.abc.Iterable>` is a
-            :py:class:str or a :py:class:tuple):
+            :py:class:`str` or a :py:class:`tuple`).
 
-            .. code:: python
+        :return: A copy of ``self`` that will be rendered by calling its
+            render function with ``*args`` and ``**kwargs``, with the
+            exception that the keyword argument ``keys`` will not be
+            passed on to the render function and will instead be used by
+            React to identify the new element.
 
-                from blu.html import div
+        Below is an example of using the ``key`` argument:
 
-                PEOPLE = [
-                    {'id': 1, 'name': 'Amy'},
-                    {'id': 2, 'name': 'Bill'},
-                    {'id': 3, 'name': 'Carrie' },
-                ]
+        .. code-block:: python
 
-                @client
-                def 
+            from blu import client
+            from blu.html import div
 
-                div[
+            PEOPLE = [
+                {'id': 0, 'name': 'Allison'},
+                {'id': 1, 'name': 'Bill'},
+                {'id': 2, 'name': 'Carrie'},
+            ]
 
-                ]
 
-        :param **kwargs: The keyword arguments to pass into the
-            element's render function when it is rendered.
+            @client
+            def Greeting(name):
+                return div[f'Hello, {name}!']
 
-        :return: A copy of ``self`` with call arguments set to ``*args``
-            and ``**kwargs``.
-        
-        .. include:: /_includes/client-element-call-notes.rst
+            
+            [Greeting(x['name'], key=x['id']) for x in PEOPLE]
+
+        .. code-block:: html
+
+            <div>Hello, Allison!</div>
+            <div>Hello, Bill!</div>
+            <div>Hello, Carrie!</div>
         """
         return ClientElement(
             self._renderer,
@@ -728,11 +743,31 @@ class ClientElement:
 
     def __getitem__(self, *children: 'Node') -> 'ClientElement':
         """
-        .. include:: /_includes/client-element-children.rst
+        Create a copy of ``self`` that will render with the given
+        children displayed where the render function uses the ``yield``
+        keyword.
+
+        .. code-block:: python
+
+            from blu import client
+            from blu.html import span
+
+
+            @client
+            def RedText(text):
+                return span(style={'color': 'red'})[(yield)]
+
+
+            RedText['Danger! This text is red.']
+
+        .. code-block:: html
+
+            <span style="color: red">Danger! This text is red.</span>
 
         :param children: Any valid :type:`blu.Node`\s.
-        :return: A copy of the ``self``, with the children replaced by
-            ``children``.
+        :return: A copy of ``self`` that will render with ``children``
+            displayed where the element's render function uses the
+            ``yield`` keyword.
         """
         return ClientElement(
             self._renderer,

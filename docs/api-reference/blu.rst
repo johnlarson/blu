@@ -18,7 +18,7 @@
     - html
     - is_client
     - use_effect
-    - use_state 
+    - use_state
     - use_ref
 
 .. automodule:: blu

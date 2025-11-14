@@ -18,6 +18,11 @@ class Ref[T]:
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
         return self._current
+    
+    def __setitem__(self, empty_slice: slice, new_value: T):
+        if empty_slice.start or empty_slice.stop or empty_slice.step:
+            raise
+        self._current = new_value
 
 
 def use_ref[T](init: T) -> Ref[T]:

@@ -5,7 +5,7 @@
 
     Document the following:
 
-    - Node
+    - ElementRenderer?
     - Ref
     - Response
     - WrongEnvironmentError
@@ -18,7 +18,7 @@
     - use_ref 
 
 .. automodule:: blu
-    :exclude-members: HTMLElement, ClientElement, Key
+    :exclude-members: HTMLElement, ClientElement, Key, Ref
 
     .. autoclass:: ClientElement()
         :special-members: __call__, __getitem__
@@ -28,6 +28,9 @@
 
     .. autoclass:: Key
         :special-members: __getitem__
+
+    .. autoclass:: Ref
+        :special-members: __getitem__, __setitem__
 
 
 .. py:type:: Node
@@ -157,4 +160,3 @@
 
         .. code-block:: html
 
-            

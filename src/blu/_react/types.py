@@ -226,7 +226,7 @@ class HTMLElement:
         )
 
     def __getitem__(
-        self, children: Node | EllipsisType | tuple[Node, ...]
+        self, children: Node | tuple[Node, ...]
     ) -> 'HTMLElement':
         """
         Create a copy of ``self`` whose child nodes are set to the items
@@ -282,7 +282,7 @@ class HTMLElement:
         return HTMLElement(
             self._tagname,
             props=self._attrs,
-            children=_index_to_children(index),
+            children=_index_to_children(children),
         )
     
     def _rename_props(self, props: Props) -> Props:
@@ -612,7 +612,7 @@ class Key:
             Hello, <b>World</b>!
 
         :param children: A :type:`blu.Node` or :py:class:`tuple` of
-            :type`blu.Node`\\s.
+            :type:`blu.Node`\\s.
         :return: If ``children`` is a :py:class:`tuple`, a frament whose
             children are ``list(children)``. Otherwise, a fragment whose
             children are ``[children]``.

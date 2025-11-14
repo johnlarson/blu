@@ -19,7 +19,7 @@
     - use_ref 
 
 .. automodule:: blu
-    :exclude-members: HTMLElement, ClientElement
+    :exclude-members: HTMLElement, ClientElement, Key
 
     .. autoclass:: ClientElement()
         :special-members: __call__, __getitem__

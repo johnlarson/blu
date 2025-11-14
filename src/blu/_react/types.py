@@ -93,8 +93,9 @@ type Children = list[Node]
 
 class HTMLElement:
     """
-    A React html element, i.e. a React element whose type is a string.
-    Created using the :mod:`blu.html` module.
+    A `React DOM component instance
+    <https://react.dev/reference/react-dom/components>`_. Created using
+    the :mod:`blu.html` module.
 
     .. code-block:: python
 
@@ -148,7 +149,7 @@ class HTMLElement:
         self._children = children
 
     def __call__(
-        self, /, attributes: Props = {}, **kwargs: PropValue
+        self, /, props: Props = {}, **kwargs: PropValue
     ) -> 'HTMLElement':
         """
         Create a copy of ``self`` with React props set based on the
@@ -164,20 +165,22 @@ class HTMLElement:
 
             <div id="my-div"></div>
 
-        :param attributes: A mapping of prop names to prop values. This
-            is an escape hatch for cases when the prop name can't be
-            represented as a keyword argument name.
+        :param props: A mapping of prop names to prop values. This is an
+            escape hatch for cases when the prop name can't be
+            represented as a keyword argument name. Note that this is a
+            keyword-only argument.
 
-        :param kwargs: The new props.
+        :param kwargs: The new props, where the argument name is the
+            prop's key and the argument value is the prop's value. This
+            is the usual way to specify props.
 
         :return: A copy of :data:`self` with the same :data:`children`
             but with :data:`props` set as follows:
 
-            1. For any key-value pair in the :data:`attributes`
-               argument, the prop named by the key will be set to the
-               value.
+            1. For any key-value pair in the :data:`props` argument, the
+               prop named by the key will be set to the value.
 
-               For example, :data:`div(attributes={'my_prop_': 45})`
+               For example, :data:`div(props={'my_prop_': 45})`
                results in the React element ``<div my_prop_={45} />``
 
             2. For any keyword argument, the value will be set to a key
@@ -191,27 +194,27 @@ class HTMLElement:
 
             3. If there is any conflict between the :data:`attributes`
                argument and the keyword arguments, the prop that has the
-               conflict will be set based on the :data:`attributes`
+               conflict will be set based on the :data:`props`
                argument as described in (1). Any props that do not have
                conflicts will be set the same way they otherwise would,
                irrespective of the props that do have conflicts.
 
                For example,
-               :data:`div(attributes={'props-only': 'props', 'shared': 'props'}, shared='kw', kw_only='kw')`
+               :data:`div(props={'props-only': 'props', 'shared': 'props'}, shared='kw', kw_only='kw')`
                results in the React element
-               ``<div props-only="props" shared="props kw-only="kw" />``
+               ``<div props-only="props" shared="props" kw-only="kw" />``
         
         .. note:: ``children`` is not a valid prop name in Blu. To set
             React children, use the index operator (:data:`[]`).
         """
         all_props = {
             **self._rename_props(kwargs),
-            **self._rename_props(attributes),
+            **self._rename_props(props),
         }
         for prop_name in all_props:
             if not is_client and prop_name.startswith('on'):
                 raise WrongEnvironmentError(
-                    f'Could not add attribute "{prop_name}" to {self.tagname} '
+                    f'Could not add attribute "{prop_name}" to {self._tagname} '
                     f'element. Event-handling attributes like "{prop_name}" '
                     'can only be set in client-side rendering; this code was '
                     'run server-side.'
@@ -223,11 +226,11 @@ class HTMLElement:
         )
 
     def __getitem__(
-        self, index: Node | EllipsisType | tuple[Node, ...]
+        self, children: Node | EllipsisType | tuple[Node, ...]
     ) -> 'HTMLElement':
         """
-        Create a copy of ``self`` with the same props, but with child
-        nodes set to the items passed in.
+        Create a copy of ``self`` whose child nodes are set to the items
+        passed in.
 
         .. code-block:: python
 
@@ -239,21 +242,14 @@ class HTMLElement:
 
             <div>Hello World!</div>
         
-        :param index: A :type:`blu.Node`, a :py:class:`tuple` of
-            :type:`blu.Node`\\ s, or :py:data:`... <ellipsis>`.
+        :param children: A :type:`blu.Node` or a :py:class:`tuple` of
+            :type:`blu.Node`\\ s.
         :return:
-            - If :data:`index` is a :type:`blu.Node`: A copy of
-              :data:`self` with :data:`children` set to :data:`[index]`.
-            - If :data:`index` is a :py:class:`tuple` of
-              :type:`blu.Node`\\ s: A copy of :data:`self` with
-              :data:`children` set to :data:`list(index)`.
-            - If :data:`index` is :py:data:`... <ellipsis>`: A copy of
-              :data:`self` with :data:`children` set to :data:`[]`
-        
-        .. note:: Using the index operator (:data:`[]`) on an
-            :data:`HTMLComponent` does not mutate the original
-            :data`HTMLComponent; insteadd, it returns a copy of the
-            :data:`HTMLComponent` with the given *children*.
+            - If ``children`` is a :type:`blu.Node`: A copy of
+              :data:`self` whose children are set to ``[children]``.
+            - If ``children`` is a :py:class:`tuple` of
+              :type:`blu.Node`\\ s: A copy of :data:`self` whose
+              children are set to ``list(children)``.
         """
 
         # For example, to generate a div with two spans in it:
@@ -449,7 +445,8 @@ class CustomElement:
         )
 
     def __getitem__(
-        self, index: Node | EllipsisType | tuple[Node, ...]
+        self,
+        children: Node | tuple[Node, ...],
     ) -> 'CustomElement':
         """
         Create a copy of :data:`self` with the :data:`children`
@@ -674,7 +671,7 @@ class ClientElement:
 
         :return: A copy of ``self`` that will be rendered by calling its
             render function with ``*args`` and ``**kwargs``, with the
-            exception that the keyword argument ``keys`` will not be
+            exception that the keyword argument ``key`` will not be
             passed on to the render function and will instead be used by
             React to identify the new element.
 
@@ -712,7 +709,10 @@ class ClientElement:
             self._children,
         )
 
-    def __getitem__(self, *children: 'Node') -> 'ClientElement':
+    def __getitem__(
+        self,
+        children: Node | tuple[Node, ...],
+    ) -> 'ClientElement':
         """
         Create a copy of ``self`` that will render with the given
         children displayed where the render function uses the ``yield``
@@ -735,7 +735,8 @@ class ClientElement:
 
             <span style="color: red">Danger! This text is red.</span>
 
-        :param children: Any valid :type:`blu.Node`\s.
+        :param children: Any valid :type:`blu.Node` or a
+            :py:class:`tuple` of :type:`blu.Node`\s.
         :return: A copy of ``self`` that will render with ``children``
             displayed where the element's render function uses the
             ``yield`` keyword.

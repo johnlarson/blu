@@ -16,7 +16,7 @@
     - is_client
     - use_effect
     - use_state
-    - use_ref
+    - use_ref 
 
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement
@@ -26,6 +26,9 @@
 
     .. autoclass:: HTMLElement()
         :special-members: __call__, __getitem__
+
+    .. autoclass:: Key
+        :special-members: __getitem__
 
 
 .. py:type:: Node

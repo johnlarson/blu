@@ -532,22 +532,97 @@ def _index_to_children(
 
 
 class Key:
-    key: Any
-    children: list[Node]
+    """
+    A keyed fragment of React nodes.
 
-    def __init__(self, key: Any, children: list[Node] = []):
-        self.key = key
-        self.children = children
+    .. code-block:: python
 
-    def __getitem__(self, children: Node | EllipsisType) -> 'Key':
-        actual_children: list[Node]
-        if isinstance(children, EllipsisType):
-            actual_children = []
-        elif isinstance(children, tuple):
-            actual_children = list(children)
+        from blu import Key
+        from blu.html import b
+
+        Key('my-id')[
+            'Hello, ',
+            b['World'],
+            '!',
+        ]
+
+    .. code-block:: html
+
+        Hello, <b>World</b>!
+
+    :param key: A key to be used by React to uniquely identify the
+        fragment.
+    :return: An empty fragment identified by ``key``.
+
+    In most cases, you won't need to use :class:`blu.Key`, but it is
+    required when rendering an item in an
+    :py:class:`Iterable <collections.abc.Iterable>` (unless that
+    :py:class:`Iterable <collections.abc.Iterable>` is a :py:class:`str`
+    or :py:class:`tuple`):
+
+    .. code-block:: python
+
+        from blu import Key
+        from blu.html import b
+
+        PEOPLE = [
+            {'id': 1, name: 'Andy'},
+            {'id': 2, name: 'Brittany'},
+            {'id': 3, name: 'Calvin'},
+        ]
+
+        Key(person['id'])[
+            'Hello, ',
+            b[person['name']],
+            '!',
+        ]
+        for person in PEOPLE
+
+    .. code-block:: html
+
+        Hello, <b>Andy</b>!
+        Hello, <b>Brittany</b>!
+        Hello, <b>Calvin</b>!
+    """
+
+    _key: Any
+    _children: list[Node]
+
+    def __init__(self, key: Any):
+        self._key = key
+        self._children = []
+
+    def __getitem__(self, children: Node | tuple[Node]) -> 'Key':
+        """
+        Create a copy of ``self`` with the given children.
+
+        .. code-block:: python
+
+            from blu import Key
+            from blu.html import b
+
+            Key('my-id')[
+                'Hello, ',
+                b['World'],
+                '!',
+            ]
+
+        .. code-block:: html
+
+            Hello, <b>World</b>!
+
+        :param children: A :type:`blu.Node` or :py:class:`tuple` of
+            :type`blu.Node`\\s.
+        :return: If ``children`` is a :py:class:`tuple`, a frament whose
+            children are ``list(children)``. Otherwise, a fragment whose
+            children are ``[children]``.
+        """
+        copy = Key(self._key)
+        if isinstance(children, tuple):
+            copy._children = list(children)
         else:
-            actual_children = [children]
-        return Key(self.key, actual_children)
+            copy._children = [children]
+        return copy
 
 
 type ElementRenderer[**P] = Callable[

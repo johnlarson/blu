@@ -1,4 +1,6 @@
-from collections.abc import AsyncGenerator, Callable, Generator
+from collections.abc import (
+    AsyncGenerator, Callable, Generator, Iterable
+)
 from numbers import Number
 from pathlib import Path
 from types import EllipsisType
@@ -31,22 +33,13 @@ type Node = '''
     ClientElement[...] |
     HTMLElement |
     Key |
-    Sequence[Node] |
+    Iterable[Node] |
     str |
     int |
     float |
     bool |
     None
 '''
-"""
-A valid child of a `ReactElement`.
-
-.. note::
-
-    Even though a :py:class:`tuple` is a
-    :py:class:`abc.collections.Iterable`, :py:class:`tuple`\\ s are not
-    valid nodes in Blu.
-"""
 
 # """Valid value for a prop of a `ReactElement`."""
 type PropValue = Jsonable | Node

@@ -5,7 +5,9 @@ from blu._utils.typing import Protocol, Any
 from blu import html
 from blu._exceptions import WrongEnvironmentError
 from blu._react import create_html_element as create_rare_html_element
-from blu._react.types import HTMLElement, Key, ClientElement, Node
+from blu._react.types import (
+    ElementRenderer, HTMLElement, Key, ClientElement, Node
+)
 from blu._react.client_decorator import client
 from blu._react.hooks import Ref, use_effect, use_ref, use_state
 
@@ -32,6 +34,7 @@ else:
 
 
 __all__ = [
+    'ElementRenderer',
     'ClientElement',
     'HTMLElement',
     'Key',

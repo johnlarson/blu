@@ -5,9 +5,7 @@
 
     Document the following:
 
-    - ElementRenderer?
-    - Ref
-    - Response
+    - ElementRenderer
     - WrongEnvironmentError
     - app
     - client

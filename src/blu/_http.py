@@ -185,9 +185,32 @@ class Request:
 
 
 class Response:
-    body: Node
-    status: int
-    headers: dict[str, str]
+    """
+    An HTTP response for a page in a web application. Return a
+    :class:`Response <blu.Response>` from a ``__page__`` function (see
+    :ref:`File Conventions`) to set HTTP status and headers for that
+    page.
+
+    .. code-block:: python
+        :caption: __index__.py
+        
+        def __page__():
+            return Response(
+                p['Hello.'],
+                status=404,
+                headers={
+                    'Cache-Control': 'no-cache',
+                    'Last-Modified': 'Tue, 10 Dec 2024 10:00:00 GMT',
+                },
+            )
+    
+    :param body: The React node to render when displaying the page.
+    :param status: The status code to send in the HTTP response.
+    :param headers: The HTTP headers to send in the HTTP response.
+    """
+    _body: Node
+    _status: int
+    _headers: dict[str, str]
 
     def __init__(
         self,
@@ -195,6 +218,6 @@ class Response:
         status: int = 200,
         headers: Mapping[str, str] = {},
     ):
-        self.body = body
-        self.status = status
-        self.headers = {**headers}
+        self._body = body
+        self._status = status
+        self._headers = {**headers}

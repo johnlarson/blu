@@ -6,14 +6,13 @@
     Document the following:
 
     - ElementRenderer
-    - WrongEnvironmentError
     - app
     - client
     - create_rare_html_element
     - is_client
     - use_effect
     - use_state
-    - use_ref
+    - use_ref 
 
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement, Key, Ref

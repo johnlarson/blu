@@ -58,6 +58,32 @@ class Ref[T]:
         return self._current
     
     def __setitem__(self, empty_slice: slice, new_value: T):
+        """
+        Set the :class:`Ref <blu.Ref>` to point to a different value.
+
+        .. code-block:: python
+
+            from blu import client
+            from blu.tml import button
+
+            __client__ = True
+
+
+            @client
+            def TwoButtons():
+                ref = use_ref('Hello')
+                ref[:] = 'Goodbye'
+                ref[:]  # 'Goodbye'
+
+        :param empty_slice: Must be an empty slice, i.e. when you must
+            put a single colon between the square brackets, without any
+            numbers.
+        :param new_value: The new value that should be stored in
+            ``self``.
+
+        Once this method has been called, the :class:`Ref <blu.Ref>`\\'s
+        stored value will be set to ``new_value``.
+        """
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
         self._current = new_value

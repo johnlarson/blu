@@ -12,9 +12,47 @@ def use_state[T](init: T) -> tuple[T, Callable[[T], None]]:
 
 
 class Ref[T]:
+    """
+    The object returned by :func:`blu.use_ref`.
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.tml import button
+
+        __client__ = True
+
+
+        @client
+        def TwoButtons():
+            # assigns variable ref to an instance of Ref.
+            ref = use_ref()
+    """
+
     _current: T
     
     def __getitem__(self, empty_slice: slice) -> T:
+        """
+        Get the value currently stored in the :class:`Ref <blu.Ref>`.
+
+        .. code-block:: python
+
+            from blu import client
+            from blu.tml import button
+
+            __client__ = True
+
+
+            @client
+            def TwoButtons():
+                ref = use_ref('Hello')
+                ref[:]  # 'Hello'
+        
+        :param empty_slice: Must be an empty slice, i.e. when you must
+            put a single colon between the square brackets, without any
+            numbers.
+        :return: The value currently stored in ``self``.
+        """
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
         return self._current

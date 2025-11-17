@@ -5,7 +5,6 @@
 
     Document the following:
 
-    - create_rare_html_element
     - is_client
     - use_effect
     - use_state

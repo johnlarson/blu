@@ -5,7 +5,6 @@
 
     Document the following:
 
-    - ElementRenderer
     - app
     - client
     - create_rare_html_element
@@ -29,6 +28,40 @@
     .. autoclass:: Ref
         :special-members: __getitem__, __setitem__
 
+.. py:type:: ClientRenderer[**P]
+    :canonical: Callable[P, blu.Node | Generator[None, Node, Node]]
+
+    A function that defines how a :class:`ClientElement <blu.ClientElement>` is rendered. This type of function is passed into the :func:`client <blu.client>` decorator to create a :class:`ClientElement <blu.ClientElement>`:
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import span
+
+
+        @client
+        def Greeting():
+            return 'Hello, World!'
+
+    For more details on how :type:`ClientRenderer <blu.ClientRenderer>` functions are used, see :func:`client() <blu.client>`.
+
+    
+    When a :class:`ClientElement <blu.ClientElement>` is rendered, the rendering function it was created from is called, with whatever arguments were passed in using :meth:`ClientElement.__call__() <blu.ClientElement.__call__>`:
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import span
+
+
+        @client
+        def Greeting(name='World'):
+            return f'Hello, {name}!'
+
+        
+        Greeting(name)
+
+    If arguments were never set using :meth:`ClientElement.__call__() <blu.ClientElement.__call__>`, then the render function will be called 
 
 .. py:type:: Node
     :canonical: ClientElement | HTMLElement | Key | Iterable[Node] | str | int | float | bool | None

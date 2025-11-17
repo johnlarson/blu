@@ -25,6 +25,29 @@ def import_client(path: str | _Path, name: str = 'default') -> CustomElement:
 
 
 def create_html_element(tagname: str) -> HTMLElement:
+    """
+    Create an HTML element. Usually, you will use the :mod:`blu.html`
+    module to create HTML elements, but in rare cases where you cannot
+    import the tag name you need from :mod:`blu.html`, you can use this
+    function to create an HTML element from any valid tag name.
+
+    .. code-block:: python
+
+        from blu import create_rare_html_element
+
+        my_element = create_rare_html_element('my_element-')
+
+        my_element(id='my-id')['Hello, World!']
+    
+        
+    .. code-block:: html
+
+        <my_element->Hello, World!</my_element->
+
+    :param tagname: A valid HTML tag name.
+    :return: A :class:`blu.HTMLElement` whose tag name is ``tagname``,
+        with no props set.
+    """
     ...
 
 

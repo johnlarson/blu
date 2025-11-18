@@ -5,7 +5,6 @@
 
     Document the following:
 
-    - is_client
     - use_effect
     - use_state
     - use_ref 

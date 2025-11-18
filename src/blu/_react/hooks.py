@@ -2,10 +2,33 @@ from collections.abc import AsyncGenerator, Callable, Generator
 
 
 def use_effect(
-    callback: Callable[[], Generator[None] | AsyncGenerator[None]],
+    callback: Callable[
+        [],
+        None | Generator[None] | AsyncGenerator[None],
+    ],
 ):
     """
     .. include:: /_includes/hook-note.rst
+
+    Perform set-up actions immediately after a :class:`ClientElement
+    <blu.ClientElement>` is rendered to the DOM and/or tear-down actions
+    immediately before it is removed from the DOM.
+
+    .. code-block:: python
+
+        from blu import client, use_effect
+        from blu.html import div
+
+        @client
+        def MyClientElement():
+            
+            @use_effect
+            def setup_and_teardown():
+                do_some_setup()
+                yield
+                do_some_teardown()
+
+            return div['Hello!']
     """
     ...
 

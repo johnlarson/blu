@@ -4,10 +4,16 @@ from collections.abc import AsyncGenerator, Callable, Generator
 def use_effect(
     callback: Callable[[], Generator[None] | AsyncGenerator[None]],
 ):
+    """
+    .. include:: /_includes/hook-note.rst
+    """
     ...
 
 
 def use_state[T](init: T) -> tuple[T, Callable[[T], None]]:
+    """
+    .. include:: /_includes/hook-note.rst
+    """
     ...
 
 
@@ -90,4 +96,7 @@ class Ref[T]:
 
 
 def use_ref[T](init: T) -> Ref[T]:
+    """
+    .. include:: /_includes/hook-note.rst
+    """
     ...

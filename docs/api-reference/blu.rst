@@ -41,43 +41,27 @@
         .. code-block:: console
    
             $ daphne blu:app
-        
+    
+    .. py:data:: is_client
+        :annotation: bool
 
-.. py:type:: ClientRenderer[**P]
-    :canonical: Callable[P, blu.Node | Generator[None, Node, Node]]
-
-    A function that defines how a :class:`ClientElement <blu.ClientElement>` is rendered. This type of function is passed into the :func:`client <blu.client>` decorator to create a :class:`ClientElement <blu.ClientElement>`:
-
-    .. code-block:: python
-
-        from blu import client
-        from blu.html import span
-
-
-        @client
-        def Greeting():
-            return 'Hello, World!'
-
-    For more details on how :type:`ClientRenderer <blu.ClientRenderer>` functions are used, see :func:`client() <blu.client>`.
-
-.. py:type:: Node
-    :canonical: ClientElement | HTMLElement | Key | Iterable[Node] | str | int | float | bool | None
-
-    A valid child of a React element. Nodes are rendered as follows:
-          
-    - A :class:`blu.HTMLElement` is rendered as described `here <https://react.dev/reference/react-dom/components>`_.
+        ``True`` if running in a web browser environment, ``False`` if running in server environment.
 
         .. code-block:: python
 
-            from blu.html import span
+            from blu import is_client
 
-            span(id='my-id')['Hello, World!']
+            if is_client:
+                print('Hello from your web browser!')
+            else:
+                print('Hello from your web app server!')
+        
 
-        .. code-block:: html
+    .. py:type:: ClientRenderer[**P]
+        :canonical: collections.abc.Callable[P, blu.Node | Generator[None, Node, Node]]
 
-            <span id="my-id">Hello, World!</span>
-    
-    - A :class:`blu.ClientElement` is rendered as the return value of its rendering function. See :class:`blu.ClientElement` for more details.
+        A function that defines how a :class:`ClientElement <blu.ClientElement>` is rendered. This type of function is passed into the :func:`client <blu.client>` decorator to create a :class:`ClientElement <blu.ClientElement>`:
+
         .. code-block:: python
 
             from blu import client
@@ -85,105 +69,135 @@
 
 
             @client
-            def WorldGreeting():
-                return span['Hello, World!']
+            def Greeting():
+                return 'Hello, World!'
 
+        For more details on how :type:`ClientRenderer <blu.ClientRenderer>` functions are used, see :func:`client() <blu.client>`.
 
-            WorldGreeting
+    .. py:type:: Node
+        :canonical: ClientElement | HTMLElement | Key | Iterable[Node] | str | int | float | bool | None
+
+        A valid child of a React element. Nodes are rendered as follows:
+            
+        - A :class:`blu.HTMLElement` is rendered as described `here <https://react.dev/reference/react-dom/components>`_.
+
+            .. code-block:: python
+
+                from blu.html import span
+
+                span(id='my-id')['Hello, World!']
+
+            .. code-block:: html
+
+                <span id="my-id">Hello, World!</span>
         
-        .. code-block:: html
+        - A :class:`blu.ClientElement` is rendered as the return value of its rendering function. See :class:`blu.ClientElement` for more details.
+            .. code-block:: python
 
-            <span>Hello, World!<span>
-    
-    - A :class:`blu.Key` is rendered as a keyed `React fragment <https://react.dev/reference/react/Fragment>`_ whose key is the same as the key passed in to the :class:`Key <blu.Key>` object's constructor.
+                from blu import client
+                from blu.html import span
 
-        .. code-block:: python
 
-            from blu import Key
+                @client
+                def WorldGreeting():
+                    return span['Hello, World!']
 
-            Key(125)[
-                span['Hello, World!'],
-            ]
 
-        .. code-block:: html
+                WorldGreeting
+            
+            .. code-block:: html
 
-            <span>Hello, World!</span>
-
-    - A :py:class:`str` is rendered as an HTML text node.
-
-        .. code-block:: python
-
-            'Hello, World!'
-
-        .. code-block:: html
-
-            Hello, World!
-
-    - A :py:class:`tuple` is rendered as a `React fragment <https://react.dev/reference/react/Fragment>`_ without a key.
-
-        .. code-block:: python
-
-            ('Hello,', ' ', 'World!')
-
-        .. code-block:: html
-
-            Hello, World!
-
-    - Any other :py:class:`Iterable <collections.abc.Iterable>` is rendered in React as JavaScript arrays.
-
-        .. code-block:: python
-
-            ['Hello,', ' ', 'World!']
-
-        .. code-block:: html
-
-            Hello, World!
-    
-    - A :py:class:`int` is rendered as an HTML text node.
-
-        .. code-block:: python
-
-            1
+                <span>Hello, World!<span>
         
-        .. code-block:: html
+        - A :class:`blu.Key` is rendered as a keyed `React fragment <https://react.dev/reference/react/Fragment>`_ whose key is the same as the key passed in to the :class:`Key <blu.Key>` object's constructor.
 
-            1
+            .. code-block:: python
+
+                from blu import Key
+
+                Key(125)[
+                    span['Hello, World!'],
+                ]
+
+            .. code-block:: html
+
+                <span>Hello, World!</span>
+
+        - A :py:class:`str` is rendered as an HTML text node.
+
+            .. code-block:: python
+
+                'Hello, World!'
+
+            .. code-block:: html
+
+                Hello, World!
+
+        - A :py:class:`tuple` is rendered as a `React fragment <https://react.dev/reference/react/Fragment>`_ without a key.
+
+            .. code-block:: python
+
+                ('Hello,', ' ', 'World!')
+
+            .. code-block:: html
+
+                Hello, World!
+
+        - Any other :py:class:`Iterable <collections.abc.Iterable>` is rendered in React as JavaScript arrays.
+
+            .. code-block:: python
+
+                ['Hello,', ' ', 'World!']
+
+            .. code-block:: html
+
+                Hello, World!
         
-    - A :py:class:`float` is rendered as an HTML text node.
+        - A :py:class:`int` is rendered as an HTML text node.
 
-        .. code-block:: python
+            .. code-block:: python
 
-            1.0
+                1
+            
+            .. code-block:: html
 
-        .. code-block:: html
+                1
+            
+        - A :py:class:`float` is rendered as an HTML text node.
 
-            1.0
-        
-    - :py:data:`True` is rendered as an HTML text node with the text ``true``.
+            .. code-block:: python
 
-        .. code-block:: python
+                1.0
 
-            True
-        
-        .. code-block:: html
+            .. code-block:: html
 
-            true
-        
-    - :py:data:`False` is rendered as an HTML text node with the text ``false``.
+                1.0
+            
+        - :py:data:`True` is rendered as an HTML text node with the text ``true``.
 
-        .. code-block:: python
+            .. code-block:: python
 
-            False
+                True
+            
+            .. code-block:: html
 
-        .. code-bock:: html
+                true
+            
+        - :py:data:`False` is rendered as an HTML text node with the text ``false``.
 
-            false
-        
-    - :py:data:`None` is rendered as nothing. It is rendered in React as the JavaScript ``null`` value.
+            .. code-block:: python
 
-        .. code-block:: python
+                False
 
-            None
+            .. code-bock:: html
 
-        .. code-block:: html
+                false
+            
+        - :py:data:`None` is rendered as nothing. It is rendered in React as the JavaScript ``null`` value.
+
+            .. code-block:: python
+
+                None
+
+            .. code-block:: html
 

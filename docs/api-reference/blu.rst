@@ -5,9 +5,7 @@
 
     Document the following:
 
-    - use_effect
     - use_state
-    - use_ref 
 
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement, Key, Ref

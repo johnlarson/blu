@@ -29,6 +29,18 @@ def use_effect(
                 do_some_teardown()
 
             return div['Hello!']
+    
+    :param callback: A non-generator function or a generator function
+        with a single ``yield`` statement.
+
+    If ``callback`` is generator function, it will be run right up until
+    the ``yield`` statement immediately after the element is initially
+    rendered to the DOM. The rest of the function will be run
+    immediately before the element is removed from the DOM.
+
+    If ``callback`` is not a generator function, ``callback`` will be
+    called immediately after the element is initially rendered to the
+    DOM.
     """
     ...
 

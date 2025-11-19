@@ -19,6 +19,9 @@ def use_effect(
         from blu import client, use_effect
         from blu.html import div
 
+        __client__ = True
+
+
         @client
         def MyClientElement():
             
@@ -48,6 +51,8 @@ def use_effect(
 def use_state[T](init: T) -> tuple[T, Callable[[T], None]]:
     """
     .. include:: /_includes/hook-note.rst
+
+    
     """
     ...
 
@@ -133,5 +138,43 @@ class Ref[T]:
 def use_ref[T](init: T) -> Ref[T]:
     """
     .. include:: /_includes/hook-note.rst
+
+    Store a value doesn't change between renders unless explicitly set
+    to a new value.
+
+    .. code-block:: python
+
+        from blu import client, is_client, use_ref
+        from blu.html import button
+
+        if is_client:
+            from js import alert
+
+        __client__ = True
+
+        
+        @client
+        def MyElement():
+            click_count_ref = use_ref(0)
+
+            def handle_click(e):
+                click_count_ref[:] = click_count_ref[:] + 1
+                count = click_count_ref[:]
+                alert(f'You\'ve clicked the button {count} times.')
+
+            return button['Click me!']
+
+    :param init: Any value.
+    :return: A :class:`Ref <blu.Ref>`. This will be the same
+        :class:`Ref <blu.Ref>` object on every render of the same
+        element. On the initial render, the value stored in the
+        :class:`Ref <blu.Ref>` will be ``init``, but you can set this to
+        a new value at any time (see :class:`blu.Ref` for how to set a
+        :class:`Ref <blu.Ref>`\\'s value).
+    
+    .. note::
+
+        Setting a :class:`Ref <blu.Ref>`\\'s value does not trigger a
+        re-render.
     """
     ...

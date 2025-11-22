@@ -52,7 +52,40 @@ def use_state[T](init: T) -> tuple[T, Callable[[T], None]]:
     """
     .. include:: /_includes/hook-note.rst
 
+    Handle state management for an element.
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import button
+
+        __client__ = True
+
+
+        @client
+        def MyElement():
+            click_count, set_click_count = use_state(0)
+
+            def handle_click(e):
+                set_click_count(click_count + 1)
+
+            return (
+                button(onClick=handle_click)[
+                    f'You\\'ve clicked {click_count} times',
+                ]
+            )
     
+    :param init: An initial value for the state being managed.
+    :return: A tuple containing two items: The current value for the
+        state being managed, and a function that takes any value and
+        causes the element whose render function ``use_state`` was
+        called in to re-render. On a re-render triggered by this setter,
+        the first item in the tuple will be whatever was passed into the
+        setter when the re-render was triggered. On a re-render not
+        triggered by this state's setter, the first item in the tuple
+        will be whatever it was in the previous render. On the initial
+        render, the first item in the tuple will be ``init``.
+            
     """
     ...
 

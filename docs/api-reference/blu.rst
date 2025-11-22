@@ -3,9 +3,23 @@
 
 .. todo::
 
-    Document the following:
+    Typing for:
 
+    - ElementRenderer
+    - ClientElement
+    - HTMLElement
+    - Key
+    - Node
+    - Ref
+    - Response
+    - WrongEnvironmentError
+    - app
+    - client
+    - create_rare_html_element
+    - html
+    - use_effect
     - use_state
+    - use_ref
 
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement, Key, Ref

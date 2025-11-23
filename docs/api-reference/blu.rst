@@ -1,13 +1,6 @@
 ``blu``
 =======
 
-.. todo::
-
-    Typing for:
-
-    - use_state
-    - use_ref
-
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement, Key, Ref
 

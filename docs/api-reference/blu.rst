@@ -66,8 +66,8 @@
                 print('Hello from your web app server!')
         
 
-    .. py:type:: ClientRenderer[**P]
-        :canonical: collections.abc.Callable[P, blu.Node | Generator[None, Node, Node]]
+    .. py:type:: ClientRenderer
+        :canonical: collections.abc.Callable[..., blu.Node | Generator[None, Node, Node]]
 
         A function that defines how a :class:`ClientElement <blu.ClientElement>` is rendered. This type of function is passed into the :func:`client <blu.client>` decorator to create a :class:`ClientElement <blu.ClientElement>`:
 
@@ -198,7 +198,7 @@
 
                 False
 
-            .. code-bock:: html
+            .. code-block:: html
 
                 false
             

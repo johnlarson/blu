@@ -721,9 +721,9 @@ class ClientElement:
                 <div>Hello, Hailey!</div>
                 <div>Hello, World!</div>
         
-        :param *args: The positional arguments to pass into the
+        :param args: The positional arguments to pass into the
             element's render function when it is rendered.
-        :param **kwargs: The keyword arguments to pass into the
+        :param kwargs: The keyword arguments to pass into the
             element's render function when it is rendered, as well as an
             optional keyword argument ``key``, which will be used by
             React to uniquely identify the element when it is rendered.

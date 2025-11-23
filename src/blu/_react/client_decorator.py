@@ -1,12 +1,12 @@
 import platform
-from blu._react.types import ClientElement, ElementRenderer
+from blu._react.types import ClientElement, ClientRenderer
 from blu._utils.client import is_client
 
 if is_client:
     from pyscript.ffi import create_proxy  # type: ignore
 
 
-def client[**P](renderer: ElementRenderer[P]) -> ClientElement:
+def client(renderer: ClientRenderer) -> ClientElement:
     """
     Decorator that converts a rendering function into a
     :class:`blu.ClientElement`.

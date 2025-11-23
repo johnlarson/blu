@@ -5,8 +5,6 @@
 
     Typing for:
 
-    - Key
-    - Node
     - Ref
     - Response
     - WrongEnvironmentError

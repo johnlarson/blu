@@ -29,7 +29,6 @@ type Serializable = (
 )
 
 type Node = '''
-    CustomElement |
     ClientElement |
     HTMLElement |
     Key |

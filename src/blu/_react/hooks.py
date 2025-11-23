@@ -1,12 +1,7 @@
 from collections.abc import AsyncGenerator, Callable, Generator
 
 
-def use_effect(
-    callback: Callable[
-        [],
-        None | Generator[None] | AsyncGenerator[None],
-    ],
-):
+def use_effect(callback: Callable[[], None | Generator[None]]):
     """
     .. include:: /_includes/hook-note.rst
 

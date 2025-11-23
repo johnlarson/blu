@@ -1,4 +1,3 @@
-import platform
 from blu._react.types import ClientElement, ClientRenderer
 from blu._utils.client import is_client
 

@@ -30,7 +30,7 @@ type Serializable = (
 
 type Node = '''
     CustomElement |
-    ClientElement[...] |
+    ClientElement |
     HTMLElement |
     Key |
     Iterable[Node] |
@@ -618,10 +618,7 @@ class Key:
         return copy
 
 
-type ElementRenderer[**P] = Callable[
-    P,
-    Node | Generator[None, Node, Node] | AsyncGenerator[None | Node, Node]
-]
+type ClientRenderer = Callable[..., Node | Generator[None, Node, Node]]
 
 
 class Element[**P](Protocol):
@@ -676,11 +673,11 @@ class ClientElement:
     _args: tuple[Any, ...]
     _kwargs: dict[str, Any]
     _children: list['Node']
-    _renderer: ElementRenderer
+    _renderer: ClientRenderer
 
     def __init__(
         self,
-        renderer: ElementRenderer,
+        renderer: ClientRenderer,
         args: tuple[Any, ...],
         kwargs: dict[str, Any],
         children: Sequence[Node],

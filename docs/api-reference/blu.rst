@@ -5,8 +5,6 @@
 
     Typing for:
 
-    - ElementRenderer
-    - ClientElement
     - HTMLElement
     - Key
     - Node

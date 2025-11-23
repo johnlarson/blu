@@ -5,7 +5,6 @@
 
     Typing for:
 
-    - HTMLElement
     - Key
     - Node
     - Ref

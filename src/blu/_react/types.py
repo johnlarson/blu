@@ -142,7 +142,7 @@ class HTMLElement:
         self._children = children
 
     def __call__(
-        self, /, props: Props = {}, **kwargs: PropValue
+        self, props: Props = {}, /, **kwargs: PropValue
     ) -> 'HTMLElement':
         """
         Create a copy of ``self`` with React props set based on the

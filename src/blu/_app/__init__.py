@@ -61,8 +61,8 @@ class Blu:
 
     async def build(self):
         await build(self.app_dir, self.static_dir, self.build_dir)
-    
-    async def page(self, path: str) -> Node:
+
+    async def node(self, path: str) -> Node:
         return await self._asgi_app.get_page_node(path)
     
     async def response(self, path: str) -> Response:

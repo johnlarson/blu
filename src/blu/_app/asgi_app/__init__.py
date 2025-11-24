@@ -1,3 +1,4 @@
+from blu._react.types import Node
 from blu._utils.typing import Iterable
 import mimetypes
 from pathlib import Path
@@ -149,6 +150,10 @@ class ASGIApp(asgi.App):
     async def get_page_node(self, path: str):
         response = await self.get_page_response(path)
         return response._body  # type: ignore
+
+    async def get_page_rendered(self, path: str):
+        unrendered = await self.get_page_node(path)
+        return _render_page_node(unrendered)
     
     async def get_page_response(self, path: str):
         if '?' in path:
@@ -160,3 +165,7 @@ class ASGIApp(asgi.App):
         else:
             request = Request(path)
         return await self._router.handle(request)
+
+
+def _render_page_node(root: Node) -> Node:
+    return root

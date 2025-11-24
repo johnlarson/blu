@@ -60,11 +60,8 @@ class ASGIApp(asgi.App):
         else:
             return
         request = await self._create_request(scope)
-        path = request.path
-        stripped = path.strip('/')
-        segments: list[str] = [] if stripped == '' else stripped.split('/')
         try:
-            response = await self._router.handle(request, segments)
+            response = await self._router.handle(request)
         except NotFound:
             await send({
                 'type': 'http.response.start',
@@ -75,7 +72,6 @@ class ASGIApp(asgi.App):
                 'body': b'Not Found: ' + scope['path'].encode('utf-8'),
             })
             return
-        assert response is not None
         await send({
             'type': 'http.response.start',
             'status': response.status,
@@ -149,3 +145,18 @@ class ASGIApp(asgi.App):
         send: asgi.Sender
     ):
         ...
+
+    async def get_page_node(self, path: str):
+        response = await self.get_page_response(path)
+        return response._body  # type: ignore
+    
+    async def get_page_response(self, path: str):
+        if '?' in path:
+            url_path, query_str = path.strip().split('?')
+            request = Request(
+                url_path,
+                QueryParams.from_query_string(query_str)
+            )
+        else:
+            request = Request(path)
+        return await self._router.handle(request)

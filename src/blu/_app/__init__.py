@@ -1,3 +1,4 @@
+from blu._http import Response
 from blu._utils.typing import AsyncGenerator
 from contextlib import asynccontextmanager
 import functools
@@ -21,7 +22,7 @@ class Blu:
     project_root: Path
     is_dev: bool
 
-    _asgi_app: asgi.App
+    _asgi_app: ASGIApp
     _app_import_path: str
 
     @property
@@ -60,6 +61,12 @@ class Blu:
 
     async def build(self):
         await build(self.app_dir, self.static_dir, self.build_dir)
+    
+    async def page(self, path: str) -> Node:
+        return await self._asgi_app.get_page_node(path)
+    
+    async def response(self, path: str) -> Response:
+        return await self._asgi_app.get_page_response(path)
 
     @asynccontextmanager
     async def dev(self) -> AsyncGenerator['Blu']:

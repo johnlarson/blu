@@ -43,8 +43,16 @@ class Router:
     def _get_page_handler(self, module_name: str) -> Handler:
         module = import_module(module_name)
         return module.__page__
+    
+    async def handle(self, request: Request) -> Response:
+        path = request.path
+        stripped = path.strip('/')
+        segments: list[str] = [] if stripped == '' else stripped.split('/')
+        response = await self.handle_rec(request, segments)
+        assert response is not None
+        return response
 
-    async def handle(
+    async def handle_rec(
         self,
         request: Request,
         path: list[str],
@@ -127,7 +135,7 @@ class Router:
             raise NotFound
         for name, segment in self.static_segments.items():
             if name == path[0]:
-                response = await segment.handle(
+                response = await segment.handle_rec(
                     request,
                     path[1:],
                     route_params,
@@ -146,7 +154,7 @@ class Router:
             raise NotFound
         for param_name, segment in self.dynamic_segments.items():
             new_route_params = {**route_params, param_name: path[0]}
-            response = await segment.handle(
+            response = await segment.handle_rec(
                 request,
                 path[1:],
                 new_route_params,

@@ -16,3 +16,4 @@ Welcome Blu's documentation.
    quickstart
    user-guide/index
    api-reference/index
+   contributing

@@ -178,7 +178,7 @@ type RenderedNode = (
 )
 
 
-def _render_page_node_rec(root: Node) -> tuple[Node, ...]:
+def _render_page_node(root: Node) -> tuple[Node, ...]:
     if isinstance(root, ClientElement):
         return _render_client_element(root)
     if isinstance(root, HTMLElement):
@@ -198,7 +198,7 @@ def _render_client_element(element: ClientElement) -> tuple[Node, ...]:
             next(render_return)
         except StopIteration as e:
             render_return = e.value
-    return _render_page_node_rec(render_return)
+    return _render_page_node(render_return)
 
 
 def _render_html_element(element: HTMLElement) -> tuple[Node, ...]:
@@ -210,5 +210,5 @@ def _render_key(key: Key) -> tuple[Node, ...]:
 
 
 def _render_iterable(root: Node) -> tuple[Node, ...]:
-    tuples = [_render_page_node_rec(x) for x in root]  # type: ignore
+    tuples = [_render_page_node(x) for x in root]  # type: ignore
     return tuple(y for x in tuples for y in x)

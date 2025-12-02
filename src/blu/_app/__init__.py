@@ -65,6 +65,9 @@ class Blu:
     async def node(self, path: str) -> Node:
         return await self._asgi_app.get_page_node(path)
     
+    async def render(self, path: str) -> Node:
+        return await self._asgi_app.get_page_rendered(path)
+    
     async def response(self, path: str) -> Response:
         return await self._asgi_app.get_page_response(path)
 

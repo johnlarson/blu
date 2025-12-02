@@ -1,4 +1,4 @@
-from blu._react.types import Node
+from blu._react.types import ClientElement, HTMLElement, Key, Node
 from blu._utils.typing import Iterable
 import mimetypes
 from pathlib import Path
@@ -165,7 +165,41 @@ class ASGIApp(asgi.App):
         else:
             request = Request(path)
         return await self._router.handle(request)
+    
+
+type RenderedNode = (
+    HTMLElement |
+    str |
+    int |
+    float |
+    bool |
+    None
+)
 
 
-def _render_page_node(root: Node) -> Node:
-    return root
+def _render_page_node(root: Node) -> tuple[Node, ...]:
+    if isinstance(root, ClientElement):
+        return _render_client_element(root)
+    if isinstance(root, HTMLElement):
+        return _render_html_element(root)
+    if isinstance(root, Key):
+        return _render_key(root)
+    if isinstance(root, Iterable) and not isinstance(root, str):
+        return _render_iterable(root)
+    return (root,)
+
+
+def _render_client_element(element: ClientElement) -> tuple[Node, ...]:
+    ...
+
+
+def _render_html_element(element: HTMLElement) -> tuple[Node, ...]:
+    ...
+
+
+def _render_key(key: Key) -> tuple[Node, ...]:
+    ...
+
+
+def _render_iterable(root: Node) -> tuple[Node, ...]:
+    ...

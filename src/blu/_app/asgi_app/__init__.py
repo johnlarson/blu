@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from blu._react.types import ClientElement, HTMLElement, Key, Node
 from blu._utils.typing import Iterable
 import mimetypes
@@ -177,7 +178,7 @@ type RenderedNode = (
 )
 
 
-def _render_page_node(root: Node) -> tuple[Node, ...]:
+def _render_page_node_rec(root: Node) -> tuple[Node, ...]:
     if isinstance(root, ClientElement):
         return _render_client_element(root)
     if isinstance(root, HTMLElement):
@@ -190,16 +191,24 @@ def _render_page_node(root: Node) -> tuple[Node, ...]:
 
 
 def _render_client_element(element: ClientElement) -> tuple[Node, ...]:
-    ...
+    render_return = element._renderer(*element._args, **element._kwargs)  # type: ignore
+    if isinstance(render_return, Generator):
+        render_return.send(element._children)
+        try:
+            next(render_return)
+        except StopIteration as e:
+            render_return = e.value
+    return _render_page_node_rec(render_return)
 
 
 def _render_html_element(element: HTMLElement) -> tuple[Node, ...]:
-    ...
+    return element[_render_iterable(element._children)]
 
 
 def _render_key(key: Key) -> tuple[Node, ...]:
-    ...
+    return _render_iterable(key._children)  # type: ignore
 
 
 def _render_iterable(root: Node) -> tuple[Node, ...]:
-    ...
+    tuples = [_render_page_node_rec(x) for x in root]  # type: ignore
+    return tuple(y for x in tuples for y in x)

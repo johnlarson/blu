@@ -1,4 +1,6 @@
 import asyncio
+from blu._app.asgi_app import render_page_node
+from blu._react.types import ClientElement, HTMLElement, Key, Node
 from blu._utils.typing import AsyncGenerator, Generator, Iterable, Mapping
 from contextlib import asynccontextmanager, contextmanager
 from importlib import import_module
@@ -326,3 +328,60 @@ def mapping_get(mapping: Mapping[Any, Any], key: Any, default: Any = None) -> An
 
 class ValidationError(Exception):
     pass
+
+
+def render(node: Node) -> Node:
+    return render_page_node(node)
+
+
+def node_eq(n1: Node, n2: Node) -> bool:
+    if type(n1) != type(n2):
+        return False
+    if isinstance(n1, ClientElement):
+        return _client_element_eq(n1, n2)
+    if isinstance(n1, HTMLElement):
+        return _html_element_eq(n1, n2)
+    if isinstance(n1, Key):
+        return _key_eq(n1, n2)
+    if isinstance(n1, Iterable) and not isinstance(n1, str):
+        return _iterable_eq(n1, n2)
+    return n1 == n2
+    
+def _client_element_eq(e1: ClientElement, e2: ClientElement) -> bool:
+    if e1._renderer != e2._renderer:
+        return False
+    if e1._args != e2._args:
+        return False
+    if e1._kwargs != e2._kwargs:
+        return False
+    return _children_eq(e1, e2)
+
+
+def _html_element_eq(e1: HTMLElement, e2: HTMLElement) -> bool:
+    if e1._tagname != e2._tagname:
+        return False
+    if e1._attrs != e2._attrs:
+        return False
+    return _children_eq(e1, e2)
+
+
+def _children_eq(
+    e1: ClientElement | HTMLElement | Key,
+    e2: ClientElement | HTMLElement | Key,
+) -> bool:
+    return _iterable_eq(e1._children, e2._children)
+
+
+def _key_eq(e1: Key, e2: Key) -> bool:
+    if e1._key != e2._key:
+        return False
+    return _children_eq(e1, e2)
+
+
+def _iterable_eq(i1: Iterable, i2: Iterable) -> bool:
+    if len(i1) != len(i2):
+        return False
+    return all(
+        node_eq(x1, i2[i])
+        for i, x1 in enumerate(i1)
+    )

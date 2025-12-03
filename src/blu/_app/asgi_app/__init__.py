@@ -154,7 +154,7 @@ class ASGIApp(asgi.App):
 
     async def get_page_rendered(self, path: str):
         unrendered = await self.get_page_node(path)
-        return _render_page_node(unrendered)
+        return render_page_node(unrendered)
     
     async def get_page_response(self, path: str):
         if '?' in path:
@@ -177,8 +177,12 @@ type RenderedNode = (
     None
 )
 
+def render_page_node(root: Node) -> Node:
+    ret_tuple = _render_page_node_rec(root)
+    return ret_tuple[0] if len(ret_tuple) == 1 else ret_tuple
 
-def _render_page_node(root: Node) -> tuple[Node, ...]:
+
+def _render_page_node_rec(root: Node) -> tuple[Node, ...]:
     if isinstance(root, ClientElement):
         return _render_client_element(root)
     if isinstance(root, HTMLElement):
@@ -193,16 +197,16 @@ def _render_page_node(root: Node) -> tuple[Node, ...]:
 def _render_client_element(element: ClientElement) -> tuple[Node, ...]:
     render_return = element._renderer(*element._args, **element._kwargs)  # type: ignore
     if isinstance(render_return, Generator):
-        render_return.send(element._children)
+        next(render_return)
         try:
-            next(render_return)
+            render_return.send(element._children)
         except StopIteration as e:
             render_return = e.value
-    return _render_page_node(render_return)
+    return _render_page_node_rec(render_return)
 
 
 def _render_html_element(element: HTMLElement) -> tuple[Node, ...]:
-    return element[_render_iterable(element._children)]
+    return (element[_render_iterable(element._children)],)
 
 
 def _render_key(key: Key) -> tuple[Node, ...]:
@@ -210,5 +214,5 @@ def _render_key(key: Key) -> tuple[Node, ...]:
 
 
 def _render_iterable(root: Node) -> tuple[Node, ...]:
-    tuples = [_render_page_node(x) for x in root]  # type: ignore
+    tuples = [_render_page_node_rec(x) for x in root]  # type: ignore
     return tuple(y for x in tuples for y in x)

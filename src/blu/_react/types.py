@@ -737,7 +737,10 @@ class ClientElement:
             render function with ``*args`` and ``**kwargs``, with the
             exception that the keyword argument ``key`` will not be
             passed on to the render function and will instead be used by
-            React to identify the new element.
+            React to identify the new element. If the original had a
+            key, it will not be retained in the copy, and the copy will
+            have a key if and only if ``**kwargs`` contains the ``key``
+            argument.
 
         Below is an example of using the ``key`` argument:
 
@@ -805,6 +808,9 @@ class ClientElement:
             displayed where the element's render function uses the
             ``yield`` keyword. If no children were specified, nothing
             will be rendered where the ``yield`` keyword is used.
+        :raises: :py:class:`TypeError` if element's rendering function
+            is not a :py:class:`Generator <collections.abc.Generator>`,
+            i.e. doesn't contain a ``yield`` statement.
         """
         return ClientElement(
             self._renderer,

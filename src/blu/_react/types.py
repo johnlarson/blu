@@ -656,7 +656,7 @@ class ClientElement:
                 return colorful_span
 
                 
-        ColoredText('red', bold=True)[
+        ColorfulText('red', bold=True)[
             'Danger! The world said hello back.',
         ]
 
@@ -800,10 +800,11 @@ class ClientElement:
             <span style="color: red">Danger! This text is red.</span>
 
         :param children: Any valid :type:`blu.Node` or a
-            :py:class:`tuple` of :type:`blu.Node`\s.
+            :py:class:`tuple` of :type:`blu.Node`\\s.
         :return: A copy of ``self`` that will render with ``children``
             displayed where the element's render function uses the
-            ``yield`` keyword.
+            ``yield`` keyword. If no children were specified, nothing
+            will be rendered where the ``yield`` keyword is used.
         """
         return ClientElement(
             self._renderer,

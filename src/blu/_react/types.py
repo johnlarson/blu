@@ -159,8 +159,7 @@ class HTMLElement:
 
         :param props: A mapping of prop names to prop values. This is an
             escape hatch for cases when the prop name can't be
-            represented as a keyword argument name. Note that this is a
-            keyword-only argument.
+            represented as a keyword argument name.
 
         :param kwargs: The new props, where the argument name is the
             prop's key and the argument value is the prop's value. This
@@ -195,9 +194,6 @@ class HTMLElement:
                :data:`div(props={'props-only': 'props', 'shared': 'props'}, shared='kw', kw_only='kw')`
                results in the React element
                ``<div props-only="props" shared="props" kw-only="kw" />``
-        
-        .. note:: ``children`` is not a valid prop name in Blu. To set
-            React children, use the index operator (:data:`[]`).
         """
         all_props = {
             **self._rename_props(kwargs),

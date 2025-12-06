@@ -112,7 +112,7 @@ class Ref[T]:
         .. code-block:: python
 
             from blu import client
-            from blu.tml import button
+            from blu.html import button
 
             __client__ = True
 

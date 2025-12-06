@@ -4,3 +4,11 @@ def test_runs_blu_from_app_module():
     current Python environment's "app" package.
     """
     ...
+
+
+def test_raises_WrongEnvironmentError_when_called_on_client():
+    """
+    Calling app client-side results in a blu.WrongEnvironmentError being
+    raised.
+    """
+    ...

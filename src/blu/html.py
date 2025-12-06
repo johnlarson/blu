@@ -75,6 +75,10 @@ def __getattr__(import_name: str) -> _HTMLElement:
 
     :param import_name: An HTML tag name.
 
-    :return: A :class:`blu.HTMLElement` whose tag name is **import_name**.
+    :return: A :class:`blu.HTMLElement` whose tag name is
+        ``import_name`` with the last trailing underscore (if any)
+        removed and any other underscores converted to dashes. The
+        :class:`HTMLElement <blu.HTMLElement>` won't have any props or
+        children.
     """
     return _HTMLElement(import_name, {}, [])

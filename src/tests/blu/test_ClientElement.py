@@ -141,6 +141,24 @@ def test_getitem_does_not_mutate_original():
     ...
 
 
+def test_accepts_any_node_children():
+    """Accepts any blu.Node as a child."""
+    ...
+
+
+def test_accepts_children_with_children():
+    """Renders correctly with element children that have children."""
+    ...
+
+
+def test_multi_step_render():
+    """
+    Correctly renders when rendering function return value includes
+    ClientElements.
+    """
+    ...
+
+
 def test_renders_correctly():
     """
     ClientElements render as expected client-side.

@@ -150,6 +150,6 @@ def test_renders_correctly():
     translate to the expected behavior in an actual Blu app.
 
     Most tests don't run in a full app environment because it would be
-    very slow to test functionality in a web browser.
+    very slow to test all functionality in a web browser.
     """
     ...

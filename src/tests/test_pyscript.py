@@ -1,0 +1,3 @@
+def test_can_import_on_client():
+    """The pyscript package can be imported in client-side code."""
+    ...

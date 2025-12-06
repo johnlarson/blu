@@ -43,7 +43,7 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     ...
 
 
-def use_state[T](init: T) -> tuple[T, Callable[[T], None]]:
+def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
     """
     .. include:: /_includes/hook-note.rst
 

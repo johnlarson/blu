@@ -120,7 +120,7 @@ Top-level functions
     
     :return: - If an instance of :type:`blu.Node`, the page that should be sent in the HTTP response.
 
-        - If an instance of :type:`blu.Request`, the HTTP response that should be sent.
+        - If an instance of :type:`blu.Response`, the HTTP response that should be sent.
 
 
 __default__.py

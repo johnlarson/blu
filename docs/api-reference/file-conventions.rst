@@ -167,6 +167,32 @@ Top-level functions
                 p['The slug value is: ', slug],
                 p['The query param value is: ', q],
             )
+    
+    .. code-block:: python
+        :caption: app/static_segment/_slug_/__default__.py
+
+        from blu.html import p
+
+        
+        def __page__(path, _, slug, /, q):
+            return (
+                p['The remaining path is: ', path],
+                p['The slug value is: ', slug],
+                p['The query param value is: ', q],
+            )
+    
+    .. code-block:: python
+        :caption: app/static_segment/_slug_/__default__.py
+
+        from blu.html import p
+
+        
+        def __page__(slug, path__, /, q):
+            return (
+                p['The remaining path is: ', path],
+                p['The slug value is: ', slug],
+                p['The query param value is: ', q],
+            )
 
     .. code-block:: html
         :caption: GET /static_segment/some-slug-value/some/extra/path?q=some-query-value

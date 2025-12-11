@@ -94,7 +94,7 @@ Handles a request whose full URL matches all directories in the path to this fil
 Top-level functions
 ^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: __page__(***url) -> blu.Node | blu.Response | flask.Response
+.. py:function:: __page__(***url) -> blu.Node | blu.Response
 
     Handle a request whose URL path is matched by this file.
 
@@ -104,7 +104,7 @@ Top-level functions
         from blu.html import p
 
         
-        def __page__(slug, *, q):
+        def __page__(slug, __, q):
             return (
                 p['The slug value is: ', slug],
                 p['The query param value is: ', q],
@@ -120,7 +120,7 @@ Top-level functions
     
     :return: - If an instance of :type:`blu.Node`, the page that should be sent in the HTTP response.
 
-        - If an instance of :type:`blu.Node` or :type:`quart.Node`, the HTTP response that should be sent.
+        - If an instance of :type:`blu.Request`, the HTTP response that should be sent.
 
 
 __default__.py
@@ -151,7 +151,7 @@ Top-level functions
 ^^^^^^^^^^^^^^^^^^^
 
 
-.. py:function:: __page__([path: str, /, ]***url) -> blu.Node | blu.Response | flask.Response
+.. py:function:: __page__(***url) -> blu.Node | blu.Response
 
     Handle a request whose URL path is matched by this file.
 
@@ -161,9 +161,9 @@ Top-level functions
         from blu.html import p
 
         
-        def __page__(path, /, slug, *, q):
+        def __page__(slug, __, q):
             return (
-                p['The remaining path is: ', path],
+                p['The remaining path is: ', __],
                 p['The slug value is: ', slug],
                 p['The query param value is: ', q],
             )
@@ -175,26 +175,11 @@ Top-level functions
         <p>The slug value is: some-slug-value</p>
         <p>The query param value is: some-query-value</p>
 
-    :param path: The remaining, unmatched portion of the URL, with no intial or trailing ``/``.
     :param url: (see :ref:`file-conventions/files/what-does-triple-start-url-mean`)
 
     :return: - If an instance of :type:`blu.Node`, the page that should be sent in the HTTP response.
 
-        - If an instance of :type:`blu.Node` or :type:`quart.Node`, the HTTP response that should be sent.
-    
-    Note that the *path* argument is not required, so the following is valid:
-
-    .. code-block:: python
-
-        def __page__(some_route_param):
-            ...
-
-    Also note that Blu recognizes the *path* parameter regardless of what it is called, so the following is valid as well:
-
-    .. code-block:: python
-
-        def __page__(remaining_path, /):
-            ...
+        - If an instance of :type:`blu.Response`, the HTTP response that should be sent.
 
 
 
@@ -245,14 +230,12 @@ A __settings__.py file can have any of the following settings:
 What does *\*\*\*url* mean?
 +++++++++++++++++++++++++++
 
-Route handlers in Blu allow you to capture route parameters from dynamic path segments and query parameters from the query string by adding keyword-only and positional/keyword arguments to the function (positional-only arguments don't capture route or query parameters).
-
-In this document, ``***url`` at the end of a function signature acts as a placeholder for positional/keyword and keyword-only arguments, and indicates that these arguments can capture route and query parameters as follows:
+In this document, when a handler has ``***url`` in its call signature, that means that when you create that type of handler, you can capture information from the page URL in the function signature as follows:
 
 Capturing route parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can capture route parameters from dynamic route segments using positional/keyword arguments:
+You can capture route parameters from dynamic route segments by passing them in as arguments:
 
 .. code-block:: python
     :caption: app/employees/_employee_id_/time_punch/_date_/__index__.py
@@ -276,7 +259,7 @@ You can capture route parameters from dynamic route segments using positional/ke
 Capturing query parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can capture query parameters using keyword-only arguments:
+Any arguments specified after ``__`` (a double underscore) in your call signature will capture query parameters instead of route parameters:
 
 .. code-block:: python
     :caption: app/greet_me/__index__.py
@@ -284,7 +267,7 @@ You can capture query parameters using keyword-only arguments:
     from blu.html import p
 
 
-    def __page__(*, my_name):
+    def __page__(__, my_name):
         return p['Hello ', my_name, '!']
 
 .. code-block:: html
@@ -300,7 +283,7 @@ You can set default values for query parameters:
     from blu.html import p
 
 
-    def __page__(*, my_name='World'):
+    def __page__(__, my_name='World'):
         return p['Hello ', my_name, '!']
 
 .. code-block:: html
@@ -316,7 +299,7 @@ You can also use ``**kwargs`` for query parameters:
     from blu.html import p
 
 
-    def __page__(*, my_name, **kwargs):
+    def __page__(__, my_name, **kwargs):
         greeting = kwargs.get('greeting', 'Hello')
         return p[greeting, ' ', my_name, '!']
 
@@ -325,35 +308,79 @@ You can also use ``**kwargs`` for query parameters:
 
     <p>Hi Kevin!</p>
 
-Handler-specific arguments
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you also have route parameters, place them before ``__``:
 
-Positional-only arguments are reserved for handler-specific arguments.
+.. code-block:: python
+    :caption: app/_id_/__index__.py
 
-For example, the *__page()__* function of __default__.py files allows you to get the remaining portion of the URL path using a positional-only argument (in Python, positional-only arguments are at the beginning of the argument list, separated from other arguments with a ``/``):
+    from blu.html import p
+
+    def __page__(id, __, foo):
+        return (
+            p['ID: ', id],
+            p['foo:', foo],
+        )
+
+.. code-block:: html
+    :caption: GET /123?foo=3
+
+    <p>ID: 123</p>
+    <p>foo: 3</p>
+
+
+Capturing the remaining path
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Since a call to a ``__page__`` handler in a ``__default__.py`` file usually results from a partial URL match rather than a full match, it can be useful to access the remaining, unmatched portion at the end of the URL path. You can capture this using the ``__`` (double underscore) argument:
 
 .. code-block:: python
     :caption: app/foo/__default__.py
 
     from blu.html import p
 
-    def __page__(path, /):
-        return p['Remaining path: ', path]
+    def __page__(__):
+        return p['Remaining path: ', __]
 
 .. code-block:: html
     :caption: GET /foo/bar/baz
 
     <p>Remaining path: bar/baz</p>
 
-Blu passes these arguments in by position, so unlike route- and query-parameter-capturing arguments, they can have any name:
+This can be used alongside route parameters and query parameters:
 
 .. code-block:: python
-    :caption: app/foo/__default__.py
+    :caption: app/_id_/__default__.py
 
     from blu.html import p
 
-    def __page__(remaining_path, /):
-        return p['Remaining path: ', remaining_path]
+    def __page__(id, __, baz):
+        return (
+            p['ID: ', id],
+            p['Remaining path:', __],
+            p['baz:', baz],
+        )
+
+.. code-block:: html
+    :caption: GET /123/foo/bar?baz=3
+
+    <p>ID: 123</p>
+    <p>Remaining path: foo/bar</p>
+    <p>baz: 3</p>
+
+An ``__index__.py`` file, however, is only matched using a full match, so it never has any remaining, unmatched URL path segments. Because of this, ``__`` will always evaluate to ``''`` in an ``__index__.py`` file's ``__page__`` handler:
+
+.. code-block:: python
+    :caption: app/foo/__index__.py
+
+    from blu.html import p
+
+    def __page__(__):
+        return p['Remaining path: ', __]
+
+.. code-block:: html
+    :caption: GET /foo/bar/baz
+
+    <p>Remaining path: </p>
 
 
 All Python Modules

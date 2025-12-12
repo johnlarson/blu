@@ -87,7 +87,7 @@ def test_nonexistent_query_params():
     If a handler's call signature includes query parameters that are not
     provided in the request URL and the call signature does not provide
     default values for those query parameters, a TypeError will be
-    thrown.
+    raised.
     """
     ...
 

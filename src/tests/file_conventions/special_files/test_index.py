@@ -42,17 +42,94 @@ def test_handler_return_response():
     ...
 
 
-def test_handler_handles_route_params():
+def test_handler_only_route_params():
     """
-    Route params are passed into the 
+    If the argument "__" does not appear in the handler call signature,
+    each argument will capture the value of the dynamic segment whose
+    name matches the argument name.
+    """
+    ...
+
+
+def nonexistent_route_params():
+    """
+    If there are route parameters in the handler's call signature whose
+    names don't match those of any of the dynamic segment matched by the
+    handler's filesystem location, a TypeError will be thrown when the
+    route is accessed through HTTP.
     """
     ...
 
 
-def test_handler_handles_query_params():
+def missing_route_params():
     """
-    
+    If there are dynamic segments matched by the handler's filesystem
+    location that don't have a corresponding argument in the handler's
+    call signature, the handler will still be called with the route
+    parameter argument(s) that it allows.
     """
     ...
 
+
+def test_handler_only_query_params():
+    """
+    If the handler's call signature starts with an argument called "__",
+    then when the handler is matched, it will be called, passing in the
+    query parameters as keyword arguments, where the query parameter
+    name is the argument key, and the query parameter value is the
+    argument value.
+    """
+    ...
+
+
+def test_nonexistent_query_params():
+    """
+    If a handler's call signature includes query parameters that are not
+    provided in the request URL and the call signature does not provide
+    default values for those query parameters, a TypeError will be
+    thrown.
+    """
+    ...
+
+
+def test_query_param_default_values():
+    """
+    If a handler's call signature includes query parameters that are not
+    provided in the request URL but the call signature does provide
+    default values for those query parameters, the handler will be run
+    with those query parameter arguments' default values.
+    """
+    ...
+
+
+def test_query_params_not_in_call_signature():
+    """
+    Any query parameters in the URL that are not captured in the call
+    signature of the __page__ handler are be ignored.
+    """
+    ...
+
+
+def test_query_params_kwargs():
+    """
+    Query parameters can be captured using keyword argument unpacking.
+    """
+    ...
+
+
+def test_handler_route_and_query_params():
+    """
+    If a __page__ handler has the argument "__" in its call signature,
+    arguments on the left will be treated as route parameters, and
+    arguments on the right of it will be treated as query parameters.
+    """
+    ...
+
+
+def test_handler_dunder_is_empty_string():
+    """
+    If a __page__ handler has the argument "__" in its call signature,
+    the value of "__" will be an empty string.
+    """
+    ...
 

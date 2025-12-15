@@ -1,5 +1,5 @@
 import pytest
-from blu import client
+from blu import client, Key
 from blu.html import div, span
 from tests.utils import renders_as
 
@@ -123,7 +123,7 @@ def test_call_does_not_retain_key():
     resulting copy will not have a key, even if the original did.
     """
     with pytest.raises(LookupError):
-        client(lambda: 'Hello')(key=1)(key=2)._get_key()
+        client(lambda: 'Hello')(key=1)()._get_key()
 
 
 def test_call_retains_children():

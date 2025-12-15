@@ -1,6 +1,7 @@
 from collections.abc import (
     AsyncGenerator, Callable, Generator, Iterable
 )
+import inspect
 from numbers import Number
 from pathlib import Path
 from types import EllipsisType
@@ -507,7 +508,7 @@ def _index_to_children(
     for child in children:
         if child is not None and not isinstance(
             child,
-            (HTMLElement, CustomElement, ClientElement, Sequence, str, Number, bool),
+            (HTMLElement, Key, ClientElement, Sequence, str, Number, bool),
         ):
             raise TypeError(
                 'HTMLElement\'s children must be valid nodes, i.e. they '
@@ -821,13 +822,15 @@ class ClientElement:
             is not a :py:class:`Generator <collections.abc.Generator>`,
             i.e. doesn't contain a ``yield`` statement.
         """
+        if not inspect.isgeneratorfunction(self._renderer):
+            raise TypeError('This element does not accept any children.')
         return ClientElement(
             self._renderer,
             self._args,
             self._kwargs,
             _index_to_children(children),
-            key=None,
-            has_key=False,
+            key=self._key,
+            has_key=self._has_key,
         )
     
     def _get_key(self):

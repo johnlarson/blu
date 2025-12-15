@@ -187,7 +187,7 @@ def _render_page_node_rec(root: Node) -> tuple[Node, ...]:
     return _collapse_nodes(uncollapsed)
 
 
-def _collapse_nodes(uncollapsed: tuple[Node, ...]) -> tuple[Node, ...]:
+def _collapse_nodes(uncollapsed: Iterable[Node]) -> tuple[Node, ...]:
     current_str = ''
     collapsed: list[Node] = []
     for item in uncollapsed:
@@ -242,4 +242,4 @@ def _render_key(key: Key) -> tuple[Node, ...]:
 
 def _render_iterable(root: Node) -> tuple[Node, ...]:
     tuples = [_render_page_node_rec(x) for x in root]  # type: ignore
-    return tuple(y for x in tuples for y in x)
+    return _collapse_nodes(y for x in tuples for y in x)

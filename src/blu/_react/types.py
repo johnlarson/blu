@@ -197,8 +197,8 @@ class HTMLElement:
                ``<div props-only="props" shared="props" kw-only="kw" />``
         """
         all_props = {
+            **props,
             **self._rename_props(kwargs),
-            **self._rename_props(props),
         }
         for prop_name in all_props:
             if not is_client and prop_name.startswith('on'):

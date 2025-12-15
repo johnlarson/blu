@@ -27,7 +27,7 @@ def test_non_trailing_underscore():
     underscore in the argument name, the underscore will be converted to
     a dash in the resulting React HTML element.
     """
-    assert div(data_count=3)['data-count'] == 3
+    assert div(data_count=3)._attrs['data-count'] == 3
 
 
 def test_props_dict():

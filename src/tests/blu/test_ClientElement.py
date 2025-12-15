@@ -1,10 +1,24 @@
+import pytest
+from blu import client
+from blu.html import div, span
+from tests.utils import renders_as
+
+
 def test_args():
     """
     Calling a ClientElement as a function returns a copy that will be
     rendered by passing in the positional args the original was called
     with into its render function.
     """
-    ...
+
+    @client
+    def Hello(first_name, last_name):
+        return f'Hello, {first_name} {last_name}!'
+    
+    assert renders_as(
+        Hello('Amanda', 'Myers'),
+        'Hello, Amanda Myers!',
+    )
 
 
 def test_kwargs():
@@ -13,7 +27,15 @@ def test_kwargs():
     rendered by passing in the keyword args the original was called with
     into its render function.
     """
-    ...
+
+    @client
+    def Hello(first_name, last_name):
+        return f'Hello, {first_name} {last_name}!'
+    
+    assert renders_as(
+        Hello(first_name='Amanda', last_name='Myers'),
+        'Hello, Amanda Myers!',
+    )
 
 
 def test_args_and_kwargs():
@@ -22,7 +44,29 @@ def test_args_and_kwargs():
     rendered by passing in both the positional and keyword args the
     original was called with into its render function.
     """
-    ...
+
+    @client
+    def Hello(first_name, last_name):
+        return f'Hello, {first_name} {last_name}!'
+    
+    assert renders_as(
+        Hello('Amanda', last_name='Myers'),
+        'Hello, Amanda Myers!',
+    )
+
+
+def test_no_args_or_children():
+    """
+    If a ClientElement has no positional or keyword arguments set, it
+    will be rendered with no arguments passed into the rendering
+    function.
+    """
+    
+    @client
+    def Hello():
+        return f'Hello!'
+    
+    assert renders_as(Hello, 'Hello!')
 
 
 def test_replace_original_args_and_kwargs():
@@ -31,15 +75,27 @@ def test_replace_original_args_and_kwargs():
     of the original positional or keyword arguments will be retained in
     the copy.
     """
-    ...
+    
+    @client
+    def E(a, b=0, c=0):
+        return (a, b, c)
+    
+    original = E(1, 2, c=3)
+    copy = original(4)
 
+    assert renders_as(copy, '400')
 
 def test_key():
     """
     Passing the keyword argument "key" into a ClientElement's __call__
     method results in ClientElement that has the provided key.
     """
-    ...
+    
+    @client
+    def E():
+        return 'Hello.'
+    
+    assert E(key=3)._get_key() == 3
 
 
 def test_key_not_passed_into_render_function():
@@ -57,7 +113,8 @@ def test_call_replaces_key():
     that will be the key of the resulting copy, regardless of what the
     original key was.
     """
-    ...
+    assert client(lambda: 'Hello')(key=1)(key=2)._get_key() == 2
+
 
 
 def test_call_does_not_retain_key():
@@ -65,7 +122,8 @@ def test_call_does_not_retain_key():
     If no key is specified in a call to ClientElement.__call__, the
     resulting copy will not have a key, even if the original did.
     """
-    ...
+    with pytest.raises(LookupError):
+        client(lambda: 'Hello')(key=1)(key=2)._get_key()
 
 
 def test_call_retains_children():
@@ -73,7 +131,12 @@ def test_call_retains_children():
     When a ClientElement is called as a function, the resulting copy has
     the same children as the original.
     """
-    ...
+    
+    @client
+    def Foo(a):
+        return (yield), a
+
+    assert renders_as(Foo[1](2), '12')
 
 
 def test_call_does_not_mutate_original():
@@ -81,7 +144,10 @@ def test_call_does_not_mutate_original():
     Calling a ClientElement as a function does not mutate the original
     in place.
     """
-    ...
+    original = client(lambda x: x)(1)
+    copy = original(2)
+    assert renders_as(copy, '2')
+    assert renders_as(original, '1')
 
 
 def test_children():
@@ -90,7 +156,15 @@ def test_children():
     but with the items passed into __getitem__ being rendered where the
     yield statement appears.
     """
-    ...
+
+    @client
+    def Foo():
+        return div[(yield)]
+    
+    assert renders_as(
+        Foo[span['Hello']],
+        div[span['Hello']],
+    )
 
 
 def test_no_children():
@@ -98,7 +172,11 @@ def test_no_children():
     Rendering an element that never had children added using __getitem__
     will result in nothing being rendered where the yield statement is.
     """
-    ...
+    @client
+    def Foo():
+        return div[(yield)]
+    
+    assert renders_as(Foo, div)
 
 
 def test_doesnt_take_children():
@@ -107,7 +185,10 @@ def test_doesnt_take_children():
     function has no yield statement, calling __getitem__ raises a
     TypeError.
     """
-    ...
+    Foo = client(lambda x: x)
+    with pytest.raises(TypeError):
+        Foo['Hello']
+
 
 
 def test_replace_children():
@@ -115,7 +196,11 @@ def test_replace_children():
     When ClientElement.__getitem__ is called, the resulting copy does
     not retain the original's children.
     """
-    ...
+    @client
+    def Foo():
+        return (yield)
+    
+    assert renders_as(Foo[1, 2, 3][4, 5, 6], '456')
 
 
 def test_getitem_retains_original_args_and_kwargs():
@@ -123,7 +208,11 @@ def test_getitem_retains_original_args_and_kwargs():
     When ClientElement.__getitem__ is called, the resulting copy has the
     same positional and keyword render arguments as the original.
     """
-    ...
+    @client
+    def Foo(x):
+        return x, (yield)
+
+    assert renders_as(Foo(1)[2], '12')
 
 
 def test_getitem_retains_key():
@@ -131,32 +220,70 @@ def test_getitem_retains_key():
     When ClientElement.__getitem__ is called, the resulting copy has the
     same key as the original.
     """
-    ...
+    @client
+    def Foo():
+        return (yield)
+    assert Foo(key=0)[1]._get_key() == 0
 
 
 def test_getitem_does_not_mutate_original():
     """
     ClientElement.__getitem__ does not mutate the original in place.
     """
-    ...
+    @client
+    def Foo():
+        return (yield)
+
+    original = Foo[1]
+    copy = original[2]
+    assert renders_as(copy, '2')
+    assert renders_as(original, '1')
 
 
 def test_accepts_any_node_children():
     """Accepts any blu.Node as a child."""
-    ...
+
+    @client
+    def Foo():
+        return (yield)
+
+    @client
+    def Bar():
+        return 'Bar'
+
+    assert renders_as(
+        Foo[
+            Bar,
+            div,
+            Key(2),
+            (1, 2, 3),
+            [4, 5, 6],
+            'Hello',
+            7,
+            8.0,
+            True,
+            False,
+            None,
+        ],
+        (
+            'Bar',
+            div,
+            '123456Hello78.0truefalse',
+        ),
+    )
 
 
 def test_accepts_children_with_children():
     """Renders correctly with element children that have children."""
-    ...
+    @client
+    def Foo():
+        return div[(yield)]
 
+    @client
+    def Bar():
+        return span[(yield)]
 
-def test_multi_step_render():
-    """
-    Correctly renders when rendering function return value includes
-    ClientElements.
-    """
-    ...
+    assert renders_as(Foo[Bar['Hello.']], div[span['Hello.']])
 
 
 def test_renders_correctly():

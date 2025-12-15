@@ -330,6 +330,10 @@ class ValidationError(Exception):
     pass
 
 
+def renders_as(input: Node, rendered: Node) -> bool:
+    return node_eq(render(input), rendered)
+
+
 def render(node: Node) -> Node:
     return render_page_node(node)
 

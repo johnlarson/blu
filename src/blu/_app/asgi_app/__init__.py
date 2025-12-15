@@ -183,6 +183,27 @@ def render_page_node(root: Node) -> Node:
 
 
 def _render_page_node_rec(root: Node) -> tuple[Node, ...]:
+    uncollapsed = _render_page_nodes_rec(root)
+    return _collapse_nodes(uncollapsed)
+
+
+def _collapse_nodes(uncollapsed: tuple[Node, ...]) -> tuple[Node, ...]:
+    current_str = ''
+    collapsed: list[Node] = []
+    for item in uncollapsed:
+        if isinstance(item, str):
+            current_str += item
+        else:
+            if current_str:
+                collapsed.append(current_str)
+                current_str = ''
+            collapsed.append(item)
+    if current_str:
+        collapsed.append(current_str)
+    return tuple(collapsed)
+
+
+def _render_page_nodes_rec(root: Node) -> tuple[Node, ...]:
     if isinstance(root, ClientElement):
         return _render_client_element(root)
     if isinstance(root, HTMLElement):
@@ -191,7 +212,13 @@ def _render_page_node_rec(root: Node) -> tuple[Node, ...]:
         return _render_key(root)
     if isinstance(root, Iterable) and not isinstance(root, str):
         return _render_iterable(root)
-    return (root,)
+    if root is True:
+        return ('true',)
+    if root is False:
+        return ('false',)
+    if root is None:
+        return ()
+    return (str(root),)
 
 
 def _render_client_element(element: ClientElement) -> tuple[Node, ...]:

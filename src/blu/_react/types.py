@@ -669,6 +669,8 @@ class ClientElement:
     _kwargs: dict[str, Any]
     _children: list['Node']
     _renderer: ClientRenderer
+    _key: Any
+    _has_key: bool
 
     def __init__(
         self,
@@ -676,11 +678,15 @@ class ClientElement:
         args: tuple[Any, ...],
         kwargs: dict[str, Any],
         children: Sequence[Node],
+        key: Any,
+        has_key: bool,
     ):
         self._renderer = renderer
         self._args = args
         self._kwargs = kwargs
         self._children = list(children)
+        self._key = key
+        self._has_key = has_key
 
     def __call__(
         self,
@@ -765,11 +771,18 @@ class ClientElement:
             <div>Hello, Bill!</div>
             <div>Hello, Carrie!</div>
         """
+        kwargs_copy = {**kwargs}
+        try:
+            del kwargs_copy['key']
+        except KeyError:
+            pass
         return ClientElement(
             self._renderer,
             args,
             kwargs,
             self._children,
+            key=kwargs.get('key', None),
+            has_key='key' in kwargs,
         )
 
     def __getitem__(
@@ -813,4 +826,11 @@ class ClientElement:
             self._args,
             self._kwargs,
             _index_to_children(children),
+            key=None,
+            has_key=False,
         )
+    
+    def _get_key(self):
+        if not self._has_key:
+            raise LookupError('This element has no key.')
+        return self._key

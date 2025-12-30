@@ -1,6 +1,8 @@
 print('Hello, World!')
 
+import base64
 from collections import defaultdict
+import pickle
 from blu._utils.typing import Generator
 
 print('defaultdic:', defaultdict)
@@ -21,7 +23,7 @@ import json
 from pyscript import js_import  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
 
-from blu._react.types import ElementRenderer, ClientElement, HTMLElement, Jsonable, Node
+from blu._react.types import ElementRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
 
 # react_dom = await js_import('https://esm.sh/react-dom/client')
 # react = await js_import('https://esm.sh/react')
@@ -29,12 +31,13 @@ from blu._react.types import ElementRenderer, ClientElement, HTMLElement, Jsonab
 from pyscript.js_modules import _blu_react_dom as react_dom
 from pyscript.js_modules import _blu_react as react
 
-async def main():
-    json_str = document.querySelector('script[type="react-data"]').textContent  # type: ignore
-    root_node_json = json.loads(json_str)  # type: ignore
-    root_node = get_node(root_node_json)
-    console.log('ROOT NODE:', root_node)
 
+async def main():
+    b64_str: str = cast(str, document.querySelector('script[type="react-data"]').textContent)  # type: ignore
+    b64_bytes = b64_str.encode('ascii')
+    pickled = base64.b64decode(b64_bytes)
+    unpickled = pickle.loads(pickled)
+    root_node = get_node(unpickled)
     if root_node_json['tagname'] == 'html':
         react_dom.createRoot(document).render(root_node)
     else:
@@ -45,26 +48,27 @@ def get_node(data: Any):
     print('DATA:', data)
     if isinstance(data, list):
         return get_array(data)
-    elif isinstance(data, dict):
-        data = cast(ReactDict, data)
-        if 'type' not in data:
-            raise TypeError('Data dict should have key "type"')
-        elif data['type'] == 'object':
-            return get_obj(data['data'])
-        elif data['type'] == 'client_element':
-            py_element = parse_py_element(data)
-            return py_to_js_node(py_element)
-        elif data['type'] == 'fragment':
-            props = {'key': data['key']} if 'key' in data else {}
-            return react.createElement(react.Fragment, get_obj(props))
-        elif data['type'] == 'native_element':
-            return react.createElement(
-                data['tagname'],
-                data['props'],
-                *get_array(data['children']),
-            )
-        else:
-            raise TypeError(f'Unknown ReactDict type: "{data['type']}"')
+    elif isinstance(data, ClientElement):
+        return py_to_js_node(data)
+    elif isinstance(data, Key):
+        props = {'key': data['key']}
+        return react.createElement(
+            react.Fragment,
+            {'key': data._key},
+            *get_array(data._children),
+        )
+    elif isinstance(data, tuple):
+        return react.createElement(
+            react.Fragment,
+            {},
+            *get_array(data),
+        )
+    elif isinstance(data, HTMLElement):
+        return react.createElement(
+            data._tagname,
+            data._props,
+            *get_array(data['children']),
+        )
     else:
         return data
 
@@ -73,7 +77,11 @@ def get_obj(obj: ReactJsObject):
     return {k: get_node(v) for k, v in obj.items()}
 
 
-def get_array(array: Any):
+def get_dict(my_dict: dict):
+    return {k: get_node(v) for k, v in my_dict.items()}
+
+
+def get_array_old(array: Any):
     return [get_node(x) for x in array]
 
 

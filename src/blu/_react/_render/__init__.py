@@ -1,6 +1,8 @@
+import base64
 from io import StringIO
 import os
 from pathlib import Path
+import pickle
 from blu._utils.typing import Optional
 from xml.etree import ElementTree as ET
 
@@ -80,12 +82,11 @@ class Renderer:
         html.append(ET.Element('body'))
         return html
 
-    
     async def _get_react_data(self, root: Node) -> ET.Element:
-        react_data = get_react_data(root)
-        react_data_str = await json.dumps(react_data)
+        pickled = pickle.dumps(root)
+        b64 = base64.b64encode(pickled).decode('ascii')
         element = ET.Element('script', type='react-data')
-        element.text = react_data_str
+        element.text = b64
         return element
 
     # def _get_script_tag(self, root: Node) -> ET.Element:

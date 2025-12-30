@@ -17,9 +17,9 @@ import uvicorn
 from blu._app import Blu
 from blu._utils import asgi, get_available_port
 from blu._utils import json
-from blu._react.client_decorator import client
+from blu import is_client
 
-if not client:
+if not is_client:
     import shutil
     import socket
 

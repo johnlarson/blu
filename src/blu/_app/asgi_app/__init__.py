@@ -76,10 +76,10 @@ class ASGIApp(asgi.App):
             return
         await send({
             'type': 'http.response.start',
-            'status': response.status,
+            'status': response._status,
             'headers': self._get_headers(response)
         })
-        body_str = await self._renderer.render_to_str(response.body)
+        body_str = await self._renderer.render_to_str(response._body)
         # await send({'type': 'http.response.body', 'body': b'Hello!'})
         await send({
             'type': 'http.response.body',
@@ -127,7 +127,7 @@ class ASGIApp(asgi.App):
             (b'Access-Control-Allow-Origin', b'https://micropython.org'),
             *[
                 (k.encode('utf-8'), v.encode('utf-8'))
-                for k, v in response.headers.items()
+                for k, v in response._headers.items()
             ],
         ]
 

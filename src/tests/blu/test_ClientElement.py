@@ -284,17 +284,3 @@ def test_accepts_children_with_children():
         return span[(yield)]
 
     assert renders_as(Foo[Bar['Hello.']], div[span['Hello.']])
-
-
-def test_renders_correctly():
-    """
-    ClientElements render as expected client-side.
-
-    This test checks core functionality in a client-side environment to
-    ensure the functionality seen in the other tests in this module
-    translate to the expected behavior in an actual Blu app.
-
-    Most tests don't run in a full app environment because it would be
-    very slow to test all functionality in a web browser.
-    """
-    ...

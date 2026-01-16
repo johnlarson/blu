@@ -1,7 +1,7 @@
 from tempfile import TemporaryDirectory
 from blu._utils.typing import Optional
 
-from blu._app import Blu
+from blu._app_old import Blu
 from blu._utils import asgi
 
 

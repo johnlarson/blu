@@ -1,5 +1,5 @@
 import asyncio
-from blu._app.asgi_app import render_page_node
+from blu._app_old.asgi_app import render_page_node
 from blu._react.types import ClientElement, HTMLElement, Key, Node
 from blu._utils.typing import AsyncGenerator, Generator, Iterable, Mapping
 from contextlib import asynccontextmanager, contextmanager
@@ -14,7 +14,7 @@ from threading import Thread
 from typing import Any, Literal, Optional, TypedDict, cast
 from bs4 import BeautifulSoup
 import uvicorn
-from blu._app import Blu
+from blu._app_old import Blu
 from blu._utils import asgi, get_available_port
 from blu._utils import json
 from blu import is_client

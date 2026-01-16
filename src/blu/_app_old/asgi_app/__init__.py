@@ -6,7 +6,7 @@ from pathlib import Path
 from blu._utils.typing import Optional
 
 import aiofiles
-from blu._app.asgi_app.router import NotFound, Router, router_from_root_package_name
+from blu._app_old.asgi_app.router import NotFound, Router, router_from_root_package_name
 from blu._http import QueryParams, Request, Response
 from blu._react._render import Renderer
 from blu._utils import asgi

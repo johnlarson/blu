@@ -7,7 +7,7 @@ from blu._utils.typing import Any, cast
 from watchdog.events import DirCreatedEvent, DirModifiedEvent, DirMovedEvent, FileSystemEventHandler, FileCreatedEvent, FileModifiedEvent, FileMovedEvent
 from watchdog.observers import Observer
 
-from blu._app.build_utils import FileBuildProcessor
+from blu._app_old.build_utils import FileBuildProcessor
 
 
 @asynccontextmanager

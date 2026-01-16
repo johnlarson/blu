@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from blu._app.build_utils import FileBuildProcessor
+from blu._app_old.build_utils import FileBuildProcessor
 from blu._utils import walk_dir_files
 
 

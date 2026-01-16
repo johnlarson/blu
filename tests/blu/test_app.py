@@ -10,15 +10,15 @@ async def test_runs_blu_from_app_module(monkeypatch: MonkeyPatch):
     app is an ASGI app that runs the Blu application defined in the
     current Python environment's "app" package.
     """
-    monkeypatch.syspath_prepend(projects / 'basic')  # type: ignore
-    sender_success = Sender()
+    monkeypatch.syspath_prepend(projects / 'static')  # type: ignore
+    sender = Sender()
     await app(
         {
             'asgi': {
                 'version': '1',
                 'spec_version': '2.0',
             },
-            'path': '/',
+            'path': '/path/file.txt',
             'headers': [],
             'type': 'http',
             'http_version': '1.1',
@@ -26,28 +26,9 @@ async def test_runs_blu_from_app_module(monkeypatch: MonkeyPatch):
             'query_string': b'',
         },
         receive,
-        sender_success,
+        sender,
     )
-    assert next(sender_success).get('status', None) == 200
-    
-    sender_404 = Sender()
-    await app(
-        {
-            'asgi': {
-                'version': '1',
-                'spec_version': '2.0',
-            },
-            'path': '/',
-            'headers': [],
-            'type': 'http',
-            'http_version': '1.1',
-            'method': 'GET',
-            'query_string': b'',
-        },
-        receive,
-        sender_404,
-    )
-    assert next(sender_404).get('status', None) == 404
+    assert sender.body() == b'Hello, World!'
 
 
 async def test_raises_WrongEnvironmentError_on_client(monkeypatch: MonkeyPatch):

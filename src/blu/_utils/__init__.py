@@ -5,7 +5,7 @@ from blu._utils.client import is_client
 from blu._utils.asyncio import io_bound
 
 if typing.TYPE_CHECKING:
-    from blu._app import Blu
+    from blu._app_old import Blu
 
 if not is_client:
     import shutil

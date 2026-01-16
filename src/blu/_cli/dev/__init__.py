@@ -12,6 +12,6 @@ async def dev():
         'uvicorn',
         '--port', str(get_available_port()),
         '--reload',
-        'blu._cli.dev.cli_dev_app:app',
+        'blu:app',
     )
     await proc.wait()

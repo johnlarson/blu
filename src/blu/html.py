@@ -18,7 +18,7 @@ React HTML elements.
     </div>
 """
 
-from blu._core.nodes import HTMLElement as _HTMLElement
+from blu._nodes import HTMLElement as _HTMLElement
 
 
 def __getattr__(import_name: str) -> _HTMLElement:

@@ -4,12 +4,11 @@ from blu._utils.client import is_client
 from blu._utils.typing import Protocol, Any
 from blu import html
 from blu._exceptions import WrongEnvironmentError
-from blu._core import create_html_element as create_rare_html_element
-from blu._core.nodes import (
-    ClientRenderer, HTMLElement, Key, ClientElement, Node
+from blu._nodes import (
+    ClientRenderer, HTMLElement, Key, ClientElement, Node, client,
+    create_html_element as create_rare_html_element,
 )
-from blu._core.client_decorator import client
-from blu._core.hooks import Ref, use_effect, use_ref, use_state
+from blu._hooks import Ref, use_effect, use_ref, use_state
 
 
 class ServerOnlyClientInterface:
@@ -29,7 +28,7 @@ if is_client:
     Response = ServerOnlyClientInterface('Response')
     app = ServerOnlyClientInterface('app')
 else:
-    from blu._core.http import Response
+    from blu._http import Response
     from blu._app import app
 
 

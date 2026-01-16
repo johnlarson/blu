@@ -23,7 +23,7 @@ import json
 from pyscript import js_import  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
 
-from blu._core.nodes import ElementRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
+from blu._nodes import ElementRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
 
 # react_dom = await js_import('https://esm.sh/react-dom/client')
 # react = await js_import('https://esm.sh/react')

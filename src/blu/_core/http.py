@@ -3,7 +3,7 @@ from blu._utils.typing import Iterator, Mapping
 
 import urllib.parse
 
-from blu._react.types import Node
+from blu._core.nodes import Node
     
 
 type QueryInit = Mapping[str, str | list[str]]

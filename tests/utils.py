@@ -1,6 +1,6 @@
 import asyncio
 from blu._app_old.asgi_app import render_page_node
-from blu._react.types import ClientElement, HTMLElement, Key, Node
+from blu._core.nodes import ClientElement, HTMLElement, Key, Node
 from blu._utils.typing import AsyncGenerator, Generator, Iterable, Mapping
 from contextlib import asynccontextmanager, contextmanager
 from importlib import import_module

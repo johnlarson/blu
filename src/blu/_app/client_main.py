@@ -17,13 +17,13 @@ import importlib
 from typing import Any, Protocol, TypedDict, cast
 from xml.dom.minidom import Element
 
-from blu._react._render.react_data import ClientElementDict, ReactDict, ReactJsObject
+from blu._core._render.react_data import ClientElementDict, ReactDict, ReactJsObject
 from js import alert, console, document  # type: ignore
 import json
 from pyscript import js_import  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
 
-from blu._react.types import ElementRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
+from blu._core.nodes import ElementRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
 
 # react_dom = await js_import('https://esm.sh/react-dom/client')
 # react = await js_import('https://esm.sh/react')

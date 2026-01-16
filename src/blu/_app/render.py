@@ -5,7 +5,7 @@ import pickle
 from blu._utils.typing import Optional
 from xml.etree import ElementTree as ET
 
-from blu._react.types import Jsonable, Node
+from blu._core.nodes import Jsonable, Node
 from blu._utils import json
 
 type Renamer = dict[tuple[Optional[str], Path], Optional[str]]

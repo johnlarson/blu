@@ -1,5 +1,5 @@
-from blu._react.client_decorator import client
-from blu._react.types import Key
+from blu._core.client_decorator import client
+from blu._core.nodes import Key
 from blu.html import div, span
 from tests.utils import node_eq, renders_as
 

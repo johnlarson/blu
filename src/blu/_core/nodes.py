@@ -4,13 +4,13 @@ from collections.abc import (
 import inspect
 from numbers import Number
 from pathlib import Path
+import re
 from types import EllipsisType
 from blu._utils.typing import Any, Mapping, Protocol, Sequence, cast
 from blu._utils.client import is_client
 
 from blu._exceptions import WrongEnvironmentError
 
-from .utils import py_to_html_name
 
 # """
 # JSON-serializable primitive value.
@@ -837,3 +837,151 @@ class ClientElement:
         if not self._has_key:
             raise LookupError('This element has no key.')
         return self._key
+
+
+def py_to_html_name(py_name: str) -> str:
+    return re.sub('_$', '', py_name).replace('_', '-')
+
+
+def create_html_element(tagname: str) -> HTMLElement:
+    """
+    Create an HTML element. Usually, you will use the :mod:`blu.html`
+    module to create HTML elements, but in rare cases where you cannot
+    import the tag name you need from :mod:`blu.html`, you can use this
+    function to create an HTML element from any valid tag name.
+
+    .. code-block:: python
+
+        from blu import create_rare_html_element
+
+        my_element = create_rare_html_element('my_element-')
+
+        my_element(id='my-id')['Hello, World!']
+    
+        
+    .. code-block:: html
+
+        <my_element->Hello, World!</my_element->
+
+    :param tagname: A valid HTML tag name.
+    :return: A :class:`blu.HTMLElement` whose tag name is ``tagname``,
+        with no props set.
+    """
+    ...
+
+
+if is_client:
+    from pyscript.ffi import create_proxy  # type: ignore
+
+
+def client(renderer: ClientRenderer) -> ClientElement:
+    """
+    Decorator that converts a rendering function into a
+    :class:`blu.ClientElement`.
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import span
+
+
+        @client
+        def ColoredText(color):
+            return span(style={'color': color})[(yield)]
+
+    :param renderer: The function that should be used to render the
+        :class:`ClientElement <blu.ClientElement>`.
+
+    :return: An element that will be rendered client-side using
+        ``renderer``.
+
+    When a :class:`ClientElement <blu.ClientElement>` is rendered, the
+    rendering function it was created from is called with whatever
+    arguments were passed in using :meth:`ClientElement.__call__()
+    <blu.ClientElement.__call__>`:
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import span
+
+
+        @client
+        def Greeting(name='World'):
+            return f'Hello, {name}!'
+
+        
+        Greeting('Gary')
+
+    .. code-block:: html
+
+        Hello, Gary!
+
+    If arguments were never set using :meth:`ClientElement.__call__()
+    <blu.ClientElement.__call__>`, then the render function will be
+    called with no arguments:
+
+    .. code-block:: python
+        
+        from blu import client
+        from blu.html import span
+
+
+        @client
+        def Greeting(name='World'):
+            return f'Hello, {name}!'
+
+        
+        Greeting
+
+    .. code-block:: html
+
+        Hello, World!
+
+    A render function may use the yield keyword (only once) to get the
+    children set using :meth:`ClientElement.__getitem__()
+    <blu.ClientElement.__getitem__>`:
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import span
+
+
+        @client
+        def RedText():
+            return span(style={'color': 'red'})[(yield)]
+
+
+        RedText['Danger!']
+
+    .. code-block:: html
+
+        <span style='color: red'>Danger!</span>
+
+    If the element's children were never set using
+    :meth:`ClientElement.__getitem__() <blu.ClientElement.__getitem__>`,
+    it won't have any children:
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.html import span
+
+
+        @client
+        def RedText():
+            return span(style={'color': 'red'})[(yield)]
+
+
+        RedText
+
+    .. code-block:: html
+
+        <span style='color: red'></span>
+    
+    """
+    element = ClientElement(renderer, (), {}, [], None, False)
+    if is_client:
+        create_proxy(element)  # type: ignore
+    return element

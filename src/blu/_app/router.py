@@ -4,7 +4,7 @@ from importlib import import_module
 import inspect
 from pathlib import Path
 from blu._utils.typing import Any, Optional, Protocol
-from blu._http import Request, Response
+from blu._app.http import Request, Response
 from blu._react.types import Node
 from blu._utils.asyncio import awaitable
 

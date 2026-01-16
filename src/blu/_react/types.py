@@ -10,7 +10,7 @@ from blu._utils.client import is_client
 
 from blu._exceptions import WrongEnvironmentError
 
-from ._utils import py_to_html_name
+from .utils import py_to_html_name
 
 # """
 # JSON-serializable primitive value.

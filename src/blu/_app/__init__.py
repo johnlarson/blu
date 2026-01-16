@@ -10,7 +10,7 @@ from pathlib import Path
 
 import aiofiles
 from blu._app.router import NotFound, router_from_root_package
-from blu._http import QueryParams, Request, Response
+from blu._app.http import QueryParams, Request, Response
 from blu._utils import asgi
 from .render import render_to_str
 

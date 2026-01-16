@@ -29,8 +29,8 @@ if is_client:
     Response = ServerOnlyClientInterface('Response')
     app = ServerOnlyClientInterface('app')
 else:
-    from blu._http import Response
-    from blu._default_app import app
+    from blu._app.http import Response
+    from blu._app import app
 
 
 __all__ = [

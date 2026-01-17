@@ -8,6 +8,7 @@ import blu
 from blu import WrongEnvironmentError, app
 from tests.utils import Sender, projects, receive
 from blu._app import _get_router  # type: ignore
+from blu import _utils
 
 
 def patch_app(module_name: str):
@@ -47,7 +48,7 @@ async def test_raises_WrongEnvironmentError_on_client(monkeypatch: MonkeyPatch):
     Calling app client-side results in a blu.WrongEnvironmentError being
     raised.
     """
-    monkeypatch.setattr(blu, 'is_client', True)
+    monkeypatch.setattr(_utils, 'is_client', True)
     with pytest.raises(WrongEnvironmentError):
         await app(
             {

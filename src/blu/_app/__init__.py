@@ -1,6 +1,7 @@
 from functools import cache
 from importlib import import_module
 from types import ModuleType
+from blu._exceptions import WrongEnvironmentError
 from blu._utils import asgi
 
 
@@ -15,9 +16,14 @@ from blu._app.router import NotFound, router_from_root_package
 from blu._http import QueryParams, Request, Response
 from blu._utils import asgi
 from .render import render_to_str
+from blu import _utils
 
 
 async def app(scope: asgi.Scope, receive: asgi.Receiver, send: asgi.Sender):
+    if _utils.is_client:
+        raise WrongEnvironmentError(
+            'Cannot call Blu ASGI app in a client environment.',
+        )
     if scope['type'] == 'lifespan':
         await _lifespan(scope, receive, send)
     elif scope['type'] == 'http':

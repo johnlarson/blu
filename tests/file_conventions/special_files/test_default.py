@@ -1,4 +1,5 @@
 import pytest
+from blu import Response
 from blu._app.router import NotFound
 from blu._http import Request
 from blu.html import div
@@ -59,33 +60,59 @@ async def test_only_matches_if_no_other_match():
     If there's an __index__.py file under a more specific path that
     matches the URL, the __index__.py file will be used instead.
     """
-    response = await router('index_file_priority').handle(Request('foo/c'))
+    response = await router('index_file_priority').handle(Request('/foo/c'))
     assert response._body == 'INDEX'  # type: ignore
 
 
-def test_more_specific_default_file():
+async def test_more_specific_default_file():
     """
     If there's another __default__.py file under a more specific path
     that matches the URL, that other __default__.py file will be used
     instead.
     """
-    ...
+    r = router('default_specific_priority')
+    response = await r.handle(Request('/foo/c'))
+    assert response._body == 'MORE SPECIFIC'  # type: ignore
 
 
-def test_handler_return_response():
+async def test_handler_return_response():
     """
     If the __page__ function returns a blu.Response object, the HTTP
     response sent to the client will have the body, status code, and
     headers set in the Response object.
     """
-    ...
+    response = await router('default_response_ret').handle(Request('/'))
+    assert response._body == 'BODY'  # type: ignore
+    assert response._status == 401  # type: ignore
+    assert response._headers == {'A': 'b'}  # type: ignore
 
 
-def test_handler_only_route_params():
+async def test_handler_only_route_params():
     """
-    If the argument "__" does not appear in the handler call signature,
-    each argument will capture the value of the dynamic segment whose
-    name matches the argument name.
+    If / does not appear in the handler call signature, each argument
+    will capture the value of the dynamic segment whose name matches the
+    argument name.
+    """
+    response = await router('default_route_params').handle(Request('/1/2/3'))
+    assert response._body == ('1', '2', '3')  # type: ignore
+
+
+async def test_path_param():
+    """
+    If / does not appear in the handler call signature and there is an
+    argument name with a double trailing underscore, that argument will
+    be populated with the remaining path, with no leading or trailing
+    slash.
+    """
+    response = await router('default_path_param').handle(Request('/1/2/3'))
+    assert response._body == '1/2/3'  # type: ignore
+
+
+def test_single_underscore_arg():
+    """
+    If / does not appear in the handler call signature and there is an
+    argument whose name is a single underscore, that argument will be
+    set to None.
     """
     ...
 
@@ -158,9 +185,29 @@ def test_query_params_kwargs():
 
 def test_handler_route_and_query_params():
     """
-    If a __page__ handler has the argument "__" in its call signature,
-    arguments on the left will be treated as route parameters, and
-    arguments on the right of it will be treated as query parameters.
+    If a __page__ handler has a / in its call signature, arguments on
+    the left will be treated as route parameters, and arguments on the
+    right of it will be treated as query parameters.
+    """
+    ...
+
+
+def test_pos_only_path_param():
+    """
+    If a __page__ handler has positional-only arguments, and one of
+    those has a trailing double underscore in its name, that argument
+    will be populated with the remaining portion of the path that is not
+    matched by the __default__.py file where __page__ is, without a
+    leading or trailing /.
+    """
+    ...
+
+
+def test_pos_only_single_underscore():
+    """
+    If a __page__ handler has positional-only arguments, and one of
+    those is named _ (single underscore), then that argument's value
+    will be set to None when __page__ is called.
     """
     ...
 

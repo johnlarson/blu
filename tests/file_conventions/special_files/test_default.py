@@ -1,52 +1,66 @@
-def test_full_match():
+import pytest
+from blu._app.router import NotFound
+from blu._http import Request
+from blu.html import div
+from tests.file_conventions._utils import router
+
+
+async def test_full_match():
     """
     If the path to __default__.py is a full match for the current URL,
     the value returned by its __page__ function will be loaded in the
     user's browser.
     """
-    ...
+    response = await router('default_full_match').handle(Request('/a/foo/c'))
+    assert response._body == 1  # type: ignore
 
 
-def test_matches_when_one_extra_segment():
+async def test_matches_when_one_extra_segment():
     """
     A URL that includes the path to an __default__.py file and contains
     an extra segment results in the file's __page__ handler being used.
     """
-    ...
+    response = await router('default_extra_segment').handle(Request('/a/b'))
+    assert response._body == 'DEFAULT'  # type: ignore
 
 
-def test_matches_when_multiple_extra_segments():
+async def test_matches_when_multiple_extra_segments():
     """
     A URL that includes the path to an __default__.py file and contains
     multiple extra segments results in the file's __page__ handler being
     used.
     """
-    ...
+    r = router('default_extra_segment')
+    response = await r.handle(Request('/a/b/c/d'))
+    assert response._body == 'DEFAULT'  # type: ignore
 
 
-def test_matches_start_only_no_match():
+async def test_matches_start_only_no_match():
     """
     A URL that only contains part of the path to an __default__.py file
     does not result that __index__.py file being used.
     """
-    ...
+    with pytest.raises(NotFound):
+        await router('default_incomplete_match').handle(Request('/a/b'))
 
 
-def test_last_filepath_segment_different_no_match():
+async def test_last_filepath_segment_different_no_match():
     """
-    A URL that almost matches the path to an __default__.py file only
-    the last segment is different does not result in that __default__.py
+    A URL that almost matches the path to a __default__.py file only the
+    last segment is different does not result in that __default__.py
     file being used.
     """
-    ...
+    with pytest.raises(NotFound):
+        await router('default_one_segment_off').handle(Request('/a/b/foo'))
 
 
-def test_only_matches_if_no_other_match():
+async def test_only_matches_if_no_other_match():
     """
     If there's an __index__.py file under a more specific path that
     matches the URL, the __index__.py file will be used instead.
     """
-    ...
+    response = await router('index_file_priority').handle(Request('foo/c'))
+    assert response._body == 'INDEX'  # type: ignore
 
 
 def test_more_specific_default_file():

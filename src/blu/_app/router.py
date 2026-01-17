@@ -155,13 +155,15 @@ class Router:
             raise NotFound
         for param_name, segment in self.dynamic_segments.items():
             new_route_params = {**route_params, param_name: path[0]}
-            response = await segment.handle_rec(
-                request,
-                path[1:],
-                new_route_params,
-            )
-            if response is not None:
-                return response
+            try:
+                response = await segment.handle_rec(
+                    request,
+                    path[1:],
+                    new_route_params,
+                )
+            except NotFound:
+                continue
+            return response
         raise NotFound
 
     async def _handle_default_page(
@@ -205,7 +207,7 @@ def is_static_segment(path: Path) -> bool:
 def is_dynamic_segment(path: Path) -> bool:
     name = path.stem
     return (
-        not path.is_dir() and
+        path.is_dir() and
         len(name) > 2 and
         name[0] == '_' and
         name[1] != '_' and

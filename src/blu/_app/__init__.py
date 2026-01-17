@@ -16,10 +16,12 @@ from .render import render_to_str
 
 import app as app_def
 
-_router = router_from_root_package(app_def)
+_router = None
 
 
 async def app(scope: asgi.Scope, receive: asgi.Receiver, send: asgi.Sender):
+    global _router
+    _router = router_from_root_package(app_def)
     if scope['type'] == 'lifespan':
         await _lifespan(scope, receive, send)
     elif scope['type'] == 'http':

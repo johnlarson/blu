@@ -17,7 +17,6 @@ import importlib
 from typing import Any, Protocol, TypedDict, cast
 from xml.dom.minidom import Element
 
-from blu._core._render.react_data import ClientElementDict, ReactDict, ReactJsObject
 from js import alert, console, document  # type: ignore
 import json
 from pyscript import js_import  # type: ignore

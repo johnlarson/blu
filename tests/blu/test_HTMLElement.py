@@ -1,5 +1,4 @@
-from blu._core.client_decorator import client
-from blu._nodes import Key
+from blu._nodes import Key, client
 from blu.html import div, span
 from tests.utils import node_eq, renders_as
 

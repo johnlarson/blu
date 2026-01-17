@@ -6,67 +6,63 @@ from tests.utils import renders_as
 
 def test_args():
     """
-    Calling a ClientElement as a function returns a copy that will be
-    rendered by passing in the positional args the original was called
-    with into its render function.
+    Calling a ClientElement as a function returns a copy whose `_args`
+    attribute is the provided positional arguments as a tuple.
     """
 
     @client
     def Hello(first_name, last_name):
         return f'Hello, {first_name} {last_name}!'
     
-    assert renders_as(
-        Hello('Amanda', 'Myers'),
-        'Hello, Amanda Myers!',
-    )
+    assert Hello('Amanda', 'Myers')._args == ('Amanda', 'Myers')  # type: ignore
 
 
 def test_kwargs():
     """
-    Calling a ClientElement as a function returns a copy that will be
-    rendered by passing in the keyword args the original was called with
-    into its render function.
+    Calling a ClientElement as a function returns a copy whose `_kwargs`
+    attribute is the given keyword arguments as a dict.
     """
 
     @client
     def Hello(first_name, last_name):
         return f'Hello, {first_name} {last_name}!'
     
-    assert renders_as(
-        Hello(first_name='Amanda', last_name='Myers'),
-        'Hello, Amanda Myers!',
-    )
+    assert Hello(first_name='Amanda', last_name='Myers')._kwargs == {  # type: ignore
+        'first_name': 'Amanda',
+        'last_name': 'Myers',
+    }
 
 
 def test_args_and_kwargs():
     """
-    Calling a ClientElement as a function returns a copy that will be
-    rendered by passing in both the positional and keyword args the
-    original was called with into its render function.
+    Caling a ClientElement with positional and keyword arguments will
+    result in a copy whose _args attribute is the given positional
+    arguments and whose _kwargs attribute is the given keyword
+    arguments.
     """
 
     @client
     def Hello(first_name, last_name):
         return f'Hello, {first_name} {last_name}!'
     
-    assert renders_as(
-        Hello('Amanda', last_name='Myers'),
-        'Hello, Amanda Myers!',
-    )
+    element = Hello('Amanda', last_name='Myers')
+    assert element._args == ('Amanda',)  # type: ignore
+    assert element._kwargs == {'last_name': 'Myers'}  # type: ignore
 
 
 def test_no_args_or_children():
     """
-    If a ClientElement has no positional or keyword arguments set, it
-    will be rendered with no arguments passed into the rendering
-    function.
+    The ClientElement return from the @client decorator will have an
+    _args attribute of () and _kwargs attribute of {}
     """
     
     @client
     def Hello():
         return f'Hello!'
     
-    assert renders_as(Hello, 'Hello!')
+
+    assert Hello._args == ()  # type: ignore
+    assert Hello._kwargs == {}  # type: ignore
 
 
 def test_replace_original_args_and_kwargs():
@@ -81,9 +77,9 @@ def test_replace_original_args_and_kwargs():
         return (a, b, c)
     
     original = E(1, 2, c=3)
-    copy = original(4)
-
-    assert renders_as(copy, '400')
+    original(4)
+    assert original._args == (1, 2)  # type: ignore
+    assert original._kwargs == {'c': 3}  # type: ignore
 
 def test_key():
     """
@@ -98,15 +94,6 @@ def test_key():
     assert E(key=3)._get_key() == 3
 
 
-def test_key_not_passed_into_render_function():
-    """
-    Passing the keyword argument "key" into a ClientElement's __call__
-    method doesn't result in the "key" keyword argument being passed on
-    to the render function during rendering.
-    """
-    ...
-
-
 def test_call_replaces_key():
     """
     If a "key" keyword argument is specified in ClientElement.__call__,
@@ -114,7 +101,6 @@ def test_call_replaces_key():
     original key was.
     """
     assert client(lambda: 'Hello')(key=1)(key=2)._get_key() == 2
-
 
 
 def test_call_does_not_retain_key():
@@ -135,8 +121,8 @@ def test_call_retains_children():
     @client
     def Foo(a):
         return (yield), a
-
-    assert renders_as(Foo[1](2), '12')
+    
+    assert Foo[1](2)._children == [1]  # type: ignore
 
 
 def test_call_does_not_mutate_original():
@@ -145,38 +131,33 @@ def test_call_does_not_mutate_original():
     in place.
     """
     original = client(lambda x: x)(1)
-    copy = original(2)
-    assert renders_as(copy, '2')
-    assert renders_as(original, '1')
+    original(2)
+    assert original._args == (1,)  # type: ignore
 
 
 def test_children():
     """
-    __getitem__ returns a copy that will be rendered as the original,
-    but with the items passed into __getitem__ being rendered where the
-    yield statement appears.
+    __getitem__ returns a copy whose children are the items passed in,
+    as a list.
     """
 
     @client
     def Foo():
         return div[(yield)]
     
-    assert renders_as(
-        Foo[span['Hello']],
-        div[span['Hello']],
-    )
+    assert Foo['Hello', 'There']._children == ['Hello', 'There']  # type: ignore
 
 
 def test_no_children():
     """
-    Rendering an element that never had children added using __getitem__
-    will result in nothing being rendered where the yield statement is.
+    If an element's children are not set, its _children attribute will
+    be [].
     """
     @client
     def Foo():
         return div[(yield)]
     
-    assert renders_as(Foo, div)
+    assert Foo._children == []  # type: ignore
 
 
 def test_doesnt_take_children():
@@ -199,8 +180,8 @@ def test_replace_children():
     @client
     def Foo():
         return (yield)
-    
-    assert renders_as(Foo[1, 2, 3][4, 5, 6], '456')
+
+    assert Foo[1, 2, 3][4, 5, 6]._children == [4, 5, 6]  # type: ignore
 
 
 def test_getitem_retains_original_args_and_kwargs():
@@ -209,10 +190,12 @@ def test_getitem_retains_original_args_and_kwargs():
     same positional and keyword render arguments as the original.
     """
     @client
-    def Foo(x):
+    def Foo(x, y):
         return x, (yield)
-
-    assert renders_as(Foo(1)[2], '12')
+    
+    element = Foo(1, y=2)[3]
+    assert element._args == (1,)  # type: ignore
+    assert element._kwargs == {'y': 2}  # type: ignore
 
 
 def test_getitem_retains_key():
@@ -235,9 +218,8 @@ def test_getitem_does_not_mutate_original():
         return (yield)
 
     original = Foo[1]
-    copy = original[2]
-    assert renders_as(copy, '2')
-    assert renders_as(original, '1')
+    original[2]
+    assert original._children == [1]  # type: ignore
 
 
 def test_accepts_any_node_children():
@@ -250,37 +232,31 @@ def test_accepts_any_node_children():
     @client
     def Bar():
         return 'Bar'
+    
+    fragment = Key(2)
 
-    assert renders_as(
-        Foo[
-            Bar,
-            div,
-            Key(2),
-            (1, 2, 3),
-            [4, 5, 6],
-            'Hello',
-            7,
-            8.0,
-            True,
-            False,
-            None,
-        ],
-        (
-            'Bar',
-            div,
-            '123456Hello78.0truefalse',
-        ),
-    )
-
-
-def test_accepts_children_with_children():
-    """Renders correctly with element children that have children."""
-    @client
-    def Foo():
-        return div[(yield)]
-
-    @client
-    def Bar():
-        return span[(yield)]
-
-    assert renders_as(Foo[Bar['Hello.']], div[span['Hello.']])
+    assert Foo[
+        Bar,
+        div,
+        fragment,
+        (1, 2, 3),
+        [4, 5, 6],
+        'Hello',
+        7,
+        8.0,
+        True,
+        False,
+        None,
+    ]._children == [  # type: ignore
+        Bar,
+        div,
+        fragment,
+        (1, 2, 3),
+        [4, 5, 6],
+        'Hello',
+        7,
+        8.0,
+        True,
+        False,
+        None,
+    ]

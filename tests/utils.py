@@ -33,6 +33,10 @@ def temp_dir() -> Generator[Path]:
         yield Path(tempdir)
 
 
+class Blu:
+    pass
+
+
 @asynccontextmanager
 async def dev_app(app_module: str) -> AsyncGenerator[Blu]:
     with temp_dir() as project_dir:

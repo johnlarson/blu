@@ -1,3 +1,0 @@
-def test_can_import_on_client():
-    """The js module can be imported in client-side code."""
-    ...

@@ -3,7 +3,7 @@ from blu import HTMLElement, create_rare_html_element
 
 def test_create_element():
     """
-    Returns an HTMLElement whose tagname exactly matches the provided
+    Returns an HTMLElement whose tag name exactly matches the provided
     tag name.
     """
     element = create_rare_html_element('my_element-_')

@@ -35,12 +35,14 @@ async def test_nested():
     assert response._body == 'Hello!'  # type: ignore
 
 
-def test_has_priority_over_dynamic_segment():
+async def test_has_priority_over_dynamic_segment():
     """
     When both a static segment directory and a dynamic segment directory
     match a segment in a URL, the static segment will be matched.
     """
-    ...
+    r = router('static_dynamic_priority')
+    response = await r.handle(Request('/static'))
+    assert response._body == 'STATIC'  # type: ignore
 
 
 def test_top_level_directory():

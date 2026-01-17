@@ -1,8 +1,19 @@
+from contextlib import contextmanager
+import importlib
+import sys
+from types import ModuleType
 from pytest import MonkeyPatch
 import pytest
 import blu
 from blu import WrongEnvironmentError, app
 from tests.utils import Sender, projects, receive
+from blu._app import _get_router  # type: ignore
+
+
+def patch_app(module_name: str):
+    module = importlib.import_module(f'tests.apps.{module_name}')
+    sys.modules['app'] = module
+    _get_router.cache_clear()
 
 
 async def test_runs_blu_from_app_module(monkeypatch: MonkeyPatch):
@@ -10,7 +21,7 @@ async def test_runs_blu_from_app_module(monkeypatch: MonkeyPatch):
     app is an ASGI app that runs the Blu application defined in the
     current Python environment's "app" package.
     """
-    monkeypatch.syspath_prepend(projects / 'static')  # type: ignore
+    patch_app('static_files')
     sender = Sender()
     await app(
         {
@@ -18,7 +29,7 @@ async def test_runs_blu_from_app_module(monkeypatch: MonkeyPatch):
                 'version': '1',
                 'spec_version': '2.0',
             },
-            'path': '/path/file.txt',
+            'path': '/path/to/static/file.txt',
             'headers': [],
             'type': 'http',
             'http_version': '1.1',
@@ -28,7 +39,7 @@ async def test_runs_blu_from_app_module(monkeypatch: MonkeyPatch):
         receive,
         sender,
     )
-    assert sender.body() == b'Hello, World!'
+    assert sender.body() == 'Hello, World!'
 
 
 async def test_raises_WrongEnvironmentError_on_client(monkeypatch: MonkeyPatch):

@@ -1,4 +1,6 @@
+from functools import cache
 from importlib import import_module
+from types import ModuleType
 from blu._utils import asgi
 
 
@@ -14,14 +16,8 @@ from blu._http import QueryParams, Request, Response
 from blu._utils import asgi
 from .render import render_to_str
 
-import app as app_def
-
-_router = None
-
 
 async def app(scope: asgi.Scope, receive: asgi.Receiver, send: asgi.Sender):
-    global _router
-    _router = router_from_root_package(app_def)
     if scope['type'] == 'lifespan':
         await _lifespan(scope, receive, send)
     elif scope['type'] == 'http':
@@ -56,7 +52,7 @@ async def _http(
         return
     request = await _create_request(scope)
     try:
-        response = await _router.handle(request)
+        response = await _get_router().handle(request)
     except NotFound:
         await send({
             'type': 'http.response.start',
@@ -86,6 +82,7 @@ async def _serve_static(
 ):
     if not _is_static_file(scope['path']):
         raise NotFound
+    app_def = _get_app_def()
     assert hasattr(app_def, '__path__')
     path_str = app_def.__path__[0]
     app_def_path = Path(path_str)
@@ -175,7 +172,7 @@ async def get_page_response(path: str):
         )
     else:
         request = Request(path)
-    return await _router.handle(request)
+    return await _get_router().handle(request)
     
 
 type RenderedNode = (
@@ -254,3 +251,15 @@ def _render_key(key: Key) -> tuple[Node, ...]:
 def _render_iterable(root: Node) -> tuple[Node, ...]:
     tuples = [_render_page_node_rec(x) for x in root]  # type: ignore
     return _collapse_nodes(y for x in tuples for y in x)
+
+
+@cache
+def _get_router():
+    app_def = _get_app_def()
+    return router_from_root_package(app_def)
+
+
+@cache
+def _get_app_def():
+    import app
+    return app

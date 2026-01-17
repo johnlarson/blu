@@ -1,6 +1,6 @@
 ``blu``
 =======
- 
+  
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement, Key, Ref
 
@@ -15,23 +15,6 @@
 
     .. autoclass:: Ref
         :special-members: __getitem__, __setitem__
-
-    .. autodata:: app
-        :no-value:
-
-        An `ASGI <https://asgi.readthedocs.io/en/latest/>`_ app that runs the Blu application defined in your current Python environment's ``app`` package (for most ASGI servers, running the server in the parent directory of your project's ``app`` directory will put your project's ``app`` package in the Python environment).
-
-        .. code-block:: console
-   
-            $ uvicorn blu:app
-
-        .. code-block:: console
-   
-            $ hypercorn blu:app
-
-        .. code-block:: console
-   
-            $ daphne blu:app
     
     .. py:data:: is_client
         :annotation: bool

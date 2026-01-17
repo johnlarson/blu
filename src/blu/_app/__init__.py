@@ -20,6 +20,25 @@ from blu import _utils
 
 
 async def app(scope: asgi.Scope, receive: asgi.Receiver, send: asgi.Sender):
+    """
+    An `ASGI <https://asgi.readthedocs.io/en/latest/>`_ app that runs
+    the Blu application defined in your current Python environment's
+    ``app`` package (for most ASGI servers, running the server in the
+    parent directory of your project's ``app`` directory will put your
+    project's ``app`` package in the Python environment).
+
+    .. code-block:: console
+
+        $ uvicorn blu:app
+
+    .. code-block:: console
+
+        $ hypercorn blu:app
+
+    .. code-block:: console
+
+        $ daphne blu:app
+    """
     if _utils.is_client:
         raise WrongEnvironmentError(
             'Cannot call Blu ASGI app in a client environment.',

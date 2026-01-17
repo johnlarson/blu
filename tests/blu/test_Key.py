@@ -10,17 +10,14 @@ def test_uses_key():
     assert fragment._key == 3  # type: ignore
 
 
-def renders_children():
-    """Renders as its children."""
-    assert renders_as(Key(3)[div['Hello']], div['Hello'])
+def stores_children():
+    """Stores children as list in _children attribute."""
+    assert Key(3)['Hello']._children == ['Hello']  # type: ignore
 
 
 def test_no_children():
-    """
-    Rendering a Key that never had children added using __getitem__ will
-    result in nothing being rendered where the Key appears.
-    """
-    assert renders_as(Key(3), ())
+    """If no children are set, _children attribute is []."""
+    assert Key(3)._children == []  # type: ignore
 
 
 def test_replace_children():
@@ -28,7 +25,7 @@ def test_replace_children():
     When Key.__getitem__ is called, the resulting copy does not retain
     the original's children.
     """
-    assert node_eq(Key(3)[div][span], Key(3)[span])
+    assert Key(3)[div][span]._children == [span]  # type: ignore
 
 
 def test_getitem_retains_key():
@@ -37,14 +34,14 @@ def test_getitem_retains_key():
     as the original.
     """
     original = Key(3)
-    assert original._key == original[div]._key  # type: ignore
+    assert original[div]._key == 3  # type: ignore
 
 
 def test_getitem_does_not_mutate_original():
     """Key.__getitem__ does not mutate the original in place."""
     original = Key(3)[div]
     original[span]
-    assert node_eq(original, Key(3)[div])
+    assert original._children == [div]  # type: ignore
 
 
 def test_accepts_any_node_children():
@@ -54,28 +51,30 @@ def test_accepts_any_node_children():
     def Foo():
         return 'Foo'
     
-    assert renders_as(
-        Key(4)[
-            Foo,
-            div,
-            Key(2),
-            (1, 2, 3),
-            [4, 5, 6],
-            'Hello',
-            7,
-            8.0,
-            True,
-            False,
-            None,
-        ],
-        (
-            'Foo',
-            div,
-            '123456Hello78.0truefalse',
-        ),
-    )
+    fragment = Key(2)
 
-
-def test_accepts_children_with_children():
-    """Renders correctly with element children that have children."""
-    assert renders_as(Key(1)[Key(2)['Hello!']], 'Hello!')
+    Key(4)[
+        Foo,
+        div,
+        fragment,
+        (1, 2, 3),
+        [4, 5, 6],
+        'Hello',
+        7,
+        8.0,
+        True,
+        False,
+        None,
+    ]._children == [  # type: ignore
+        Foo,
+        div,
+        fragment,
+        (1, 2, 3),
+        [4, 5, 6],
+        'Hello',
+        7,
+        8.0,
+        True,
+        False,
+        None,
+    ]

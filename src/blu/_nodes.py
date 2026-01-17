@@ -867,7 +867,7 @@ def create_html_element(tagname: str) -> HTMLElement:
     :return: A :class:`blu.HTMLElement` whose tag name is ``tagname``,
         with no props set.
     """
-    ...
+    return HTMLElement(tagname, {}, [])
 
 
 if is_client:

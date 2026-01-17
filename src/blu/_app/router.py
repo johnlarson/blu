@@ -195,7 +195,7 @@ class Router:
 def is_static_segment(path: Path) -> bool:
     name = path.stem
     return (
-        not path.is_dir() and
+        path.is_dir() and
         len(name) > 0 and
         name[0] != '_' and
         name[-1] != '_'

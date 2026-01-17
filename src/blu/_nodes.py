@@ -137,7 +137,7 @@ class HTMLElement:
     """
 
     def __init__(self, tagname: str, props: Props, children: Children):
-        self._tagname = py_to_html_name(tagname)
+        self._tagname = tagname
         self._attrs = props
         self._children = children
 

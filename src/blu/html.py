@@ -81,4 +81,5 @@ def __getattr__(import_name: str) -> _HTMLElement:
         :class:`HTMLElement <blu.HTMLElement>` won't have any props or
         children.
     """
-    return _HTMLElement(import_name, {}, [])
+    from blu._nodes import py_to_html_name
+    return _HTMLElement(py_to_html_name(import_name), {}, [])

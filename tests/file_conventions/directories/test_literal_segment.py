@@ -45,9 +45,10 @@ async def test_has_priority_over_dynamic_segment():
     assert response._body == 'STATIC'  # type: ignore
 
 
-def test_top_level_directory():
+async def test_top_level_directory():
     """
     A handler file that is the immediate child of the app directory
     matches the URL path /.
     """
-    ...
+    response = await router('top_level_segment').handle(Request('/'))
+    assert response._body == 'Hello!'  # type: ignore

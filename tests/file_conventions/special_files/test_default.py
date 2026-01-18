@@ -173,24 +173,29 @@ async def test_query_param_default_values():
     default values for those query parameters, the handler will be run
     with those query parameter arguments' default values.
     """
+    r = router('def_query_params_default')
+    response = await r.handle(Request('/'))
+    assert response._body == 3  # type: ignore
+
+
+async def test_query_params_not_in_call_signature():
+    """
+    Any query parameters in the URL that are not captured in the call
+    signature of the __page__ handler are ignored.
+    """
     r = router('def_missing_query_params')
-    response = await r.handle(Request('/', query={'a': '1', 'b': '1'}))
+    response = await r.handle(Request('/', query={'a': '1', 'b': '2'}))
     assert response._body == 25  # type: ignore
 
 
-def test_query_params_not_in_call_signature():
-    """
-    Any query parameters in the URL that are not captured in the call
-    signature of the __page__ handler are be ignored.
-    """
-    ...
-
-
-def test_query_params_kwargs():
+async def test_query_params_kwargs():
     """
     Query parameters can be captured using keyword argument unpacking.
     """
-    ...
+    r = router('def_query_kwarg')
+    response = await r.handle(Request('/', query={'a': '1', 'b': '2'}))
+    assert response._body == ('1', '2')  # type: ignore
+
 
 
 def test_handler_route_and_query_params():

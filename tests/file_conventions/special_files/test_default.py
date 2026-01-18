@@ -243,7 +243,7 @@ async def test_handler_dunder_is_empty_string():
 
 
 async def test_async_handler():
-    """Page handler can be an async function."""
+    """__page__ handler can be an async function."""
     r = router('def_async_handler')
     response = await r.handle(Request('/'))
     assert response._body == 'Works!'  # type: ignore

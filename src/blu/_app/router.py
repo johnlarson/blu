@@ -1,7 +1,9 @@
 from types import ModuleType
+from typing import Mapping
 from blu._utils.typing import Callable
 from importlib import import_module
 import inspect
+from inspect import Parameter
 from pathlib import Path
 from blu._utils.typing import Any, Optional, Protocol
 from blu._http import Request, Response
@@ -99,6 +101,7 @@ class Router:
             self.index_page,
             route_params,
             request,
+            path,
         )
         return await awaitable(self.index_page(**kwargs))
     
@@ -106,25 +109,22 @@ class Router:
         self,
         handler: Callable[P, Response | Node],
         route_params: dict[str, str],
-        request: Request
+        request: Request,
+        path: list[str],
     ) -> dict[str, str]:
         fn_params = inspect.signature(handler).parameters
-        route_params_kwargs = {
-            fn_param.name: route_params[fn_param.name]
-            for fn_param in fn_params.values()
-            if fn_param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-        }
-        # query_params_kwargs: dict[str, str] = {}
-        # for fn_param in fn_params.values():
-        #     if fn_param.kind == inspect.Parameter.KEYWORD_ONLY:
-        #         param_value = request.query.get(fn_param.name)
-        #         if param_value is not None:
-        #             query_params_kwargs[fn_param.name] = param_value
-        query_params_kwargs = {
-            name: query_list[0]
-            for name, query_list in request.query
-        }
-        return {**route_params_kwargs, **query_params_kwargs}
+        if any(p.kind is p.POSITIONAL_ONLY for p in fn_params.values()):
+            return {
+                name: query_list[0]
+                for name, query_list in request.query
+            }
+        ret: dict[str, str] = {}
+        for fn_param in fn_params.values():
+            if fn_param.name.endswith('__'):
+                ret[fn_param.name] = '/'.join(path)
+            else:
+                ret[fn_param.name] = route_params[fn_param.name]
+        return ret
 
     async def _handle_static(
         self,
@@ -174,11 +174,16 @@ class Router:
     ) -> Optional[Response | Node]:
         if not self.default_page:
             raise NotFound
-        args = self._get_default_handler_args(self.default_page, path)
+        args = self._get_default_handler_args(
+            self.default_page,
+            path,
+            route_params,
+        )
         kwargs = self._get_handler_kwargs(
             self.default_page,
             route_params,
             request,
+            path,
         )
         return await awaitable(self.default_page(*args, **kwargs))
     
@@ -186,12 +191,18 @@ class Router:
         self,
         default_handler: Callable[P, Response | Node],
         path: list[str],
-    ) -> list[str]:
+        route_params: Mapping[str, str],
+    ) -> tuple[str, ...]:
         parameters = inspect.signature(default_handler).parameters
-        if len(parameters) >= 1:
-            return ['/'.join(path)]
-        else:
-            return []
+        ret = ()
+        for p in parameters.values():
+            if p.kind is not Parameter.POSITIONAL_ONLY:
+                break
+            if p.name.endswith('__'):
+                ret += ('/'.join(path),)
+            else:
+                ret += (route_params[p.name],)
+        return ret
 
 
 def is_static_segment(path: Path) -> bool:

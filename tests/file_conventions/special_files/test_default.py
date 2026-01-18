@@ -222,24 +222,30 @@ async def test_pos_only_path_param():
     assert response._body == 'foo/bar'  # type: ignore
 
 
-def test_pos_only_single_underscore():
+async def test_pos_only_single_underscore():
     """
     If a __page__ handler has positional-only arguments, and one of
     those is named _ (single underscore), then that argument's value
     will be set to None when __page__ is called.
     """
-    ...
+    r = router('def_pos_only_underscore')
+    response = await r.handle(Request('/'))
+    assert response._body == None  # type: ignore
 
 
-def test_handler_dunder_is_empty_string():
+async def test_handler_dunder_is_empty_string():
     """
-    If a __page__ handler has the argument "__" in its call signature,
-    the value of "__" will be the remaining, unmatched portion of the
-    URL, without an initial or trailing /.
+    If there is not remaining path to match, the path param (non-query
+    argument with double trailing underscore in its name) is an empty
+    string.
     """
-    ...
+    r = router('def_empty_path_param')
+    response = await r.handle(Request('/a'))
+    assert response._body == ''  # type: ignore
 
 
-def test_async_handler():
+async def test_async_handler():
     """Page handler can be an async function."""
-    ...
+    r = router('def_async_handler')
+    response = await r.handle(Request('/'))
+    assert response._body == 'Works!'  # type: ignore

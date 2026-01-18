@@ -1,8 +1,6 @@
 import pytest
-from blu import Response
 from blu._app.router import NotFound
 from blu._http import Request
-from blu.html import div
 from tests.file_conventions._utils import router
 
 

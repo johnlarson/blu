@@ -133,3 +133,7 @@ def test_handler_dunder_is_empty_string():
     """
     ...
 
+
+def test_async_handler():
+    """__page__ handler can be an async function."""
+    ...

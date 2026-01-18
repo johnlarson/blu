@@ -198,16 +198,18 @@ async def test_query_params_kwargs():
 
 
 
-def test_handler_route_and_query_params():
+async def test_handler_route_and_query_params():
     """
     If a __page__ handler has a / in its call signature, arguments on
     the left will be treated as route parameters, and arguments on the
     right of it will be treated as query parameters.
     """
-    ...
+    r = router('def_route_and_query')
+    response = await r.handle(Request('/1/2', {'c': '3', 'd': '4'}))
+    assert response._body == ('1', '2', '3', '4')  # type: ignore
 
 
-def test_pos_only_path_param():
+async def test_pos_only_path_param():
     """
     If a __page__ handler has positional-only arguments, and one of
     those has a trailing double underscore in its name, that argument
@@ -215,7 +217,9 @@ def test_pos_only_path_param():
     matched by the __default__.py file where __page__ is, without a
     leading or trailing /.
     """
-    ...
+    r = router('def_pos_only_path_param')
+    response = await r.handle(Request('/foo/bar'))
+    assert response._body == 'foo/bar'  # type: ignore
 
 
 def test_pos_only_single_underscore():
@@ -235,3 +239,7 @@ def test_handler_dunder_is_empty_string():
     """
     ...
 
+
+def test_async_handler():
+    """Page handler can be an async function."""
+    ...

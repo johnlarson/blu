@@ -111,19 +111,29 @@ class Router:
         route_params: dict[str, str],
         request: Request,
         path: list[str],
-    ) -> dict[str, str]:
+    ) -> dict[str, Any]:
         fn_params = inspect.signature(handler).parameters
         if any(p.kind is p.POSITIONAL_ONLY for p in fn_params.values()):
             return {
                 name: query_list[0]
                 for name, query_list in request.query
             }
-        ret: dict[str, str] = {}
+        ret: dict[str, Any] = {}
         for fn_param in fn_params.values():
-            if fn_param.name.endswith('__'):
+            if fn_param.name == '_':
+                ret['_'] = None
+            elif fn_param.name.endswith('__'):
                 ret[fn_param.name] = '/'.join(path)
             else:
-                ret[fn_param.name] = route_params[fn_param.name]
+                try:
+                    ret[fn_param.name] = route_params[fn_param.name]
+                except KeyError:
+                    raise TypeError(
+                        f'__page__ handler {handler} has route '
+                        f'argument "{fn_param.name}", which does not '
+                        'exist for this route (URL path: '
+                        f'{request.path}).'
+                    )
         return ret
 
     async def _handle_static(
@@ -192,13 +202,15 @@ class Router:
         default_handler: Callable[P, Response | Node],
         path: list[str],
         route_params: Mapping[str, str],
-    ) -> tuple[str, ...]:
+    ) -> tuple[Any, ...]:
         parameters = inspect.signature(default_handler).parameters
-        ret = ()
+        ret: tuple[Any, ...] = ()
         for p in parameters.values():
             if p.kind is not Parameter.POSITIONAL_ONLY:
                 break
-            if p.name.endswith('__'):
+            if p.name == '_':
+                ret += (None,)
+            elif p.name.endswith('__'):
                 ret += ('/'.join(path),)
             else:
                 ret += (route_params[p.name],)

@@ -108,64 +108,74 @@ async def test_path_param():
     assert response._body == '1/2/3'  # type: ignore
 
 
-def test_single_underscore_arg():
+async def test_single_underscore_arg():
     """
     If / does not appear in the handler call signature and there is an
     argument whose name is a single underscore, that argument will be
     set to None.
     """
-    ...
+    response = await router('default_single_underscore').handle(Request('/'))
+    assert response._body == None  # type: ignore
 
 
-def nonexistent_route_params():
+async def test_nonexistent_route_params():
     """
     If there are route parameters in the handler's call signature whose
     names don't match those of any of the dynamic segment matched by the
     handler's filesystem location, a TypeError will be thrown when the
     route is accessed through HTTP.
     """
-    ...
+    with pytest.raises(TypeError):
+        await router('def_extra_route_params').handle(Request('/'))
 
 
-def missing_route_params():
+async def test_missing_route_params():
     """
     If there are dynamic segments matched by the handler's filesystem
     location that don't have a corresponding argument in the handler's
     call signature, the handler will still be called with the route
     parameter argument(s) that it allows.
     """
-    ...
+    r = router('def_missing_route_params')
+    response = await r.handle(Request('/1/2/3'))
+    assert response._body == '2'  # type: ignore
 
 
-def test_handler_only_query_params():
+async def test_handler_query_params():
     """
-    If the handler's call signature starts with an argument called "__",
+    If the handler has positional-only and positional/keyword arguments,
     then when the handler is matched, it will be called, passing in the
-    query parameters as keyword arguments, where the query parameter
-    name is the argument key, and the query parameter value is the
-    argument value.
+    query parameters as positional/keyword arguments, where the query
+    parameter name is the argument key, and the query parameter value is
+    the argument value.
     """
-    ...
+    response = await router('def_query').handle(
+        Request('/', query={'a': '1', 'b': '2', 'c': '3'}),
+    )
+    assert response._body == ('1', '2', '3')  # type: ignore
 
 
-def test_nonexistent_query_params():
+async def test_nonexistent_query_params():
     """
     If a handler's call signature includes query parameters that are not
     provided in the request URL and the call signature does not provide
     default values for those query parameters, a TypeError will be
     raised.
     """
-    ...
+    with pytest.raises(TypeError):
+        await router('def_extra_route_params').handle(Request('/'))
 
 
-def test_query_param_default_values():
+async def test_query_param_default_values():
     """
     If a handler's call signature includes query parameters that are not
     provided in the request URL but the call signature does provide
     default values for those query parameters, the handler will be run
     with those query parameter arguments' default values.
     """
-    ...
+    r = router('def_missing_query_params')
+    response = await r.handle(Request('/', query={'a': '1', 'b': '1'}))
+    assert response._body == 25  # type: ignore
 
 
 def test_query_params_not_in_call_signature():

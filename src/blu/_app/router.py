@@ -97,13 +97,18 @@ class Router:
             raise NotFound
         if path:
             raise NotFound
+        args = self._get_handler_args(
+            self.index_page,
+            path,
+            route_params,
+        )
         kwargs = self._get_handler_kwargs(
             self.index_page,
             route_params,
             request,
             path,
         )
-        return await awaitable(self.index_page(**kwargs))
+        return await awaitable(self.index_page(*args, **kwargs))
     
     def _get_handler_kwargs[**P](
         self,
@@ -114,10 +119,25 @@ class Router:
     ) -> dict[str, Any]:
         fn_params = inspect.signature(handler).parameters
         if any(p.kind is p.POSITIONAL_ONLY for p in fn_params.values()):
-            return {
-                name: query_list[0]
-                for name, query_list in request.query
-            }
+            if any(p.kind is p.VAR_KEYWORD for p in fn_params.values()):
+                return {
+                    name: query_list[0]
+                    for name, query_list in request.query
+                }
+            else:
+                ret = {}
+                for p in fn_params.values():
+                    if p.kind is p.POSITIONAL_ONLY:
+                        continue
+                    value = request.query.get(p.name, p.default)
+                    if value is Parameter.empty:
+                       raise TypeError(
+                            f'Unable to process query parameter {p.name} for '
+                            f'URL path {request.path}: __page__ handler has '
+                            f'no argument named "{p.name}".'
+                        )
+                    ret[p.name] = value
+                return ret
         ret: dict[str, Any] = {}
         for fn_param in fn_params.values():
             if fn_param.name == '_':
@@ -184,7 +204,7 @@ class Router:
     ) -> Optional[Response | Node]:
         if not self.default_page:
             raise NotFound
-        args = self._get_default_handler_args(
+        args = self._get_handler_args(
             self.default_page,
             path,
             route_params,
@@ -197,7 +217,7 @@ class Router:
         )
         return await awaitable(self.default_page(*args, **kwargs))
     
-    def _get_default_handler_args[**P](
+    def _get_handler_args[**P](
         self,
         default_handler: Callable[P, Response | Node],
         path: list[str],

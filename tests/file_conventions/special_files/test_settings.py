@@ -1,5 +1,27 @@
+from pathlib import Path
+import sys
+from tempfile import TemporaryDirectory
+import pytest
 from blu._http import Request
 from tests.file_conventions._utils import router
+from blu._settings import settings
+
+
+@pytest.fixture
+def set_settings(monkeypatch: pytest.MonkeyPatch):
+    with TemporaryDirectory() as temp_dir:
+        def handler(app_name: str):
+            to_delete = [
+                x for x in sys.modules if x == 'app' or x.startswith('app.')
+            ]
+            for name in to_delete:
+                del sys.modules[name]
+            src_path = Path(__file__).parent.parent.parent / 'apps' / app_name
+            ln_path = Path(temp_dir) / 'app'
+            ln_path.symlink_to(src_path)
+            monkeypatch.syspath_prepend(temp_dir)  # type: ignore
+            settings.cache_clear()
+        yield handler
 
 
 async def test_no_settings_file():
@@ -16,22 +38,44 @@ async def test_empty_settings_file():
     assert response._body == 'Hello, World!'  # type: ignore
 
 
-async def test_CLIENT_REQUIREMENTS_one_requirement():
+async def test_ignore_settings_file_below_top_level(set_settings):  # type: ignore
+    """
+    A __settings__.py file below the top level of the app package is
+    ignored.
+    """
+    set_settings('settings_below_top_level')
+    assert settings().CLIENT_REQUIREMENTS == []
+
+
+async def test_CLIENT_REQUIREMENTS_one_requirement(set_settings):  # type: ignore
     """
     If the CLIENT_REQUIREMENTS is a list with one package name, that
     package will be available to client-side code.
     """
-    ...
+    set_settings('settings_one_client_req')
+    assert settings().CLIENT_REQUIREMENTS == ['requests']
 
 
-async def test_CLIENT_REQUIRMENTS_multiple_requirements():
+async def test_CLIENT_REQUIRMENTS_multiple_requirements(set_settings):  # type: ignore
     """
     If the CLIENT_REQUIREMENTS is a list with multiple package names,
     those packages will all be available to client-side code.
     """
-    ...
+    set_settings('settings_multi_client_reqs')
+    assert settings().CLIENT_REQUIREMENTS == ['requests', 'flask']
 
 
-async def test_CLIENT_REQUIREMENTS_default():
+async def test_CLIENT_REQUIREMENTS_default(set_settings):  # type: ignore
     """CLIENT_REQUIREMENTS defaults to an empty list."""
-    ...
+    set_settings('empty_settings')
+    assert settings().CLIENT_REQUIREMENTS == []
+
+
+def test_no_settings_file_use_defaults(set_settings):  # type: ignore
+    """
+    If no app.__settings__ module, all settings are set to default
+    values.
+    """
+    set_settings('basic')
+    s = settings()
+    assert s.CLIENT_REQUIREMENTS == []

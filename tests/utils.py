@@ -1,4 +1,7 @@
 import asyncio
+import importlib
+from blu._settings import settings
+from blu._app import _get_app_def, _get_router
 from blu._nodes import ClientElement, HTMLElement, Key, Node
 from blu._utils.typing import AsyncGenerator, Generator, Iterable, Mapping
 from contextlib import asynccontextmanager, contextmanager
@@ -391,3 +394,11 @@ def _iterable_eq(i1: Iterable, i2: Iterable) -> bool:
         node_eq(x1, i2[i])
         for i, x1 in enumerate(i1)
     )
+
+
+def patch_app(module_name: str):
+    module = importlib.import_module(f'tests.apps.{module_name}')
+    sys.modules['app'] = module
+    _get_app_def.cache_clear()
+    _get_router.cache_clear()
+    settings.cache_clear()

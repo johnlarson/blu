@@ -6,16 +6,9 @@ from pytest import MonkeyPatch
 import pytest
 import blu
 from blu import WrongEnvironmentError, app
-from tests.utils import Sender, projects, receive
+from tests.utils import Sender, patch_app, projects, receive
 from blu._app import _get_router, _get_app_def  # type: ignore
 from blu import _utils
-
-
-def patch_app(module_name: str):
-    module = importlib.import_module(f'tests.apps.{module_name}')
-    sys.modules['app'] = module
-    _get_app_def.cache_clear()
-    _get_router.cache_clear()
 
 
 async def test_runs_blu_from_app_module(monkeypatch: MonkeyPatch):

@@ -188,6 +188,31 @@ class Sender(asgi.Sender):
         return ret_bytes.decode('utf-8')
 
 
+async def asgi_get(app: asgi.App, path: str) -> Sender:
+    if '?' in path:
+        path, query_str = path.split('?')
+        query = query_str.encode('utf-8')
+    else:
+        query = b''
+    sender = Sender()
+    await app(
+        {
+            'asgi': {
+                'version': '1',
+                'spec_version': '2.0',
+            },
+            'path': path,
+            'headers': [],
+            'type': 'http',
+            'http_version': '1.1',
+            'method': 'GET',
+            'query_string': query,
+        },
+        receive,
+        sender,
+    )
+    return sender
+
 
 @contextmanager
 def background(

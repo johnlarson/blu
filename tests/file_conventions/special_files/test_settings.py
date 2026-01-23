@@ -38,44 +38,44 @@ async def test_empty_settings_file():
     assert response._body == 'Hello, World!'  # type: ignore
 
 
-async def test_ignore_settings_file_below_top_level(set_settings):  # type: ignore
+async def test_ignore_settings_file_below_top_level(patch_app):  # type: ignore
     """
     A __settings__.py file below the top level of the app package is
     ignored.
     """
-    set_settings('settings_below_top_level')
+    patch_app('settings_below_top_level')
     assert settings().CLIENT_REQUIREMENTS == []
 
 
-async def test_CLIENT_REQUIREMENTS_one_requirement(set_settings):  # type: ignore
+async def test_CLIENT_REQUIREMENTS_one_requirement(patch_app):  # type: ignore
     """
     If the CLIENT_REQUIREMENTS is a list with one package name, that
     package will be available to client-side code.
     """
-    set_settings('settings_one_client_req')
+    patch_app('settings_one_client_req')
     assert settings().CLIENT_REQUIREMENTS == ['requests']
 
 
-async def test_CLIENT_REQUIRMENTS_multiple_requirements(set_settings):  # type: ignore
+async def test_CLIENT_REQUIRMENTS_multiple_requirements(patch_app):  # type: ignore
     """
     If the CLIENT_REQUIREMENTS is a list with multiple package names,
     those packages will all be available to client-side code.
     """
-    set_settings('settings_multi_client_reqs')
+    patch_app('settings_multi_client_reqs')
     assert settings().CLIENT_REQUIREMENTS == ['requests', 'flask']
 
 
-async def test_CLIENT_REQUIREMENTS_default(set_settings):  # type: ignore
+async def test_CLIENT_REQUIREMENTS_default(patch_app):  # type: ignore
     """CLIENT_REQUIREMENTS defaults to an empty list."""
-    set_settings('empty_settings')
+    patch_app('empty_settings')
     assert settings().CLIENT_REQUIREMENTS == []
 
 
-def test_no_settings_file_use_defaults(set_settings):  # type: ignore
+def test_no_settings_file_use_defaults(patch_app):  # type: ignore
     """
     If no app.__settings__ module, all settings are set to default
     values.
     """
-    set_settings('basic')
+    patch_app('basic')
     s = settings()
     assert s.CLIENT_REQUIREMENTS == []

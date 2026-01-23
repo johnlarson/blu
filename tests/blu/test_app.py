@@ -6,12 +6,12 @@ from pytest import MonkeyPatch
 import pytest
 import blu
 from blu import WrongEnvironmentError, app
-from tests.utils import Sender, patch_app, projects, receive
+from tests.utils import Sender, projects, receive
 from blu._app import _get_router, _get_app_def  # type: ignore
 from blu import _utils
 
 
-async def test_runs_blu_from_app_module(monkeypatch: MonkeyPatch):
+async def test_runs_blu_from_app_module(patch_app):  # type: ignore
     """
     app is an ASGI app that runs the Blu application defined in the
     current Python environment's "app" package.

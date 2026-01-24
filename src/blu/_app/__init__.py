@@ -314,17 +314,27 @@ async def _serve_app_module(
     app_pkg_locations = app.__spec__.submodule_search_locations
     assert app_pkg_locations
     app_pkg_path = Path(app_pkg_locations[0])
-    path = app_pkg_path / (stripped_rel_path + '.py')
+    parts = Path(stripped_rel_path).parts
+    assert '.' not in parts
+    assert '..' not in parts
+    assert '__pycache__' not in parts
+    assert '*' not in str(stripped_rel_path)
     try:
+        path = app_pkg_path / (stripped_rel_path + '.py')
         source_code = path.read_text()
     except FileNotFoundError:
-        await _serve_404('', send)
-        return
+        try:
+            path = app_pkg_path / stripped_rel_path / '__init__.py'
+            source_code = path.read_text()
+        except FileNotFoundError:
+            await _serve_404('', send)
+            return
     parsed = ast.parse(source_code)
     for stmt in ast.iter_child_nodes(parsed):
         if isinstance(stmt, ast.Assign):
             stmt_source = ast.get_source_segment(source_code, stmt)
             if stmt_source == '__client__ = True':
+                parts = path.parts
                 await _serve_module(path, send)
                 return
     await _serve_404('', send)
@@ -336,14 +346,21 @@ async def _serve_blu_module(
 ):
     rel_path = scope['path'].replace('/_blu_internal/blu_module/', '')
     stripped_rel_path = rel_path.strip('/')
-    path = Path(__file__).parent.parent / stripped_rel_path
-    await _serve_module(path, send)
-
-
-async def _serve_module(path: Path, send: asgi.Sender):
+    blu_root = Path(__file__).parent.parent
+    try:
+        path = blu_root / (stripped_rel_path + '.py')
+    except FileNotFoundError:
+        path = blu_root / stripped_rel_path / '__init__.py'
     parts = path.parts
     assert '.' not in parts
     assert '..' not in parts
     assert '__pycache__' not in parts
-    assert all('*' not in x for x in parts)
+    assert '*' not in str(path)
+    await _serve_module(path, send)
+
+
+
+
+
+async def _serve_module(path: Path, send: asgi.Sender):
     await _serve_file(path, 'text/x-python', send)

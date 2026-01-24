@@ -45,3 +45,23 @@ async def test_module_doesnt_exist(patch_app):  # type: ignore
     headers = next(sender)
     assert headers.get('status', None) == 404
     assert sender.body() == ''
+
+
+async def test_reject_single_dot_segment(patch_app):  # type: ignore
+    """Rejects module paths with the segment '.'."""
+    patch_app('app_module_reject')
+
+
+async def test_reject_double_dot_segment(patch_app):  # type: ignore
+    """Rejects module paths with the segment '..'."""
+    patch_app('app_module_reject')
+
+
+async def test_reject_stars_in_segments(patch_app):  # type: ignore
+    """Rejects module paths that include an asterisk."""
+    patch_app('app_module_reject')
+
+
+async def test_reject_pycache_dir(patch_app):  # type: ignore
+    """Rejects module paths with the segment '__pycache__'."""
+    patch_app('app_module_reject')

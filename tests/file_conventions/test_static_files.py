@@ -43,3 +43,11 @@ async def test_dynamic_segments_dynamic_url_404(patch_app):  # type: ignore
     sender = await asgi_get('/foo/file.txt')
     assert next(sender).get('status', None) == 404
     assert sender.body() == 'Not found: /foo/file.txt'
+
+
+async def test_py_file(patch_app):  # type: ignore
+    """Trying to access a .py file will result in a 404."""
+    patch_app('client_module')
+    sender = await asgi_get('/module.py')
+    assert next(sender).get('status', None) == 404
+    assert sender.body() == 'Not found: /module.py'

@@ -1,3 +1,4 @@
+import ast
 from functools import cache
 from importlib import import_module
 from types import ModuleType
@@ -69,6 +70,12 @@ async def _http(
     receive: asgi.Receiver,
     send: asgi.Sender
 ):
+    if scope['path'].startswith('/_blu_internal/app_module'):
+        await _serve_app_module(scope, send)
+        return
+    if scope['path'].startswith('/_blu_internal/blu_module'):
+        await _serve_blu_module(scope, send)
+        return
     try:
         await _serve_static(scope, send)
     except NotFound:
@@ -79,14 +86,7 @@ async def _http(
     try:
         response = await _get_router().handle(request)
     except NotFound:
-        await send({
-            'type': 'http.response.start',
-            'status': 404,
-        })
-        await send({
-            'type': 'http.response.body',
-            'body': b'Not Found: ' + scope['path'].encode('utf-8'),
-        })
+        await _serve_404('Not Found: ' + scope['path'], send)
         return
     await send({
         'type': 'http.response.start',
@@ -98,6 +98,17 @@ async def _http(
     await send({
         'type': 'http.response.body',
         'body': body_str.encode('utf-8'),
+    })
+
+
+async def _serve_404(message: str, send: asgi.Sender):
+    await send({
+        'type': 'http.response.start',
+        'status': 404,
+    })
+    await send({
+        'type': 'http.response.body',
+        'body': message.encode(),
     })
 
 
@@ -113,40 +124,42 @@ async def _serve_static(
     app_def_path = Path(path_str)
     file_path = app_def_path / scope['path'].strip('/')
     content_type, _ = mimetypes.guess_type(file_path)
+    try:
+        await _serve_file(file_path, content_type, send)
+    except (FileNotFoundError, IsADirectoryError):
+        raise NotFound
+
+
+async def _serve_file(path: Path, content_type: str | None, send: asgi.Sender):
     headers = (
         [] if content_type is None
         else [(b'Content-Type', content_type.encode('utf-8'))]
     )
-    try:
-        async with aiofiles.open(file_path, 'rb') as file:
-            await send({
-                'type': 'http.response.start',
-                'status': 200,
-                'headers': headers,
-                'trailers': False,
-            })
-            async for chunk in file:
-                await send({
-                    'type': 'http.response.body',
-                    'body': chunk,
-                    'more_body': True,
-                })
+    async with aiofiles.open(path, 'rb') as file:
+        await send({
+            'type': 'http.response.start',
+            'status': 200,
+            'headers': headers,
+            'trailers': False,
+        })
+        async for chunk in file:
             await send({
                 'type': 'http.response.body',
-                'body': b'',
-                'more_body': False,
+                'body': chunk,
+                'more_body': True,
             })
-    except (FileNotFoundError, IsADirectoryError):
-        raise NotFound
+        await send({
+            'type': 'http.response.body',
+            'body': b'',
+            'more_body': False,
+        })
     
 
 def _is_static_file(url_path: str):
     if '__pycache__' in url_path:
         return False
     if url_path.strip().endswith('.py'):
-        module_path = 'app.' + '.'.join(url_path.strip().split('/'))
-        module = import_module(module_path)
-        return getattr(module, '__client__', False)
+        return False
     return True
 
 
@@ -288,3 +301,49 @@ def _get_router():
 def _get_app_def():
     import app
     return app
+
+
+async def _serve_app_module(
+    scope: asgi.HTTPConnectionScope,
+    send: asgi.Sender,
+):
+    rel_path = scope['path'].replace('/_blu_internal/app_module/', '')
+    stripped_rel_path = rel_path.strip('/')
+    import app
+    assert app.__spec__ is not None
+    app_pkg_locations = app.__spec__.submodule_search_locations
+    assert app_pkg_locations
+    app_pkg_path = Path(app_pkg_locations[0])
+    path = app_pkg_path / (stripped_rel_path + '.py')
+    try:
+        source_code = path.read_text()
+    except FileNotFoundError:
+        await _serve_404('', send)
+        return
+    parsed = ast.parse(source_code)
+    for stmt in ast.iter_child_nodes(parsed):
+        if isinstance(stmt, ast.Assign):
+            stmt_source = ast.get_source_segment(source_code, stmt)
+            if stmt_source == '__client__ = True':
+                await _serve_module(path, send)
+                return
+    await _serve_404('', send)
+
+
+async def _serve_blu_module(
+    scope: asgi.HTTPConnectionScope,
+    send: asgi.Sender,
+):
+    rel_path = scope['path'].replace('/_blu_internal/blu_module/', '')
+    stripped_rel_path = rel_path.strip('/')
+    path = Path(__file__).parent.parent / stripped_rel_path
+    await _serve_module(path, send)
+
+
+async def _serve_module(path: Path, send: asgi.Sender):
+    parts = path.parts
+    assert '.' not in parts
+    assert '..' not in parts
+    assert '__pycache__' not in parts
+    assert all('*' not in x for x in parts)
+    await _serve_file(path, 'text/x-python', send)

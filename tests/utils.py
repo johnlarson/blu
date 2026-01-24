@@ -188,7 +188,8 @@ class Sender(asgi.Sender):
         return ret_bytes.decode('utf-8')
 
 
-async def asgi_get(app: asgi.App, path: str) -> Sender:
+async def asgi_get(path: str) -> Sender:
+    from blu import app
     if '?' in path:
         path, query_str = path.split('?')
         query = query_str.encode('utf-8')

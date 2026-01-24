@@ -11,10 +11,15 @@ from blu._utils import client as client_utils
 @contextmanager
 def reload_is_client(system):
     with mock.patch('platform.system', return_value=system):
+        _reload_is_client()
+        yield
+    _reload_is_client()
+
+
+def _reload_is_client():
         importlib.reload(client_utils)
         importlib.reload(_utils)
         importlib.reload(blu)
-        yield
 
 
 def test_is_false_in_server_environment():

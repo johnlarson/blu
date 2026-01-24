@@ -19,7 +19,7 @@ async def test_no_match_404(patch_app):  # type: ignore
     patch_app('static_files')
     sender = await asgi_get('/wrong/path/to/file.txt')
     assert next(sender).get('status', None) == 404
-    assert sender.body() == 'Not found: /wrong/path/to/file.txt'
+    assert sender.body() == 'Not Found: /wrong/path/to/file.txt'
 
 
 async def test_dynamic_segments_static_url(patch_app):  # type: ignore
@@ -42,7 +42,7 @@ async def test_dynamic_segments_dynamic_url_404(patch_app):  # type: ignore
     patch_app('static_files_dynamic_path')
     sender = await asgi_get('/foo/file.txt')
     assert next(sender).get('status', None) == 404
-    assert sender.body() == 'Not found: /foo/file.txt'
+    assert sender.body() == 'Not Found: /foo/file.txt'
 
 
 async def test_py_file(patch_app):  # type: ignore
@@ -50,4 +50,4 @@ async def test_py_file(patch_app):  # type: ignore
     patch_app('client_module')
     sender = await asgi_get('/module.py')
     assert next(sender).get('status', None) == 404
-    assert sender.body() == 'Not found: /module.py'
+    assert sender.body() == 'Not Found: /module.py'

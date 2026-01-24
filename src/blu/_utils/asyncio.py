@@ -26,11 +26,15 @@ def to_sync[**P, R](fn: Callable[P, Coroutine[Any, Any, R]]) -> Callable[P, R]:
     return ret
 
 
-def io_bound[**P, R](fn: Callable[P, R]) -> Callable[P, Awaitable[R]]:
+def io_bound[**P, R](
+    fn: Callable[P, R],
+) -> Callable[P, Coroutine[Any, Any, R]]:
     return _asyncify(fn, ThreadPoolExecutor)  # type: ignore
 
 
-def cpu_bound[**P, R](fn: Callable[P, R]) -> Callable[P, Awaitable[R]]:
+def cpu_bound[**P, R](
+    fn: Callable[P, R],
+) -> Callable[P, Coroutine[Any, Any, R]]:
     return _asyncify(fn, ProcessPoolExecutor)  # type: ignore
 
 

@@ -24,13 +24,6 @@ async def test_blu_submodule_available_client_side(patch_app):  # type: ignore
     assert sender.body() == expected
 
 
-async def test_reject_single_dot_segment(patch_app):  # type: ignore
-    """Rejects module paths with the segment '.'."""
-    patch_app('basic')
-    with pytest.raises(AssertionError):
-        await asgi_get('/_blu_internal/blu_module/./html')
-
-
 async def test_reject_double_dot_segment(patch_app):  # type: ignore
     """Rejects module paths with the segment '..'."""
     patch_app('basic')

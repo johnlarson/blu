@@ -315,7 +315,6 @@ async def _serve_app_module(
     assert app_pkg_locations
     app_pkg_path = Path(app_pkg_locations[0])
     parts = Path(stripped_rel_path).parts
-    assert '.' not in parts
     assert '..' not in parts
     assert '__pycache__' not in parts
     assert '*' not in str(stripped_rel_path)
@@ -344,19 +343,20 @@ async def _serve_blu_module(
     scope: asgi.HTTPConnectionScope,
     send: asgi.Sender,
 ):
-    rel_path = scope['path'].replace('/_blu_internal/blu_module/', '')
+    url_path_stripped = scope['path'].strip('/')
+    parts = Path(url_path_stripped).parts
+    assert '..' not in parts
+    assert '__pycache__' not in parts
+    assert '*' not in url_path_stripped
+    rel_path = url_path_stripped.replace('_blu_internal/blu_module', '')
     stripped_rel_path = rel_path.strip('/')
     blu_root = Path(__file__).parent.parent
     try:
         path = blu_root / (stripped_rel_path + '.py')
+        await _serve_module(path, send)
     except FileNotFoundError:
         path = blu_root / stripped_rel_path / '__init__.py'
-    parts = path.parts
-    assert '.' not in parts
-    assert '..' not in parts
-    assert '__pycache__' not in parts
-    assert '*' not in str(path)
-    await _serve_module(path, send)
+        await _serve_module(path, send)
 
 
 

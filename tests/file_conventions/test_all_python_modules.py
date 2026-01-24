@@ -1,3 +1,5 @@
+from pathlib import Path
+import pytest
 from tests.utils import asgi_get
 
 
@@ -47,21 +49,27 @@ async def test_module_doesnt_exist(patch_app):  # type: ignore
     assert sender.body() == ''
 
 
-async def test_reject_single_dot_segment(patch_app):  # type: ignore
-    """Rejects module paths with the segment '.'."""
-    patch_app('app_module_reject')
-
-
 async def test_reject_double_dot_segment(patch_app):  # type: ignore
     """Rejects module paths with the segment '..'."""
     patch_app('app_module_reject')
+    with pytest.raises(AssertionError):
+        await asgi_get('/_blu_internal/app_module/../module')
 
 
 async def test_reject_stars_in_segments(patch_app):  # type: ignore
     """Rejects module paths that include an asterisk."""
     patch_app('app_module_reject')
+    with pytest.raises(AssertionError):
+        await asgi_get('/_blu_internal/app_module/*')
 
 
 async def test_reject_pycache_dir(patch_app):  # type: ignore
     """Rejects module paths with the segment '__pycache__'."""
     patch_app('app_module_reject')
+    app_root = Path(__file__).parent.parent / 'apps/app_module_reject'
+    module_dir = app_root / '__pycache__'
+    module_dir.mkdir(exist_ok=True)
+    module_file_path = module_dir / 'module.py'
+    module_file_path.touch()
+    with pytest.raises(AssertionError):
+        await asgi_get('/_blu_internal/app_module/__pycache__/module')

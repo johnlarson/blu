@@ -112,8 +112,11 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""
     p = await page('e2e')
     await p.goto('/rendering')
-    await expect(p.locator('del')).to_have_count(1)
-    
+    await sleep(300)
+    del_ = p.locator('del')
+    await expect(del_).to_have_count(1)
+    await expect(del_).to_have_id('my-id')
+    await expect(del_).to_have_text('ABCDEF12.0truefalse')
 
 
 async def test_routing():

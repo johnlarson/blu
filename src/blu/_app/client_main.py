@@ -77,6 +77,8 @@ def get_node(data: Any):
             data._attrs,
             *get_array(data._children),
         )
+    elif isinstance(data, float):
+        return str(data)
     else:
         return data
 

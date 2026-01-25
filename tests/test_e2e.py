@@ -2,10 +2,9 @@ from asyncio import Task, sleep
 import asyncio
 from collections.abc import AsyncGenerator, Awaitable, Callable, Generator
 from typing import cast
-from xxlimited import Str
 import aiohttp
 from playwright.async_api import (
-    async_playwright, Page, BrowserType, BrowserContext
+    async_playwright, Page, BrowserType, BrowserContext, expect
 )
 import pytest
 import uvicorn
@@ -113,8 +112,8 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""
     p = await page('e2e')
     await p.goto('/rendering')
-    await sleep(300)
-    assert await p.locator('del').count() == 1
+    await expect(p.locator('del')).to_have_count(1)
+    
 
 
 async def test_routing():

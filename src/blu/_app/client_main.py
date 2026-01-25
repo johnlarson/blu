@@ -22,7 +22,7 @@ import json
 from pyscript import js_import  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
 
-from blu._nodes import ElementRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
+from blu._nodes import ClientRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
 
 # react_dom = await js_import('https://esm.sh/react-dom/client')
 # react = await js_import('https://esm.sh/react')
@@ -37,7 +37,8 @@ async def main():
     pickled = base64.b64decode(b64_bytes)
     unpickled = pickle.loads(pickled)
     root_node = get_node(unpickled)
-    if root_node_json['tagname'] == 'html':
+    print('ROOT NODE:', root_node.to_py())
+    if isinstance(root_node, dict) and root_node.get('type', None) == 'html':
         react_dom.createRoot(document).render(root_node)
     else:
         react_dom.createRoot(document.body).render(root_node)  # type: ignore
@@ -48,7 +49,15 @@ def get_node(data: Any):
     if isinstance(data, list):
         return get_array(data)
     elif isinstance(data, ClientElement):
-        return py_to_js_node(data)
+        return react.createElement(
+            PythonElement,
+            to_js({
+                'renderer': create_proxy(data.renderer),
+                'args': data.args,
+                'kwargs': data.kwargs,
+                'py_children': data.children,
+            }),
+        )
     elif isinstance(data, Key):
         props = {'key': data['key']}
         return react.createElement(
@@ -65,14 +74,14 @@ def get_node(data: Any):
     elif isinstance(data, HTMLElement):
         return react.createElement(
             data._tagname,
-            data._props,
-            *get_array(data['children']),
+            data._attrs,
+            *get_array(data._children),
         )
     else:
         return data
 
 
-def get_obj(obj: ReactJsObject):
+def get_obj(obj: dict[str, Any]):
     return {k: get_node(v) for k, v in obj.items()}
 
 
@@ -80,12 +89,13 @@ def get_dict(my_dict: dict):
     return {k: get_node(v) for k, v in my_dict.items()}
 
 
-def get_array_old(array: Any):
+def get_array(array: Any):
+    print('ARRAY:', array)
     return [get_node(x) for x in array]
 
 
 class PythonElementProps(TypedDict):
-    renderer: ElementRenderer
+    renderer: ClientRenderer
     args: tuple[Jsonable, ...]
     kwargs: dict[str, Jsonable]
     py_children: list[Node]
@@ -102,14 +112,11 @@ def PythonElement(props: PythonElementProps, extra: Any = None):
         try:
             next(result)
         except StopIteration as e:
-            return py_to_js_node(e.value)
+            return get_node(e.value)
     elif isinstance(result, AsyncGenerator):
         raise TypeError('ClientElements cannot be created from async rendering functions.')
     else:
-        ret = py_to_js_node(result)
-        console.log('RET:', ret)
-        return ret
-        # return py_to_js_node(result)
+        return get_node(result)
 
 
 def py_to_js_node(py_node: Node):
@@ -136,7 +143,7 @@ def py_to_js_node(py_node: Node):
         )
 
 
-def parse_py_element(data: ClientElementDict):
+def parse_py_element(data: dict[str, Any]):
     print('CLIENT ELEMENT:', data)
     return ClientElement(
         get_renderer(data),
@@ -146,7 +153,7 @@ def parse_py_element(data: ClientElementDict):
     )
 
 
-def get_renderer(data: Any) -> ElementRenderer:
+def get_renderer(data: Any) -> ClientRenderer:
     module = importlib.import_module(data['module'])
     return getattr(module, data['name'])
 

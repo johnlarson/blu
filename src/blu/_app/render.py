@@ -87,7 +87,6 @@ async def _get_python_script() -> ET.Element:
 
 async def _get_config() -> dict[str, Jsonable]:
     return {
-        'debug': True,
         'js_modules': {
             'main': {
                 'https://esm.sh/react-dom/client': '_blu_react_dom',
@@ -96,7 +95,7 @@ async def _get_config() -> dict[str, Jsonable]:
         },
         'files': {
             '/_blu_internal/blu_pkg.zip': './blu/*',
-            # '/_blu_internal/app_pkg.zip': './app/*',
+            '/_blu_internal/app_pkg.zip': './app/*',
         },
         'experimental_create_proxy': 'auto',
     }

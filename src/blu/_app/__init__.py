@@ -381,14 +381,13 @@ async def _serve_module(path: Path, send: asgi.Sender):
 def _python_zip_dir():
     ret = Path(TemporaryDirectory().name)
     _blu_pkg_zip(ret)
-    # _app_pkg_zip(ret)
+    _app_pkg_zip(ret)
     return ret
 
 
 def _blu_pkg_zip(zips_root: Path):
     print('BLU ZIP')
     src_dir = Path(__file__).parent.parent
-    archive_dir = src_dir.parent
     base_name = str(zips_root / 'blu')
     shutil.make_archive(base_name, 'zip', src_dir, src_dir)
 
@@ -401,16 +400,17 @@ def _app_pkg_zip(zips_root: Path):
     assert app_pkg_locations
     src_path = Path(app_pkg_locations[0])
     dest_path = zips_root / 'app.zip'
-    with ZipFile(dest_path, 'w', compression=zipfile.ZIP_STORED) as dest_f:
+    with ZipFile(dest_path, 'w') as dest_f:
         for path in src_path.rglob('*'):
             if path.is_file():
                 if _is_client_module(path):
-                    arcname = Path('app') / path.relative_to(src_path)
-                    dest_f.write(path, arcname=arcname)
+                    dest_f.write(str(path))
     print('DONE ZIPPING')
 
 
 def _is_client_module(path: Path) -> bool:
+    if path.suffix != '.py':
+        return False
     source_code = path.read_text()
     parsed = ast.parse(source_code)
     for stmt in ast.iter_child_nodes(parsed):

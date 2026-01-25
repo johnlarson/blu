@@ -1,6 +1,6 @@
 from asyncio import Task
 import asyncio
-from collections.abc import Awaitable, Callable, Generator
+from collections.abc import AsyncGenerator, Awaitable, Callable, Generator
 from typing import cast
 from xxlimited import Str
 import aiohttp
@@ -14,15 +14,14 @@ from blu._utils import get_available_port
 
 
 @pytest.fixture
-async def client(patch_app, server: Callable[[], str]):  # type: ignore
+async def client(patch_app, server: Callable[[], Awaitable[str]]):  # type: ignore
     session: aiohttp.ClientSession | None = None
     try:
         async def ret(app_name: str):
             nonlocal session
             patch_app(app_name)
-            session = aiohttp.ClientSession(server())
+            session = aiohttp.ClientSession(await server())
             await session.__aenter__()
-            await _wait_for_server_start(session)
             return session
         yield ret
     finally:
@@ -31,34 +30,39 @@ async def client(patch_app, server: Callable[[], str]):  # type: ignore
 
 
 @pytest.fixture
-def page(
-    patch_app: Callable[[str], None],
+async def page(
+    # patch_app: Callable[[str], None],
     web_browser: BrowserType,
-    server: Callable[[], Str],
-) -> Generator[Callable[[str], Awaitable[Page]]]:
+    # server: Callable[[], Awaitable[str]],
+) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
     async def ret(app_name: str) -> Page:
-        patch_app(app_name)
-        base_url = server()
-        context = cast(
-            BrowserContext,
-            await web_browser.new_context(base_url=base_url),  # type: ignore
-        )
+        # patch_app(app_name)
+        # base_url = await server()
+        # context = cast(
+        #     BrowserContext,
+        #     await web_browser.new_context(base_url=base_url),  # type: ignore
+        # )
+        context = cast(BrowserContext, await web_browser.new_context())
+        print('CREATED_CONTEXT!!!!')
         return await context.new_page()
     yield ret
 
 
 @pytest.fixture
-def server() -> Generator[Callable[[], str]]:
+def server() -> Generator[Callable[[], Awaitable[str]]]:
     server_task: Task[None] | None = None
     try:
-        def ret() -> str:
+        async def ret() -> str:
             nonlocal server_task
             port = get_available_port()
             from blu import app
             config = uvicorn.Config(app, port=port)
             server = uvicorn.Server(config)
             server_task = asyncio.create_task(server.serve())
-            return f'http://127.0.0.1:{port}'
+            base_url = f'http://127.0.0.1:{port}'
+            async with aiohttp.ClientSession(base_url) as session:
+                await _wait_for_server_start(session)
+            return base_url
         yield ret
     finally:
         if server_task is not None:
@@ -69,8 +73,7 @@ def server() -> Generator[Callable[[], str]]:
 async def web_browser():
     async with async_playwright() as playwright:
         chromium = playwright.chromium
-        headless = False
-        yield await chromium.launch(headless=headless)
+        yield await chromium.launch(headless=True, slow_mo=50)
 
 
 async def _wait_for_server_start(session: aiohttp.ClientSession):
@@ -84,10 +87,11 @@ async def _wait_for_server_start(session: aiohttp.ClientSession):
     raise TimeoutError('Dev server never started.')
 
 
-async def test_render_nodes():
+async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""
-    ...
-
+    p = await page('e2e')
+    await p.goto('/rendering')
+    assert await p.locator('del').count() == 1
 
 async def test_routing():
     """Requests should be routed as described in the documentation."""

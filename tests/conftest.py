@@ -1,4 +1,6 @@
 from collections.abc import AsyncGenerator
+from os import getcwd
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -64,6 +66,7 @@ def patch_project_dir(monkeypatch: pytest.MonkeyPatch):
         for name in to_delete:
             del sys.modules[name]
         monkeypatch.syspath_prepend(path)  # type: ignore
+        monkeypatch.chdir(path)
         settings.cache_clear()
         _get_app_def.cache_clear()
         _get_router.cache_clear()

@@ -1,7 +1,12 @@
+import ast
 import base64
+from functools import cache
 from io import StringIO
 from pathlib import Path
 import pickle
+import shutil
+from tempfile import TemporaryDirectory
+from zipfile import ZipFile
 from blu._utils.typing import Optional
 from xml.etree import ElementTree as ET
 
@@ -70,20 +75,27 @@ def _get_pyscript_include() -> ET.Element:
     )
 
 async def _get_python_script() -> ET.Element:
-    config: dict[str, Jsonable] = {
+    return ET.Element(
+        'script',
+        {
+            'type': 'py',
+            'config': await json.dumps(await _get_config()),
+            'src': '/_blu_internal/client_main.py',
+        },
+    )
+
+
+async def _get_config() -> dict[str, Jsonable]:
+    return {
         'js_modules': {
             'main': {
                 'https://esm.sh/react-dom/client': '_blu_react_dom',
                 'https://esm.sh/react': '_blu_react',
             },
         },
+        'files': {
+            '/_blu_internal/blu_pkg.zip': './blu/*',
+            # '/_blu_internal/app_pkg.zip': './app/*',
+        },
         'experimental_create_proxy': 'auto',
     }
-    return ET.Element(
-        'script',
-        {
-            'type': 'py',
-            'config': await json.dumps(config),
-            'src': '/_blu_internal/blu_module/_app/client_main',
-        },
-    )

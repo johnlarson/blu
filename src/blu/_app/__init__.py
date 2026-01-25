@@ -1,7 +1,11 @@
 import ast
 from functools import cache
 from importlib import import_module
+import shutil
+from tempfile import TemporaryDirectory
 from types import ModuleType
+from zipfile import ZipFile
+import zipfile
 from blu._exceptions import WrongEnvironmentError
 from blu._utils import asgi
 
@@ -65,16 +69,26 @@ async def _lifespan(
     await send({'type': 'lifespan.shutdown.complete'})
 
 
+PYTHON_MIME = 'text/x-python'
+ZIP_MIME = 'text/zip'
+
+
 async def _http(
     scope: asgi.HTTPConnectionScope,
     receive: asgi.Receiver,
     send: asgi.Sender
 ):
-    if scope['path'].startswith('/_blu_internal/app_module'):
-        await _serve_app_module(scope, send)
+    if scope['path'] == '/_blu_internal/app_pkg.zip':
+        path = _python_zip_dir() / 'app.zip'
+        await _serve_file(path, ZIP_MIME, send)
         return
-    if scope['path'].startswith('/_blu_internal/blu_module'):
-        await _serve_blu_module(scope, send)
+    if scope['path'] == '/_blu_internal/blu_pkg.zip':
+        path = _python_zip_dir() / 'blu.zip'
+        await _serve_file(path, ZIP_MIME, send)
+        return
+    if scope['path'] == '/_blu_internal/client_main.py':
+        path = Path(__file__).parent / 'client_main.py'
+        await _serve_file(path, PYTHON_MIME, send)
         return
     try:
         await _serve_static(scope, send)
@@ -359,8 +373,49 @@ async def _serve_blu_module(
         await _serve_module(path, send)
 
 
-
-
-
 async def _serve_module(path: Path, send: asgi.Sender):
     await _serve_file(path, 'text/x-python', send)
+
+
+@cache
+def _python_zip_dir():
+    ret = Path(TemporaryDirectory().name)
+    _blu_pkg_zip(ret)
+    # _app_pkg_zip(ret)
+    return ret
+
+
+def _blu_pkg_zip(zips_root: Path):
+    print('BLU ZIP')
+    src_dir = Path(__file__).parent.parent
+    archive_dir = src_dir.parent
+    base_name = str(zips_root / 'blu')
+    shutil.make_archive(base_name, 'zip', src_dir, src_dir)
+
+
+def _app_pkg_zip(zips_root: Path):
+    print('APP ZIP')
+    import app
+    assert app.__spec__ is not None
+    app_pkg_locations = app.__spec__.submodule_search_locations
+    assert app_pkg_locations
+    src_path = Path(app_pkg_locations[0])
+    dest_path = zips_root / 'app.zip'
+    with ZipFile(dest_path, 'w', compression=zipfile.ZIP_STORED) as dest_f:
+        for path in src_path.rglob('*'):
+            if path.is_file():
+                if _is_client_module(path):
+                    arcname = Path('app') / path.relative_to(src_path)
+                    dest_f.write(path, arcname=arcname)
+    print('DONE ZIPPING')
+
+
+def _is_client_module(path: Path) -> bool:
+    source_code = path.read_text()
+    parsed = ast.parse(source_code)
+    for stmt in ast.iter_child_nodes(parsed):
+        if isinstance(stmt, ast.Assign):
+            stmt_source = ast.get_source_segment(source_code, stmt)
+            if stmt_source == '__client__ = True':
+                return True
+    return False

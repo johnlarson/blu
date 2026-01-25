@@ -42,7 +42,10 @@ async def page(
             base_url = await server()
             context = await browser.new_context(base_url=base_url)
             return await context.new_page()
-        yield ret
+        try:
+            yield ret
+        finally:
+            await browser.close()
 
 
 @pytest.fixture
@@ -110,7 +113,7 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""
     p = await page('e2e')
     await p.goto('/rendering')
-    await sleep(3600)
+    await sleep(300)
     assert await p.locator('del').count() == 1
 
 

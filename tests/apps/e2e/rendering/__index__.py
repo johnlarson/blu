@@ -1,4 +1,4 @@
-from blu import Key
+from blu import Key, client
 from blu.html import del_, span
 
 __client__ = True
@@ -6,6 +6,7 @@ __client__ = True
 
 def __page__():
     return del_(id='my-id')[
+        Text,
         span['A'],
         'B',
         ('C', 'D'),
@@ -16,3 +17,8 @@ def __page__():
         True,
         False,
     ]
+
+
+@client
+def Text():
+    return 'Hello, World!'

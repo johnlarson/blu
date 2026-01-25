@@ -87,6 +87,7 @@ async def _get_python_script() -> ET.Element:
 
 async def _get_config() -> dict[str, Jsonable]:
     return {
+        'debug': True,
         'js_modules': {
             'main': {
                 'https://esm.sh/react-dom/client': '_blu_react_dom',

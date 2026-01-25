@@ -12,7 +12,7 @@ print('Generator:', Generator)
 
 
 import asyncio
-from collections.abc import AsyncGenerator, Callable, Generator, Sequence
+from collections.abc import AsyncGenerator, Callable, Generator, Iterable, Sequence
 import importlib
 from typing import Any, Protocol, TypedDict, cast
 from xml.dom.minidom import Element
@@ -46,9 +46,7 @@ async def main():
 
 def get_node(data: Any):
     print('DATA:', data)
-    if isinstance(data, list):
-        return get_array(data)
-    elif isinstance(data, ClientElement):
+    if isinstance(data, ClientElement):
         return react.createElement(
             PythonElement,
             to_js({
@@ -62,25 +60,29 @@ def get_node(data: Any):
         props = {'key': data['key']}
         return react.createElement(
             react.Fragment,
-            {'key': data._key},
+            to_js({'key': data._key}),
             *get_array(data._children),
         )
     elif isinstance(data, tuple):
         return react.createElement(
             react.Fragment,
-            {},
+            to_js({}),
             *get_array(data),
         )
+    elif isinstance(data, str):
+        return data
+    elif isinstance(data, Iterable):
+        return get_array(data)
     elif isinstance(data, HTMLElement):
         return react.createElement(
             data._tagname,
-            data._attrs,
+            to_js(data._attrs),
             *get_array(data._children),
         )
-    elif isinstance(data, float):
-        return str(data)
+    elif data is None:
+        return None
     else:
-        return data
+        return str(data)
 
 
 def get_obj(obj: dict[str, Any]):
@@ -93,7 +95,7 @@ def get_dict(my_dict: dict):
 
 def get_array(array: Any):
     print('ARRAY:', array)
-    return [get_node(x) for x in array]
+    return to_js([get_node(x) for x in array])
 
 
 class PythonElementProps(TypedDict):

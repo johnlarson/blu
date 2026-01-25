@@ -47,6 +47,10 @@ async def main():
 def get_node(data: Any):
     print('DATA:', data)
     if isinstance(data, ClientElement):
+        print('R:', data._renderer)
+        print('ARGS:', data._args)
+        print('KWARGS:', data._kwargs)
+        print('CHILDREN:', data._children)
         return react.createElement(
             PythonElement,
             to_js({
@@ -112,9 +116,9 @@ def PythonElement(props: PythonElementProps, extra: Any = None):
     print('B')
     if isinstance(result, Generator):
         next(result)
-        result.send(props.py_children)
         try:
-            next(result)
+            result.send(props.py_children)
+            # next(result)
         except StopIteration as e:
             return get_node(e.value)
     elif isinstance(result, AsyncGenerator):

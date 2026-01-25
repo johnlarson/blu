@@ -846,13 +846,33 @@ class ClientElement:
     def __reduce__(self):
         module = self._renderer.__module__
         name = self._renderer.__name__
-        return (_import_client_module, (module, name))
+        return (
+            _import_client_module,
+            (
+                module,
+                name,
+                self._args,
+                self._kwargs,
+                self._children,
+                self._key,
+                self._has_key,
+            ),
+        )
 
 
-def _import_client_module(module: str, name: str):
+def _import_client_module(module: str, name: str, args: tuple[Any], kwargs: dict[str, Any], children: list[Any], key: Any, has_key: bool):
     print('MODULE:', module)
     print('NAME:', name)
-    return getattr(importlib.import_module(module), name)
+    base = getattr(importlib.import_module(module), name)
+    if has_key:
+        all_kwargs = {**kwargs, 'key': key}
+    else:
+        all_kwargs = kwargs
+    with_args = base(*args, **all_kwargs)
+    if children:
+        return with_args[tuple(children)]
+    else:
+        return with_args
 
 
 def py_to_html_name(py_name: str) -> str:

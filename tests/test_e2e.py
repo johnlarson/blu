@@ -96,7 +96,7 @@ async def test_routing():
 
 async def test_is_client():
     """
-    blu.is_client should be True server-side and False client-side.
+    blu.is_client should be True client-side and False server-side.
     """
     ...
 

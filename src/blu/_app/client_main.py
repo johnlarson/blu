@@ -50,10 +50,10 @@ def get_node(data: Any):
         return react.createElement(
             PythonElement,
             to_js({
-                'renderer': create_proxy(data.renderer),
-                'args': data.args,
-                'kwargs': data.kwargs,
-                'py_children': data.children,
+                'renderer': create_proxy(data._renderer),
+                'args': data._args,
+                'kwargs': data._kwargs,
+                'py_children': data._children,
             }),
         )
     elif isinstance(data, Key):

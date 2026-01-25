@@ -1,4 +1,4 @@
-from asyncio import Task
+from asyncio import Task, sleep
 import asyncio
 from collections.abc import AsyncGenerator, Awaitable, Callable, Generator
 from typing import cast
@@ -31,10 +31,29 @@ async def client(patch_app, server: Callable[[], Awaitable[str]]):  # type: igno
 
 @pytest.fixture
 async def page(
+    patch_app: Callable[[str], None],
+    server: Callable[[], Awaitable[str]],
+) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
+    async with async_playwright() as playwright:
+        chromium = playwright.chromium
+        browser = await chromium.launch(headless=False)
+        async def ret(app_name: str) -> Page:
+            patch_app(app_name)
+            base_url = await server()
+            context = await browser.new_context(base_url=base_url)
+            return await context.new_page()
+        yield ret
+
+
+@pytest.fixture
+async def page_old(
     # patch_app: Callable[[str], None],
     web_browser: BrowserType,
     # server: Callable[[], Awaitable[str]],
 ) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
+    async with async_playwright() as playwright:
+        chromium = playwright.chromium
+        browser = await chromium.launch(headless=False)
     async def ret(app_name: str) -> Page:
         # patch_app(app_name)
         # base_url = await server()
@@ -91,7 +110,9 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""
     p = await page('e2e')
     await p.goto('/rendering')
+    await sleep(3600)
     assert await p.locator('del').count() == 1
+
 
 async def test_routing():
     """Requests should be routed as described in the documentation."""

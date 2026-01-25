@@ -17,7 +17,7 @@ def __page__():
         None,
         True,
         False,
-        Complex('Y')['Z']
+        DoubleRender('Y')[span['Z']]
     ]
 
 
@@ -27,5 +27,10 @@ def Simple():
 
 
 @client
+def DoubleRender(a):
+    return Complex(a)[(yield)]
+
+
+@client
 def Complex(a):
-    return span[a, (yield)]
+    return span[a, span[(yield)]]

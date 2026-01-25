@@ -1,6 +1,7 @@
 from collections.abc import (
     AsyncGenerator, Callable, Generator, Iterable
 )
+import importlib
 import inspect
 from numbers import Number
 from pathlib import Path
@@ -629,6 +630,10 @@ class Element[**P](Protocol):
 UNSET = object()
 
 
+def noop():
+    pass
+
+
 class ClientElement:
     """
     A custom element to be rendered client-side. Created using the
@@ -837,6 +842,17 @@ class ClientElement:
         if not self._has_key:
             raise LookupError('This element has no key.')
         return self._key
+    
+    def __reduce__(self):
+        module = self._renderer.__module__
+        name = self._renderer.__name__
+        return (_import_client_module, (module, name))
+
+
+def _import_client_module(module: str, name: str):
+    print('MODULE:', module)
+    print('NAME:', name)
+    return getattr(importlib.import_module(module), name)
 
 
 def py_to_html_name(py_name: str) -> str:

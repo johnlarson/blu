@@ -404,7 +404,7 @@ def _app_pkg_zip(zips_root: Path):
         for path in src_path.rglob('*'):
             if path.is_file():
                 if _is_client_module(path):
-                    dest_f.write(str(path))
+                    dest_f.write(str(path), arcname=path.relative_to(src_path))
     print('DONE ZIPPING')
 
 

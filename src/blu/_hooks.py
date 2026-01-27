@@ -1,6 +1,5 @@
 from collections.abc import AsyncGenerator, Callable, Generator
 from typing import Any
-from react import useEffect, useState, useRef
 
 
 def use_effect(callback: Callable[[], None | Generator[None]]):
@@ -42,6 +41,7 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     called immediately after the element is initially rendered to the
     DOM.
     """
+    from react import useEffect
     manager = EffectManager().use_setup()
     manager.callback = callback
     useEffect(manager.js_callback)
@@ -66,6 +66,7 @@ class HookManager:
         self.proxy.destroy()
 
     def use_teardown(self):
+        from react import useEffect
         useEffect(self.self_effect, [])
 
 
@@ -125,6 +126,7 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
         render, the first item in the tuple will be ``init``.
             
     """
+    from react import useState
     manager = StateManager().use_setup()
     value, js_setter = useState(init)
     manager.value = value
@@ -262,6 +264,7 @@ def use_ref[T](init: T) -> Ref[T]:
         Setting a :class:`Ref <blu.Ref>`\\'s value does not trigger a
         re-render.
     """
+    from react import useRef
     manager = RefManager().use_setup()
     ref_in: Ref[T] = Ref()
     ref_in[:] = init

@@ -1,4 +1,6 @@
 from collections.abc import AsyncGenerator, Callable, Generator
+from typing import Any
+from react import useEffect, useState, useRef
 
 
 def use_effect(callback: Callable[[], None | Generator[None]]):
@@ -40,7 +42,56 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     called immediately after the element is initially rendered to the
     DOM.
     """
+    manager = use_manager(EffectManager(callback))
+    useEffect(manager.js_callback)
+    # no_gc = _get_proxy_set()
+    # def js_callback():
+    #     result = callback()
+    #     if isinstance(result, Generator):
+    #         def cleanup():
+    #             try:
+    #                 next(result)
+    #             except StopIteration:
+    #                 pass
+    #         no_gc.add(cleanup)
+    #         return cleanup
+    # js_callback_ref = useRef(js_callback)
+    # no_gc.add(js_callback_ref.current)
+    
+    # useEffect(js_callback_ref.current)
+    # _use_drop_refs_effect(no_gc)
+
+
+class HookManager:
     ...
+
+
+def manager(manager: HookManager):
+    ...
+
+
+class EffectManager(HookManager):
+    _callback: Callable[callback: Callable[[], None | Generator[None]]]
+
+
+
+def _get_proxy_set():
+    from pyscript.ffi import create_proxy
+    no_gc = create_proxy(set())
+
+
+def use_manager(manager: HookManager) -> ffi.PythonProxy:
+
+    
+
+def _use_drop_refs_effect(no_gc: list[Any]):
+    def drop_refs_effect():
+        def cleanup():
+            no_gc.destroy()
+        no_gc.append(cleanup)
+    drop_refs_effect_ref = useRef(drop_refs_effect)
+    no_gc.add(drop_refs_effect_ref.current)
+    useEffect(drop_refs_effect_ref.current, [])
 
 
 def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
@@ -82,7 +133,29 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
         render, the first item in the tuple will be ``init``.
             
     """
-    ...
+    no_gc = _get_proxy_set()
+    init_ref = useRef(init)
+    _use_drop_refs_effect(no_gc)
+    current_value, setter = useState(init)
+    
+    def setter_wrapper(new_value: T):
+        no_gc.remove(current_value)
+        no_gc.append(new_value)
+        setter(new_value)
+
+    try:
+        prev_wrapper = next(
+            x for x in no_gc
+            if getattr(x, '__name__', None).endswith('setter_wrapper')
+        )
+    except StopIteration:
+        pass
+    else:
+        no_gc.remove(prev_wrapper)
+    no_gc.append(setter_wrapper)
+    
+    return current_value, setter_wrapper
+
 
 
 class Ref[T]:
@@ -205,4 +278,9 @@ def use_ref[T](init: T) -> Ref[T]:
         Setting a :class:`Ref <blu.Ref>`\\'s value does not trigger a
         re-render.
     """
-    ...
+    no_gc = _get_proxy_list()
+    ref = useRef(Ref(init)).current
+    if ref not in no_gc:
+        no_gc.append(ref)
+    
+

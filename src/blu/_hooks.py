@@ -49,26 +49,24 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
 
 
 class HookManager:
-    self_effect: Callable[[], None | Callable[[], None]]
-    self_cleanup: Callable[[], None]
+    proxy: Any
 
     def use_setup(self):
         from pyscript.ffi import create_proxy
         proxy_pre_ref = create_proxy(self)
-        proxy = useRef(proxy_pre_ref).current
-        if proxy_pre_ref is not proxy:
+        self.proxy = useRef(proxy_pre_ref).current
+        if proxy_pre_ref is not self.proxy:
             proxy_pre_ref.destroy()
-        def drop_refs_effect():
-            def cleanup():
-                proxy.destroy()
-            self.self_cleanup = cleanup
-        self.self_effect = useRef(drop_refs_effect).current
         return proxy
+    
+    def self_effect(self):
+        return self.self_cleanup
+    
+    def self_cleanup(self):
+        self.proxy.destroy()
 
     def use_teardown(self):
         useEffect(self.self_effect, [])
-
-    
 
 
 class EffectManager(HookManager):
@@ -85,6 +83,7 @@ class EffectManager(HookManager):
                 next(self.generator)
             except StopIteration:
                 pass
+        self.generator = None
 
 
 def _use_drop_refs_effect(no_gc: list[Any]):
@@ -276,10 +275,9 @@ def use_ref[T](init: T) -> Ref[T]:
     manager = RefManager().use_setup()
     ref_in: Ref[T] = Ref()
     ref_in[:] = init
-    ref: Ref[T] = useRef(ref_in).current
-    manager.ref = ref
+    manager.ref = useRef(ref_in).current
     manager.use_teardown()
-    return ref
+    return manager.ref
     
 
 class RefManager[T](HookManager):

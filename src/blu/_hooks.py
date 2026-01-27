@@ -86,16 +86,6 @@ class EffectManager(HookManager):
         self.generator = None
 
 
-def _use_drop_refs_effect(no_gc: list[Any]):
-    def drop_refs_effect():
-        def cleanup():
-            no_gc.destroy()
-        no_gc.append(cleanup)
-    drop_refs_effect_ref = useRef(drop_refs_effect)
-    no_gc.add(drop_refs_effect_ref.current)
-    useEffect(drop_refs_effect_ref.current, [])
-
-
 def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
     """
     .. include:: /_includes/hook-note.rst
@@ -282,4 +272,3 @@ def use_ref[T](init: T) -> Ref[T]:
 
 class RefManager[T](HookManager):
     ref: Ref[T] | None = None
-

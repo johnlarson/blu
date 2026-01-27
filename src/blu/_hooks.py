@@ -42,47 +42,50 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     called immediately after the element is initially rendered to the
     DOM.
     """
-    manager = use_manager(EffectManager(callback))
+    manager = EffectManager().use_setup()
+    manager.callback = callback
     useEffect(manager.js_callback)
-    # no_gc = _get_proxy_set()
-    # def js_callback():
-    #     result = callback()
-    #     if isinstance(result, Generator):
-    #         def cleanup():
-    #             try:
-    #                 next(result)
-    #             except StopIteration:
-    #                 pass
-    #         no_gc.add(cleanup)
-    #         return cleanup
-    # js_callback_ref = useRef(js_callback)
-    # no_gc.add(js_callback_ref.current)
-    
-    # useEffect(js_callback_ref.current)
-    # _use_drop_refs_effect(no_gc)
+    manager.use_teardown()
 
 
 class HookManager:
-    ...
+    self_effect: Callable[[], None | Callable[[], None]]
+    self_cleanup: Callable[[], None]
 
+    def use_setup(self):
+        from pyscript.ffi import create_proxy
+        proxy_pre_ref = create_proxy(self)
+        proxy = useRef(proxy_pre_ref).current
+        if proxy_pre_ref is not proxy:
+            proxy_pre_ref.destroy()
+        def drop_refs_effect():
+            def cleanup():
+                proxy.destroy()
+            self.self_cleanup = cleanup
+        self.self_effect = useRef(drop_refs_effect).current
+        return proxy
 
-def manager(manager: HookManager):
-    ...
+    def use_teardown(self):
+        useEffect(self.self_effect, [])
+
+    
 
 
 class EffectManager(HookManager):
-    _callback: Callable[callback: Callable[[], None | Generator[None]]]
+    callback: Callable[callback: Callable[[], None | Generator[None]]] | None = None
+    generator: Generator[None] | None = None
 
-
-
-def _get_proxy_set():
-    from pyscript.ffi import create_proxy
-    no_gc = create_proxy(set())
-
-
-def use_manager(manager: HookManager) -> ffi.PythonProxy:
-
+    def js_callback(self):
+        self.generator = self.callback()
+        return self.js_cleanup
     
+    def js_cleanup(self):
+        if self.generator is not None:
+            try:
+                next(self.generator)
+            except StopIteration:
+                pass
+
 
 def _use_drop_refs_effect(no_gc: list[Any]):
     def drop_refs_effect():
@@ -133,29 +136,21 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
         render, the first item in the tuple will be ``init``.
             
     """
-    no_gc = _get_proxy_set()
-    init_ref = useRef(init)
-    _use_drop_refs_effect(no_gc)
-    current_value, setter = useState(init)
-    
-    def setter_wrapper(new_value: T):
-        no_gc.remove(current_value)
-        no_gc.append(new_value)
-        setter(new_value)
+    manager = StateManager().use_setup()
+    value, js_setter = useState(init)
+    manager.value = value
+    manager.js_setter = js_setter
+    manager.use_teardown()
+    return manager.value, manager.setter
 
-    try:
-        prev_wrapper = next(
-            x for x in no_gc
-            if getattr(x, '__name__', None).endswith('setter_wrapper')
-        )
-    except StopIteration:
-        pass
-    else:
-        no_gc.remove(prev_wrapper)
-    no_gc.append(setter_wrapper)
-    
-    return current_value, setter_wrapper
 
+class StateManager[T](HookManager):
+    value: T
+    js_setter: Callable[[T], None]
+
+    def setter(self, new_value: T):
+        self.value = new_value
+        self.js_setter(new_value)
 
 
 class Ref[T]:
@@ -278,9 +273,15 @@ def use_ref[T](init: T) -> Ref[T]:
         Setting a :class:`Ref <blu.Ref>`\\'s value does not trigger a
         re-render.
     """
-    no_gc = _get_proxy_list()
-    ref = useRef(Ref(init)).current
-    if ref not in no_gc:
-        no_gc.append(ref)
+    manager = RefManager().use_setup()
+    ref_in: Ref[T] = Ref()
+    ref_in[:] = init
+    ref: Ref[T] = useRef(ref_in).current
+    manager.ref = ref
+    manager.use_teardown()
+    return ref
     
+
+class RefManager[T](HookManager):
+    ref: Ref[T] | None = None
 

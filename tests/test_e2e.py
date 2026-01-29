@@ -197,13 +197,15 @@ async def test_use_state(page: PageFixture):
     await expect(counter).to_have_text('2')
 
 
-async def test_use_ref_html_element():
+async def test_use_ref_html_element(page: PageFixture):
     """
     Passing a Ref as the "ref" prop of an HTML element should result in
     that Ref referencing the HTML element in an effect and during the
     following render.
     """
-    ...
+    p = await page('e2e')
+    await p.goto('/html_editing_effect')
+    await expect(p.locator('.test-div')).to_have_text('Hello.')
 
 
 async def test_client_side_availability():

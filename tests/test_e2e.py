@@ -159,7 +159,10 @@ async def test_use_effect(page: PageFixture):
     await expect(button).to_be_attached()
     async with p.expect_event('dialog') as dialog_info_setup_2:
         dialog_teardown_1.accept()
-    await expect(button).not_to_be_attached()
+    dialog_setup_2 = dialog_info_setup_2.value
+    assert expect(dialog_setup_2).message == 'SETUP'
+    await dialog_setup_2.accept()
+    await expect(button).to_be_attached()
 
 
 async def test_use_ref(page: PageFixture):

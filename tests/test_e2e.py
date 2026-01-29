@@ -183,11 +183,18 @@ async def test_use_ref(page: PageFixture):
     await expect(counter).to_have_text('3')
 
 
-async def test_use_state():
+async def test_use_state(page: PageFixture):
     """
     blu.use_state should behave as described in the documentation.
     """
-    ...
+    p = await page('e2e')
+    await p.goto('/use_state')
+    counter = p.locator('#count')
+    await expect(counter).to_have_text('0')
+    await p.click('button')
+    await expect(counter).to_have_text('1')
+    await p.click('button')
+    await expect(counter).to_have_text('2')
 
 
 async def test_use_ref_html_element():

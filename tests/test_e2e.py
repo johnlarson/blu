@@ -88,6 +88,9 @@ def server() -> Generator[Callable[[], Awaitable[str]]]:
     finally:
         if server_task is not None:
             server_task.cancel()
+        
+
+type PageFixture = Callable[[str], Awaitable[Page]]
 
 
 @pytest.fixture(scope='module')
@@ -138,9 +141,25 @@ async def test_wrong_environment_error():
     ...
 
 
-async def test_use_effect():
+async def test_use_effect(page: PageFixture):
     """blu.use_effect should work as described in the documentation."""
-    ...
+    p = await page('e2e')
+    async with p.expect_event('dialog') as dialog_info_setup_1:
+        await p.goto('/use_effect')
+    dialog_setup_1 = dialog_info_setup_1.value
+    assert dialog_setup_1.message == 'SETUP'
+    button = p.locator('button')
+    await expect(button).not_to_be_attached()
+    dialog_setup_1.accept()
+    await expect(button).to_be_attached()
+    async with p.expect_event('dialog') as dialog_info_teardown_1:
+        await p.click('button')
+    dialog_teardown_1 = dialog_info_teardown_1.value
+    assert dialog_teardown_1.message == 'TEARDOWN'
+    await expect(button).to_be_attached()
+    async with p.expect_event('dialog') as dialog_info_setup_2:
+        dialog_teardown_1.accept()
+    await expect(button).not_to_be_attached()
 
 
 async def test_use_ref():

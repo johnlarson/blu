@@ -162,12 +162,25 @@ async def test_use_effect(page: PageFixture):
     await expect(button).not_to_be_attached()
 
 
-async def test_use_ref():
+async def test_use_ref(page: PageFixture):
     """
     blu.use_ref should store references and be editable as described in
     the documentation.
     """
-    ...
+    p = await page('e2e')
+    await p.goto('/use_ref')
+    counter = p.locator('#count')
+    await expect(counter).to_have_text('0')
+    await p.click('#increment')
+    await p.click('#increment')
+    await p.click('#increment')
+    await asyncio.sleep(.1)
+    await expect(counter).to_have_text('0')
+    await p.click('#rerender')
+    await expect(counter).to_have_text('3')
+    await p.click('#rerender')
+    await asyncio.sleep(.1)
+    await expect(counter).to_have_text('3')
 
 
 async def test_use_state():

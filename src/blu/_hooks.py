@@ -41,7 +41,7 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     called immediately after the element is initially rendered to the
     DOM.
     """
-    from react import useEffect
+    from pyscript.js_modules._blu_react import useEffect
     manager = EffectManager().use_setup()
     manager.callback = callback
     useEffect(manager.js_callback)
@@ -53,11 +53,15 @@ class HookManager:
 
     def use_setup(self):
         from pyscript.ffi import create_proxy
+        from pyscript.js_modules._blu_react import useRef
         proxy_pre_ref = create_proxy(self)
         self.proxy = useRef(proxy_pre_ref).current
-        if proxy_pre_ref is not self.proxy:
-            proxy_pre_ref.destroy()
-        return proxy
+        
+        # TODO: fix memory leak
+        # if proxy_pre_ref is not self.proxy:
+        #     proxy_pre_ref.destroy()
+        # return self.proxy
+        return self
     
     def self_effect(self):
         return self.self_cleanup
@@ -66,12 +70,12 @@ class HookManager:
         self.proxy.destroy()
 
     def use_teardown(self):
-        from react import useEffect
+        from pyscript.js_modules._blu_react import useEffect
         useEffect(self.self_effect, [])
 
 
 class EffectManager(HookManager):
-    callback: Callable[callback: Callable[[], None | Generator[None]]] | None = None
+    callback: Callable[[], None | Generator[None] | None] = lambda: None
     generator: Generator[None] | None = None
 
     def js_callback(self):
@@ -126,7 +130,7 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
         render, the first item in the tuple will be ``init``.
             
     """
-    from react import useState
+    from pyscript.js_modules._blu_react import useState
     manager = StateManager().use_setup()
     value, js_setter = useState(init)
     manager.value = value
@@ -264,7 +268,7 @@ def use_ref[T](init: T) -> Ref[T]:
         Setting a :class:`Ref <blu.Ref>`\\'s value does not trigger a
         re-render.
     """
-    from react import useRef
+    from pyscript.js_modules._blu_react import useRef
     manager = RefManager().use_setup()
     ref_in: Ref[T] = Ref()
     ref_in[:] = init

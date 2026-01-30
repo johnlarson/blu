@@ -93,6 +93,7 @@ async def _get_config() -> dict[str, Jsonable]:
                 'https://esm.sh/react': '_blu_react',
             },
         },
+        'debug': True,
         'files': {
             '/_blu_internal/blu_pkg.zip': './blu/*',
             '/_blu_internal/app_pkg.zip': './app/*',

@@ -146,6 +146,7 @@ async def test_use_effect(page: PageFixture):
     p = await page('e2e')
     async with p.expect_event('dialog') as dialog_info_setup_1:
         await p.goto('/use_effect')
+        await sleep(500)
     dialog_setup_1 = dialog_info_setup_1.value
     assert dialog_setup_1.message == 'SETUP'
     button = p.locator('button')

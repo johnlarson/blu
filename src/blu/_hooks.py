@@ -60,17 +60,20 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
 
 class HookManager:
     proxy: Any
+    watch_list: Any
 
     def __init__(self):
         self.proxy = create_proxy(self)
         self.self_effect = create_proxy(self.self_effect)
         self.self_cleanup = create_proxy(self.self_cleanup)
+        self.watch_list = create_proxy([])
 
     def self_effect(self):
         return self.self_cleanup
     
     def self_cleanup(self):
         self.self_effect.destroy()
+        self.watch_list.destroy()
         self.self_cleanup.destroy()
         self.proxy.destroy()
 
@@ -79,10 +82,9 @@ def use_setup(manager: HookManager):
     from pyscript.ffi import create_proxy
     # from pyscript.js_modules._blu_react import useEffect, useRef
     # return create_proxy(manager)
-    proxy_pre_ref = create_proxy(manager)
-    proxy = useRef(proxy_pre_ref).current
-    
-    useEffect(proxy.self_effect, [])
+    proxy = create_proxy(manager)
+    proxy.self_effect()
+    useEffect(proxy.self_effect)
     return proxy
 
 
@@ -176,15 +178,15 @@ class StateManager[T](HookManager):
         js_setter: Callable[[T], None],
     ):
         super().__init__()
-        if value_proxy.unwrap() is not init_proxy.unwrap():
-            init_proxy.destroy()
+        # if value_proxy.unwrap() is not init_proxy.unwrap():
+        #     init_proxy.destroy()
         self.value_proxy = value_proxy
         self.js_setter = create_proxy(js_setter)
         self.setter = create_proxy(self.setter)
 
     def setter(self, new_value: T):
         # self.js_setter(create_proxy(new_value))
-        # self.js_setter(5)
+        self.js_setter(create_proxy(5))
         pass
 
     def self_cleanup(self):

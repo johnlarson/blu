@@ -93,7 +93,7 @@ def use_setup(manager: HookManager, long_lasting: bool = False):
 
 class EffectManager(HookManager):
     callback: Callable[[], None | Generator[None] | None] = lambda: None
-    # generator: Generator[None] | None = None
+    generator: Generator[None] | None = None
 
     def __init__(self, callback: Callable[[], None | Generator[None] | None]):
         from pyscript.ffi import create_proxy
@@ -114,11 +114,11 @@ class EffectManager(HookManager):
                 next(self.generator)
             except StopIteration:
                 pass
-                # self.generator.destroy()
         self.generator = None
 
     def self_cleanup(self):
         self.callback.destroy()
+        self.generator.destroy()
         self.js_callback.destroy()
         super().self_cleanup()
 

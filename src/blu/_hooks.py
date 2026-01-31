@@ -42,53 +42,72 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     DOM.
     """
     from pyscript.js_modules._blu_react import useEffect
-    manager = EffectManager().use_setup()
-    manager.callback = callback
+    # manager = use_setup(EffectManager())
+    # manager.callback = callback
+    from pyscript.ffi import create_proxy
+    def blah():
+        pass
+    manager = create_proxy(EffectManager())
+    # js_callback = create_proxy(manager.js_callback)
     useEffect(manager.js_callback)
-    manager.use_teardown()
+    #manager.use_teardown()
 
 
 class HookManager:
-    proxy: Any
 
-    def use_setup(self):
-        from pyscript.ffi import create_proxy
-        from pyscript.js_modules._blu_react import useRef
-        proxy_pre_ref = create_proxy(self)
-        self.proxy = useRef(proxy_pre_ref).current
-        
-        # TODO: fix memory leak
-        # if proxy_pre_ref is not self.proxy:
-        #     proxy_pre_ref.destroy()
-        # return self.proxy
-        return self
-    
-    def self_effect(self):
-        return self.self_cleanup
-    
-    def self_cleanup(self):
-        self.proxy.destroy()
+    def __call__(self):
+        pass
+    # proxy: Any
 
-    def use_teardown(self):
-        from pyscript.js_modules._blu_react import useEffect
-        useEffect(self.self_effect, [])
+    # def self_effect(self):
+    #     return self.self_cleanup
+    
+    # def self_cleanup(self):
+    #     self.proxy.destroy()
+
+    def cleanup():
+        pass
+
+
+def use_setup(manager: HookManager):
+    from pyscript.ffi import create_proxy
+    # from pyscript.js_modules._blu_react import useEffect, useRef
+    return create_proxy(manager)
+    proxy_pre_ref = create_proxy(manager)
+    proxy = useRef(proxy_pre_ref).current
+    
+    # TODO: fix memory leak
+    # if proxy_pre_ref is not self.proxy:
+    #     proxy_pre_ref.destroy()
+    # return self.proxy
+    useEffect(proxy.self_effect, [])
+    return proxy
 
 
 class EffectManager(HookManager):
-    callback: Callable[[], None | Generator[None] | None] = lambda: None
-    generator: Generator[None] | None = None
+    # callback: Callable[[], None | Generator[None] | None] = lambda: None
+    # generator: Generator[None] | None = None
+
+    def __init__(self):
+        from pyscript.ffi import create_proxy
+        super().__init__()
+        self.js_callback = create_proxy(self.js_callback)
 
     def js_callback(self):
+        return
         self.generator = self.callback()
         return self.js_cleanup
     
-    def js_cleanup(self):
-        if self.generator is not None:
-            try:
-                next(self.generator)
-            except StopIteration:
-                pass
-        self.generator = None
+    # def js_cleanup(self):
+    #     if self.generator is not None:
+    #         try:
+    #             next(self.generator)
+    #         except StopIteration:
+    #             pass
+    #     self.generator = None
+
+    def cleanup():
+        self.js_callback.destroy()
 
 
 def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:

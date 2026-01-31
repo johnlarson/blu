@@ -12,16 +12,19 @@ def __page__():
 @client
 def EffectTest():
     from js import alert
+    from pyscript.ffi import create_proxy
 
-    render_id, rerender = use_state(0)
+    # render_id, rerender = use_state(0)
 
     @use_effect
+    @create_proxy
     def _():
         alert('SETUP')
         yield
         alert('TEARDOWN')
 
-    def handle_button_click():
-        rerender(render_id + 1)
+    # def handle_button_click():
+    #     rerender(render_id + 1)
     
-    return button(onClick=handle_button_click)
+    return button['CLICK!']
+    # return button(onClick=handle_button_click)

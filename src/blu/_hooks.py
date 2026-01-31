@@ -1,5 +1,11 @@
 from collections.abc import AsyncGenerator, Callable, Generator
 from typing import Any
+import typing
+from blu._utils import is_client
+
+if is_client or typing.TYPE_CHECKING:
+    from pyscript.ffi import create_proxy
+    from pyscript.js_modules._blu_react import useEffect, useRef, useState
 
 
 def use_effect(callback: Callable[[], None | Generator[None]]):
@@ -41,7 +47,6 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     called immediately after the element is initially rendered to the
     DOM.
     """
-    from pyscript.js_modules._blu_react import useEffect
     # manager = use_setup(EffectManager())
     # manager.callback = callback
     from pyscript.ffi import create_proxy
@@ -54,19 +59,20 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
 
 
 class HookManager:
+    proxy: Any
 
-    def __call__(self):
-        pass
-    # proxy: Any
+    def __init__(self):
+        self.proxy = create_proxy(self)
+        self.self_effect = create_proxy(self.self_effect)
+        self.self_cleanup = create_proxy(self.self_cleanup)
 
-    # def self_effect(self):
-    #     return self.self_cleanup
+    def self_effect(self):
+        return self.self_cleanup
     
-    # def self_cleanup(self):
-    #     self.proxy.destroy()
-
-    def cleanup():
-        pass
+    def self_cleanup(self):
+        self.self_effect.destroy()
+        self.self_cleanup.destroy()
+        self.proxy.destroy()
 
 
 def use_setup(manager: HookManager):
@@ -106,8 +112,9 @@ class EffectManager(HookManager):
     #             pass
     #     self.generator = None
 
-    def cleanup():
+    def self_cleanup(self):
         self.js_callback.destroy()
+        super().self_cleanup()
 
 
 def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:

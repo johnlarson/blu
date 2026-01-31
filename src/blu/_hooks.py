@@ -52,7 +52,7 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     from pyscript.ffi import create_proxy
     def blah():
         pass
-    manager = create_proxy(EffectManager())
+    manager = create_proxy(EffectManager(callback))
     # js_callback = create_proxy(manager.js_callback)
     useEffect(manager.js_callback)
     #manager.use_teardown()
@@ -91,12 +91,13 @@ def use_setup(manager: HookManager):
 
 
 class EffectManager(HookManager):
-    # callback: Callable[[], None | Generator[None] | None] = lambda: None
+    callback: Callable[[], None | Generator[None] | None] = lambda: None
     # generator: Generator[None] | None = None
 
-    def __init__(self):
+    def __init__(self, callback: Callable[[], None | Generator[None] | None]):
         from pyscript.ffi import create_proxy
         super().__init__()
+        self.callback = create_proxy(callback)
         self.js_callback = create_proxy(self.js_callback)
 
     def js_callback(self):
@@ -113,6 +114,7 @@ class EffectManager(HookManager):
     #     self.generator = None
 
     def self_cleanup(self):
+        self.callback.destroy()
         self.js_callback.destroy()
         super().self_cleanup()
 

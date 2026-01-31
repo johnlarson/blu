@@ -157,12 +157,9 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
         render, the first item in the tuple will be ``init``.
             
     """
-    from pyscript.js_modules._blu_react import useState
-    manager = StateManager().use_setup()
-    value, js_setter = useState(init)
-    manager.value = value
-    manager.js_setter = js_setter
-    manager.use_teardown()
+    init_proxy = create_proxy(init)
+    value, js_setter = useState(init_proxy)
+    manager = use_setup(StateManager(init_proxy, value, js_setter))
     return manager.value, manager.setter
 
 
@@ -170,9 +167,28 @@ class StateManager[T](HookManager):
     value: T
     js_setter: Callable[[T], None]
 
+    def __init__(
+        self,
+        init_proxy: Any,
+        value: T,
+        js_setter: Callable[[T], None],
+    ):
+        if value is init_proxy:
+            self.value = value
+        else:
+            self.value = create_proxy(value)
+            init_proxy.destroy()
+        self.js_setter = create_proxy(js_setter)
+        self.setter = create_proxy(self.setter)
+
     def setter(self, new_value: T):
-        self.value = new_value
-        self.js_setter(new_value)
+        self.js_setter(create_proxy(new_value))
+
+    def self_cleanup(self):
+        self.value.destroy()
+        self.js_setter.destroy()
+        self.setter.destroy()
+        return super().self_cleanup()
 
 
 class Ref[T]:

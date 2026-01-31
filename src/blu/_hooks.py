@@ -109,12 +109,12 @@ class EffectManager(HookManager):
         return self.js_cleanup
     
     def js_cleanup(self):
-        return
         if self.generator is not None:
             try:
                 next(self.generator)
             except StopIteration:
                 pass
+                # self.generator.destroy()
         self.generator = None
 
     def self_cleanup(self):

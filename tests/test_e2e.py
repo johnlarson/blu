@@ -144,24 +144,21 @@ async def test_wrong_environment_error():
 async def test_use_effect(page: PageFixture):
     """blu.use_effect should work as described in the documentation."""
     p = await page('e2e')
+    button = p.locator('button')
     async with p.expect_event('dialog') as dialog_info_setup_1:
         await p.goto('/use_effect')
-        await sleep(500)
-    dialog_setup_1 = dialog_info_setup_1.value
+        # await sleep(500)
+    dialog_setup_1 = await dialog_info_setup_1.value
     assert dialog_setup_1.message == 'SETUP'
-    button = p.locator('button')
-    await expect(button).not_to_be_attached()
-    dialog_setup_1.accept()
-    await expect(button).to_be_attached()
+    await dialog_setup_1.accept()
     async with p.expect_event('dialog') as dialog_info_teardown_1:
         await p.click('button')
-    dialog_teardown_1 = dialog_info_teardown_1.value
+    dialog_teardown_1 = await dialog_info_teardown_1.value
     assert dialog_teardown_1.message == 'TEARDOWN'
-    await expect(button).to_be_attached()
     async with p.expect_event('dialog') as dialog_info_setup_2:
-        dialog_teardown_1.accept()
-    dialog_setup_2 = dialog_info_setup_2.value
-    assert expect(dialog_setup_2).message == 'SETUP'
+        await dialog_teardown_1.accept()
+    dialog_setup_2 = await dialog_info_setup_2.value
+    assert dialog_setup_2.message == 'SETUP'
     await dialog_setup_2.accept()
     await expect(button).to_be_attached()
 

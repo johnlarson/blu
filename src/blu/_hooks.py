@@ -169,7 +169,7 @@ class StateManager[T](HookManager):
         if value_proxy.unwrap() is not init_proxy.unwrap():
             init_proxy.destroy()
         self.value_proxy = value_proxy
-        self.js_setter = create_proxy(js_setter)
+        self.js_setter = js_setter
         self.setter = create_proxy(self.setter)
 
     def setter(self, new_value: T):
@@ -177,9 +177,8 @@ class StateManager[T](HookManager):
 
     def self_cleanup(self):
         # TODO: fix memory leak
-        # self.value.destroy()
-        # self.js_setter.destroy()
-        # self.setter.destroy()
+        self.value_proxy.destroy()
+        self.setter.destroy()
         super().self_cleanup()
 
 
@@ -322,7 +321,7 @@ def use_ref[T](init: T) -> Ref[T]:
     manager_in = use_setup(RefManager(ref), True)
     manager_out = useRef(manager_in).current
     # TODO: fix memory leak
-    # if manager_in is not manager_out:
+    # if manager_in.unwrap() is not manager_out.unwrap():
     #     manager_in.self_cleanup()
     return manager_out.ref
     

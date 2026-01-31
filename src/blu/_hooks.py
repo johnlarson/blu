@@ -180,7 +180,6 @@ class StateManager[T](HookManager):
         # self.js_setter.destroy()
         # self.setter.destroy()
         super().self_cleanup()
-        pass
 
 
 class Ref[T]:

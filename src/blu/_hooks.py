@@ -173,9 +173,7 @@ class StateManager[T](HookManager):
         self.setter = create_proxy(self.setter)
 
     def setter(self, new_value: T):
-        # self.js_setter(create_proxy(new_value))
-        self.js_setter(create_proxy(5))
-        pass
+        self.js_setter(create_proxy(new_value))
 
     def self_cleanup(self):
         # self.value.destroy()

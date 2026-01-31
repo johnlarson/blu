@@ -151,8 +151,6 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
     """
     init_proxy = create_proxy(init)
     value_proxy, js_setter = useState(init_proxy)
-    print('VALUE_PROXY TYPE:', type(value_proxy))
-    print('VALUE TYPE:', type(value_proxy.unwrap()))
     manager = use_setup(StateManager(init_proxy, value_proxy, js_setter))
     return manager.value_proxy.unwrap(), manager.setter
 
@@ -168,8 +166,8 @@ class StateManager[T](HookManager):
         js_setter: Callable[[T], None],
     ):
         super().__init__()
-        # if value_proxy.unwrap() is not init_proxy.unwrap():
-        #     init_proxy.destroy()
+        if value_proxy.unwrap() is not init_proxy.unwrap():
+            init_proxy.destroy()
         self.value_proxy = value_proxy
         self.js_setter = create_proxy(js_setter)
         self.setter = create_proxy(self.setter)

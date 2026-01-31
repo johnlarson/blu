@@ -176,6 +176,7 @@ class StateManager[T](HookManager):
         self.js_setter(create_proxy(new_value))
 
     def self_cleanup(self):
+        # TODO: fix memory leak
         # self.value.destroy()
         # self.js_setter.destroy()
         # self.setter.destroy()

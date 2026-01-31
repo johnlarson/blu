@@ -73,11 +73,15 @@ class HookManager:
 
 def use_setup(manager: HookManager, long_lasting: bool = False):
     proxy = create_proxy(manager)
+    use_self_cleanup(proxy, long_lasting)
+    return proxy
+
+
+def use_self_cleanup(proxy: Any, long_lasting: bool = False):
     if long_lasting:
         useEffect(proxy.self_effect, proxy.watch_list)
     else:
         useEffect(proxy.self_effect)
-    return proxy
 
 
 class EffectManager(HookManager):

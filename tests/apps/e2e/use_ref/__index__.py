@@ -14,10 +14,10 @@ def RefTest():
     render_id, rerender = use_state(0)
     count_ref = use_ref(0)
 
-    def click_increment():
+    def click_increment(e):
         count_ref[:] = count_ref[:] + 1
 
-    def click_rerender():
+    def click_rerender(e):
         rerender(render_id + 1)
     
     return (

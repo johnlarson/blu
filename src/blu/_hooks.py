@@ -85,7 +85,7 @@ def use_setup(manager: HookManager, long_lasting: bool = False):
     proxy = create_proxy(manager)
     proxy.self_effect()
     if long_lasting:
-        useEffect(proxy.self_effect, proxy.watch_lilst)
+        useEffect(proxy.self_effect, proxy.watch_list)
     else:
         useEffect(proxy.self_effect)
     return proxy
@@ -338,8 +338,9 @@ def use_ref[T](init: T) -> Ref[T]:
     ref[:] = init
     manager_in = use_setup(RefManager(ref), True)
     manager_out = useRef(manager_in).current
-    if manager_in is not manager_out:
-        manager_in.self_cleanup()
+    # TODO: fix memory leak
+    # if manager_in is not manager_out:
+    #     manager_in.self_cleanup()
     return manager_out.ref
     
 

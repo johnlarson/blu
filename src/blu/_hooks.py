@@ -78,15 +78,11 @@ class HookManager:
 def use_setup(manager: HookManager):
     from pyscript.ffi import create_proxy
     # from pyscript.js_modules._blu_react import useEffect, useRef
-    return create_proxy(manager)
+    # return create_proxy(manager)
     proxy_pre_ref = create_proxy(manager)
     proxy = useRef(proxy_pre_ref).current
     
-    # TODO: fix memory leak
-    # if proxy_pre_ref is not self.proxy:
-    #     proxy_pre_ref.destroy()
-    # return self.proxy
-    useEffect(proxy.self_effect, [])
+    #useEffect(proxy.self_effect, [])
     return proxy
 
 

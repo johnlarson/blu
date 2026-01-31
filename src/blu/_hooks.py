@@ -82,7 +82,7 @@ def use_setup(manager: HookManager):
     proxy_pre_ref = create_proxy(manager)
     proxy = useRef(proxy_pre_ref).current
     
-    #useEffect(proxy.self_effect, [])
+    useEffect(proxy.self_effect, [])
     return proxy
 
 

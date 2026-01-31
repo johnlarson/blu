@@ -47,15 +47,8 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     called immediately after the element is initially rendered to the
     DOM.
     """
-    # manager = use_setup(EffectManager())
-    # manager.callback = callback
-    from pyscript.ffi import create_proxy
-    def blah():
-        pass
     manager = EffectManager(callback)
-    # js_callback = create_proxy(manager.js_callback)
     useEffect(manager.js_callback)
-    #manager.use_teardown()
 
 
 class HookManager:
@@ -79,11 +72,7 @@ class HookManager:
 
 
 def use_setup(manager: HookManager, long_lasting: bool = False):
-    from pyscript.ffi import create_proxy
-    # from pyscript.js_modules._blu_react import useEffect, useRef
-    # return create_proxy(manager)
     proxy = create_proxy(manager)
-    proxy.self_effect()
     if long_lasting:
         useEffect(proxy.self_effect, proxy.watch_list)
     else:
@@ -96,7 +85,6 @@ class EffectManager(HookManager):
     generator: Generator[None] | None = None
 
     def __init__(self, callback: Callable[[], None | Generator[None] | None]):
-        from pyscript.ffi import create_proxy
         super().__init__()
         self.callback = create_proxy(callback)
         self.js_callback = create_proxy(self.js_callback)
@@ -114,7 +102,6 @@ class EffectManager(HookManager):
                 next(self.generator)
             except StopIteration:
                 pass
-        self.generator = None
 
     def self_cleanup(self):
         self.callback.destroy()

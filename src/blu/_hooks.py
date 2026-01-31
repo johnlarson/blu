@@ -160,6 +160,7 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
     init_proxy = create_proxy(init)
     value, js_setter = useState(init_proxy)
     manager = use_setup(StateManager(init_proxy, value, js_setter))
+    return 1, 2
     return manager.value, manager.setter
 
 
@@ -173,22 +174,26 @@ class StateManager[T](HookManager):
         value: T,
         js_setter: Callable[[T], None],
     ):
-        if value is init_proxy:
-            self.value = value
-        else:
-            self.value = create_proxy(value)
-            init_proxy.destroy()
-        self.js_setter = create_proxy(js_setter)
-        self.setter = create_proxy(self.setter)
+        super().__init__()
+        # if value is init_proxy:
+        #     self.value = value
+        # else:
+        #     self.value = create_proxy(value)
+        #     init_proxy.destroy()
+        # self.js_setter = create_proxy(js_setter)
+        # self.setter = create_proxy(self.setter)
+        pass
 
     def setter(self, new_value: T):
-        self.js_setter(create_proxy(new_value))
+        # self.js_setter(create_proxy(new_value))
+        pass
 
     def self_cleanup(self):
-        self.value.destroy()
-        self.js_setter.destroy()
-        self.setter.destroy()
-        return super().self_cleanup()
+        # self.value.destroy()
+        # self.js_setter.destroy()
+        # self.setter.destroy()
+        super().self_cleanup()
+        pass
 
 
 class Ref[T]:

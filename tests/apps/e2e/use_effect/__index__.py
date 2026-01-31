@@ -14,7 +14,7 @@ def EffectTest():
     from js import alert
     from pyscript.ffi import create_proxy
 
-    # render_id, rerender = use_state(0)
+    render_id, rerender = use_state(0)
 
     @use_effect
     def _():

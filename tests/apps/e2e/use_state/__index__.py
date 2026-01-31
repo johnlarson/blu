@@ -12,7 +12,7 @@ def __page__():
 def StateTest():
     count, set_count = use_state(0)
 
-    def click_increment():
+    def click_increment(e):
         set_count(count + 1)
     
     return (

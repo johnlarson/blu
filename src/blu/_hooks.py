@@ -52,7 +52,7 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     from pyscript.ffi import create_proxy
     def blah():
         pass
-    manager = create_proxy(EffectManager(callback))
+    manager = EffectManager(callback)
     # js_callback = create_proxy(manager.js_callback)
     useEffect(manager.js_callback)
     #manager.use_teardown()

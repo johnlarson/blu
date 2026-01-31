@@ -175,11 +175,11 @@ class StateManager[T](HookManager):
         js_setter: Callable[[T], None],
     ):
         super().__init__()
-        # if value is init_proxy:
-        #     self.value = value
-        # else:
-        #     self.value = create_proxy(value)
-        #     init_proxy.destroy()
+        if value is init_proxy:
+            self.value = value
+        else:
+            self.value = create_proxy(value)
+            init_proxy.destroy()
         self.js_setter = create_proxy(js_setter)
         self.setter = create_proxy(self.setter)
 

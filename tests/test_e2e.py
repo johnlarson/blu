@@ -152,6 +152,10 @@ async def test_use_effect(page: PageFixture):
     await expect(events_div).to_have_text('SETUP')
     await p.click('button')
     await expect(events_div).to_have_text('SETUP,TEARDOWN,SETUP')
+    await p.click('button')
+    await expect(events_div).to_have_text(
+        'SETUP,TEARDOWN,SETUP,TEARDOWN,SETUP',
+    )
 
 
 async def test_use_ref(page: PageFixture):

@@ -24,6 +24,7 @@ def EffectTest():
         alert('TEARDOWN')
 
     def handle_button_click(e):
+        print('Clicked!')
         rerender(render_id + 1)
     
     return button(onClick=handle_button_click)['CLICK!']

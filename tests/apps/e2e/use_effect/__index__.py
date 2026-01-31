@@ -17,14 +17,19 @@ def EffectTest():
     render_id, rerender = use_state(0)
     print('TYPE:', type(render_id))
 
+    events_ref = use_ref([])
+
     @use_effect
     def _():
-        alert('SETUP')
+        events_ref[:] = [*events_ref[:], 'SETUP']
         yield
-        alert('TEARDOWN')
+        events_ref[:] = [*events_ref[:], 'TEARDOWN']
 
     def handle_button_click(e):
         print('Clicked!')
         rerender(render_id + 1)
     
-    return button(onClick=handle_button_click)['CLICK!']
+    return (
+        button(onClick=handle_button_click)['CLICK!'],
+        div(id='events')[','.join(events_ref[:])]
+    )

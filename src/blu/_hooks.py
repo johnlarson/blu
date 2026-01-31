@@ -78,13 +78,16 @@ class HookManager:
         self.proxy.destroy()
 
 
-def use_setup(manager: HookManager):
+def use_setup(manager: HookManager, long_lasting: bool = False):
     from pyscript.ffi import create_proxy
     # from pyscript.js_modules._blu_react import useEffect, useRef
     # return create_proxy(manager)
     proxy = create_proxy(manager)
     proxy.self_effect()
-    useEffect(proxy.self_effect)
+    if long_lasting:
+        useEffect(proxy.self_effect, proxy.watch_lilst)
+    else:
+        useEffect(proxy.self_effect)
     return proxy
 
 
@@ -241,7 +244,7 @@ class Ref[T]:
         """
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
-        return self._current
+        return self._current.unwrap()
     
     def __setitem__(self, empty_slice: slice, new_value: T):
         """
@@ -272,7 +275,21 @@ class Ref[T]:
         """
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
-        self._current = new_value
+        try:
+            current = self._current
+        except AttributeError:
+            pass
+        else:
+            current.destroy()
+        self._current = create_proxy(new_value)
+
+    def _cleanup(self):
+        try:
+            current = self._current
+        except AttributeError:
+            pass
+        else:
+            current.destroy()
 
 
 def use_ref[T](init: T) -> Ref[T]:
@@ -317,14 +334,24 @@ def use_ref[T](init: T) -> Ref[T]:
         Setting a :class:`Ref <blu.Ref>`\\'s value does not trigger a
         re-render.
     """
-    from pyscript.js_modules._blu_react import useRef
-    manager = RefManager().use_setup()
-    ref_in: Ref[T] = Ref()
-    ref_in[:] = init
-    manager.ref = useRef(ref_in).current
-    manager.use_teardown()
-    return manager.ref
+    ref: Ref[T] = Ref()
+    ref[:] = init
+    manager_in = use_setup(RefManager(ref), True)
+    manager_out = useRef(manager_in).current
+    if manager_in is not manager_out:
+        manager_in.self_cleanup()
+    return manager_out.ref
     
 
 class RefManager[T](HookManager):
     ref: Ref[T] | None = None
+
+    def __init__(self, ref: Ref[T]):
+        super().__init__()
+        self.ref = create_proxy(ref)
+
+    def self_cleanup(self):
+        self.ref._cleanup()
+        self.ref.destroy()
+        super().self_cleanup()
+    

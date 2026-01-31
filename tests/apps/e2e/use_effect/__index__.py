@@ -22,8 +22,8 @@ def EffectTest():
         yield
         alert('TEARDOWN')
 
-    # def handle_button_click():
-    #     rerender(render_id + 1)
+    def handle_button_click():
+        rerender(render_id + 1)
     
     return button['CLICK!']
     # return button(onClick=handle_button_click)

@@ -97,17 +97,17 @@ class EffectManager(HookManager):
         self.js_callback = create_proxy(self.js_callback)
 
     def js_callback(self):
-        return
         self.generator = self.callback()
         return self.js_cleanup
     
-    # def js_cleanup(self):
-    #     if self.generator is not None:
-    #         try:
-    #             next(self.generator)
-    #         except StopIteration:
-    #             pass
-    #     self.generator = None
+    def js_cleanup(self):
+        return
+        if self.generator is not None:
+            try:
+                next(self.generator)
+            except StopIteration:
+                pass
+        self.generator = None
 
     def self_cleanup(self):
         self.callback.destroy()

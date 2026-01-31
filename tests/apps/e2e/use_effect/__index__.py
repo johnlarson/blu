@@ -17,7 +17,6 @@ def EffectTest():
     # render_id, rerender = use_state(0)
 
     @use_effect
-    @create_proxy
     def _():
         alert('SETUP')
         yield

@@ -15,6 +15,7 @@ def EffectTest():
     from pyscript.ffi import create_proxy
 
     render_id, rerender = use_state(0)
+    print('TYPE:', type(render_id))
 
     @use_effect
     def _():
@@ -22,8 +23,7 @@ def EffectTest():
         yield
         alert('TEARDOWN')
 
-    def handle_button_click():
+    def handle_button_click(e):
         rerender(render_id + 1)
     
-    return button['CLICK!']
-    # return button(onClick=handle_button_click)
+    return button(onClick=handle_button_click)['CLICK!']

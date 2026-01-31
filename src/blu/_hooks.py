@@ -160,8 +160,7 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
     init_proxy = create_proxy(init)
     value, js_setter = useState(init_proxy)
     manager = use_setup(StateManager(init_proxy, value, js_setter))
-    return 1, 2
-    return manager.value, manager.setter
+    return manager.value.unwrap(), manager.setter
 
 
 class StateManager[T](HookManager):

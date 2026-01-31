@@ -4,7 +4,7 @@ import typing
 from blu._utils import is_client
 
 if is_client or typing.TYPE_CHECKING:
-    from pyscript.ffi import create_proxy
+    from pyscript.ffi import create_proxy, to_js
     from pyscript.js_modules._blu_react import useEffect, useRef, useState
 
 
@@ -59,14 +59,13 @@ class HookManager:
         self.proxy = create_proxy(self)
         self.self_effect = create_proxy(self.self_effect)
         self.self_cleanup = create_proxy(self.self_cleanup)
-        self.watch_list = create_proxy([])
+        self.watch_list = to_js([])
 
     def self_effect(self):
         return self.self_cleanup
     
     def self_cleanup(self):
         self.self_effect.destroy()
-        self.watch_list.destroy()
         self.self_cleanup.destroy()
         self.proxy.destroy()
 
@@ -323,11 +322,10 @@ def use_ref[T](init: T) -> Ref[T]:
     ref[:] = init
     manager_in = use_setup(RefManager(ref), True)
     manager_out = useRef(manager_in).current
-    # TODO: fix memory leak
-    # if manager_in.unwrap() is not manager_out.unwrap():
-    #     manager_in.self_cleanup()
+    if manager_in.unwrap() is not manager_out.unwrap():
+        manager_in.self_cleanup()
     return manager_out.ref
-    
+
 
 class RefManager[T](HookManager):
     ref: Ref[T] | None = None

@@ -327,7 +327,7 @@ def use_ref[T](init: T) -> Ref[T]:
     if init_proxy.unwrap() is not value_ref.current.unwrap():
         init_proxy.destroy()
     ref_ref.current._js_ref = value_ref
-    # use_setup(RefManager(ref_ref.current))
+    use_setup(RefManager(ref_ref.current), True)
     return ref_ref.current
 
 

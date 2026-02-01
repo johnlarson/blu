@@ -42,7 +42,7 @@ async def page(
 ) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
     async with async_playwright() as playwright:
         chromium = playwright.chromium
-        browser = await chromium.launch(headless=False)
+        browser = await chromium.launch(headless=True)
         async def ret(app_name: str) -> Page:
             patch_app(app_name)
             base_url = await server()
@@ -133,13 +133,13 @@ async def test_routing(page: PageFixture):
     p = await page('e2e')
     route = p.locator('#route')
     await p.goto('/routing/1?q=2')
-    await expect(route).to_have_text('/routing/1 (1, 2)')
+    await expect(route).to_have_text('/routing/_a_ (1, 2)')
     await p.goto('/routing/1/2/3/4')
     await expect(route).to_have_text('/routing/_a_/... (1, 2/3/4)')
     await p.goto('/routing/1/static')
-    await expect(route).to_have_text('/route/_a_/static (1)')
+    await expect(route).to_have_text('/routing/_a_/static (1)')
     await p.goto('/routing/1/2')
-    await expect(route).to_have_text('route/_a_/_b_ (1, 2)')
+    await expect(route).to_have_text('/routing/_a_/_b_ (1, 2)')
 
 async def test_is_client(page: PageFixture):
     """

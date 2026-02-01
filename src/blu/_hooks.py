@@ -318,13 +318,33 @@ def use_ref[T](init: T) -> Ref[T]:
         Setting a :class:`Ref <blu.Ref>`\\'s value does not trigger a
         re-render.
     """
-    ref: Ref[T] = Ref()
-    ref[:] = init
-    manager_in = use_setup(RefManager(ref), True)
-    manager_out = useRef(manager_in).current
-    if manager_in.unwrap() is not manager_out.unwrap():
-        manager_in.self_cleanup()
-    return manager_out.ref
+    ref_in: Ref[T] = create_proxy(Ref())
+    ref_ref = useRef(ref_in)
+    if ref_in.unwrap() is not ref_ref.current.unwrap():
+        ref_in.destroy()
+    init_proxy = create_proxy(init)
+    value_ref = useRef(init_proxy)
+    if init_proxy.unwrap() is not value_ref.current.unwrap():
+        init_proxy.destroy()
+    ref_ref.current._js_ref = ref_ref
+    use_setup(RefManager(ref_ref.current))
+
+
+def use_element_ref(manager: RefManager):
+    element_ref = useRef(None)
+    manager.ref._element_ref = element_ref
+    manager.ref._update_from_element_ref()
+    
+    @use_effect
+    def _():
+        manager.ref._update_from_element_ref()
+
+
+def use_element_ref_teardown(manager: RefManager):
+    @use_effect
+    def _():
+        yield
+        manager.ref._update_from_element_ref()
 
 
 class RefManager[T](HookManager):

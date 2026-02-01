@@ -1,8 +1,15 @@
-from blu import Response, WrongEnvironmentError, app
+from blu import Response, WrongEnvironmentError, app, client
 from blu.html import div
+
+__client__ = True
 
 
 def __page__():
+    return Foo
+
+
+@client
+def Foo():
     errors: list[str] = []
     try:
         app(None, None, None)
@@ -12,5 +19,6 @@ def __page__():
         Response()
     except WrongEnvironmentError:
         errors.append('Response')
+    print('ENDDD')
 
     return div(id='errors')[','.join(errors)]

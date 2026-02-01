@@ -12,16 +12,16 @@ from blu._hooks import Ref, use_effect, use_ref, use_state
 
 
 class ServerOnlyClientInterface:
-    name: str
+    _name: str
     
     def __init__(self, name: str):
-        self.name = name
+        self._name = name
 
     def __call__(self, *args: Any, **kwargs: Any):
-        raise WrongEnvironmentError(f'Cannot instantiate {self.name} in client environment.')
+        raise WrongEnvironmentError(f'Cannot instantiate {self._name} in client environment.')
     
-    def __getattribute__(self, name: str) -> Any:
-        raise WrongEnvironmentError(f'Cannot use {self.name} in client environment.')
+    def __getattr__(self, name: str) -> Any:
+        raise WrongEnvironmentError(f'Cannot use {self._name} in client environment.')
 
 
 if is_client:

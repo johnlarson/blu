@@ -19,6 +19,5 @@ def Foo():
         Response()
     except WrongEnvironmentError:
         errors.append('Response')
-    print('ENDDD')
-
+    
     return div(id='errors')[','.join(errors)]

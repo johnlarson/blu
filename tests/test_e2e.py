@@ -145,12 +145,14 @@ async def test_is_client(page: PageFixture):
     await expect(p.locator('#is_client')).to_have_text('True')
 
 
-async def test_wrong_environment_error():
+async def test_wrong_environment_error(page: PageFixture):
     """
     Trying to use blu.Response or blu.app client-side should raise a
     blu.WrongEnvironmentError.
     """
-    ...
+    p = await page('e2e')
+    await p.goto('/wrong_environment_error')
+    await expect(p.locator('#errors')).to_have_text('app,Response')
 
 
 async def test_use_effect(page: PageFixture):
@@ -215,9 +217,11 @@ async def test_use_ref_html_element(page: PageFixture):
     await expect(p.locator('#test-div')).to_have_text('Hello.', timeout=10_000)
 
 
-async def test_client_side_availability():
-    """The blu, js, and pyscript packages are available client-side."""
-    ...
+async def test_client_side_availability(page: PageFixture):
+    """The js and pyscript packages are available client-side."""
+    p = await page('e2e')
+    await p.goto('/client_import')
+    await expect(p.locator('#status')).to_have_text('Success!')
 
 
 async def test_static_files():

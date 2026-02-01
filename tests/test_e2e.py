@@ -266,9 +266,9 @@ async def test_client_file_specifier_http(client: ClientFixture):
                 zip_f_write.write(chunk)
         with ZipFile(zip_path, 'r') as zip_f_read:
             zip_f_read.extractall(temp_dir)
-        success_path = temp_dir / 'app/app_pkg_clientside/success/module.py'
+        success_path = temp_dir / 'app_pkg_clientside/success/module.py'
         assert success_path.exists()
-        fail_path = temp_dir / 'app/app_pkg_clientside/fail/module.py'
+        fail_path = temp_dir / 'app_pkg_clientside/fail/module.py'
         assert not fail_path.exists()
 
 

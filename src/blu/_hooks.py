@@ -5,6 +5,7 @@ from blu._utils import is_client
 
 if is_client or typing.TYPE_CHECKING:
     from pyscript.ffi import create_proxy, to_js
+    from pyodide.ffi import JsDoubleProxy
     from pyscript.js_modules._blu_react import useEffect, useRef, useState
 
 
@@ -228,7 +229,11 @@ class Ref[T]:
         print('EMPTY SLICE:', empty_slice)
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
-        return self._js_ref.current.unwrap()
+        current = self._js_ref.current
+        if isinstance(current, JsDoubleProxy):
+            return current.unwrap()
+        else:
+            return current
     
     def __setitem__(self, empty_slice: slice, new_value: T):
         """
@@ -273,7 +278,8 @@ class Ref[T]:
         except AttributeError:
             pass
         else:
-            current.destroy()
+            if isinstance(current, JsDoubleProxy):
+                current.destroy()
 
 
 def use_ref[T](init: T) -> Ref[T]:

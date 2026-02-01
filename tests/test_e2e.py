@@ -121,10 +121,18 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     await expect(del_).to_have_text('Hello, World!ABCDEF12.0TrueFalseYZ')
 
 
-async def test_routing():
+async def test_routing(page: PageFixture):
     """Requests should be routed as described in the documentation."""
-    ...
-
+    p = await page('e2e')
+    route = p.locator('#route')
+    await p.goto('/routing/1?q=2')
+    await expect(route).to_have_text('/routing/1 (1, 2)')
+    await p.goto('/routing/1/2/3/4')
+    await expect(route).to_have_text('/routing/_a_/... (1, 2/3/4)')
+    await p.goto('/routing/1/static')
+    await expect(route).to_have_text('/route/_a_/static (1)')
+    await p.goto('/routing/1/2')
+    await expect(route).to_have_text('route/_a_/_b_ (1, 2)')
 
 async def test_is_client():
     """

@@ -1,2 +1,5 @@
-def __page__():
-    return '/routing/_a_/static'
+from blu.html import div
+
+
+def __page__(a):
+    return div(id='route')[f'/routing/_a_/static ({a})']

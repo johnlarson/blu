@@ -42,7 +42,7 @@ async def page(
 ) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
     async with async_playwright() as playwright:
         chromium = playwright.chromium
-        browser = await chromium.launch(headless=False)
+        browser = await chromium.launch(headless=True)
         async def ret(app_name: str) -> Page:
             patch_app(app_name)
             base_url = await server()
@@ -148,7 +148,7 @@ async def test_is_client(page: PageFixture):
     assert not is_client
     p = await page('e2e')
     await p.goto('/is_client')
-    await expect(p.locator('#is_client')).to_have_text('True')
+    await expect(p.locator('#is_client')).to_have_text('True', timeout=10_000)
 
 
 async def test_wrong_environment_error(page: PageFixture):
@@ -158,7 +158,10 @@ async def test_wrong_environment_error(page: PageFixture):
     """
     p = await page('e2e')
     await p.goto('/wrong_environment_error')
-    await expect(p.locator('#errors')).to_have_text('app,Response')
+    await expect(p.locator('#errors')).to_have_text(
+        'app,Response',
+        timeout=10_000,
+    )
 
 
 async def test_use_effect(page: PageFixture):

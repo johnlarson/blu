@@ -42,7 +42,7 @@ async def page(
 ) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
     async with async_playwright() as playwright:
         chromium = playwright.chromium
-        browser = await chromium.launch(headless=True)
+        browser = await chromium.launch(headless=False)
         async def ret(app_name: str) -> Page:
             patch_app(app_name)
             base_url = await server()
@@ -237,7 +237,7 @@ async def test_static_files(client: ClientFixture):
     assert (await response.text()) == 'Hello, World!'
 
 
-async def test_client_file_specifier(page: PageFixture, client: ClientFixture):
+async def test_client_file_specifier_ui(page: PageFixture):
     """
     Python files within the app package are available client-side if
     they contain the top-level statement "__client__ = True"; otherwise,
@@ -245,9 +245,17 @@ async def test_client_file_specifier(page: PageFixture, client: ClientFixture):
     """
     p = await page('e2e')
     await p.goto('/app_pkg_clientside/success')
-    assert await expect(p.locator('#status')).to_have_text('Success!')
+    await expect(p.locator('#status')).to_have_text('Success!')
     await p.goto('/app_pkg_clientside/fail')
-    assert await expect(p.locator('#status')).to_have_text('Fail.')
+    await expect(p.locator('#status')).to_have_text('Fail.')
+
+
+async def test_client_file_specifier_http(client: ClientFixture):
+    """
+    Python files within the app package are not accessible from outside
+    the server unless they contain the top-level statement
+    "__client__ = True".
+    """
     c = await client('e2e')
     response = await c.get('/_blu_internal/app_pkg.zip')
     with TemporaryDirectory() as temp_dir_str:

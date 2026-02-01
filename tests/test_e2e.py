@@ -1,7 +1,10 @@
 from asyncio import Task, sleep
 import asyncio
 from collections.abc import AsyncGenerator, Awaitable, Callable, Generator
+from pathlib import Path
+from tempfile import SpooledTemporaryFile, TemporaryDirectory
 from typing import cast
+from zipfile import ZipFile
 import aiohttp
 from playwright.async_api import (
     async_playwright, Page, BrowserType, BrowserContext, expect
@@ -234,13 +237,31 @@ async def test_static_files(client: ClientFixture):
     assert (await response.text()) == 'Hello, World!'
 
 
-async def test_client_file_specifier():
+async def test_client_file_specifier(page: PageFixture, client: ClientFixture):
     """
     Python files within the app package are available client-side if
     they contain the top-level statement "__client__ = True"; otherwise,
     they are not available client-side.
     """
-    ...
+    p = await page('e2e')
+    await p.goto('/app_pkg_clientside/success')
+    assert await expect(p.locator('#status')).to_have_text('Success!')
+    await p.goto('/app_pkg_clientside/fail')
+    assert await expect(p.locator('#status')).to_have_text('Fail.')
+    c = await client('e2e')
+    response = await c.get('/_blu_internal/app_pkg.zip')
+    with TemporaryDirectory() as temp_dir_str:
+        temp_dir = Path(temp_dir_str)
+        zip_path = temp_dir / 'app_pkg.zip'
+        with open(zip_path, 'wb') as zip_f_write:
+            async for chunk in response.content.iter_chunked(1024):
+                zip_f_write.write(chunk)
+        with ZipFile(zip_path, 'r') as zip_f_read:
+            zip_f_read.extractall(temp_dir)
+        success_path = temp_dir / 'app/app_pkg_clientside/success/module.py'
+        assert success_path.exists()
+        fail_path = temp_dir / 'app/app_pkg_clientside/fail/module.py'
+        assert not fail_path.exists()
 
 
 async def test_dev_server():

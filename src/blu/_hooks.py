@@ -201,8 +201,7 @@ class Ref[T]:
             # assigns variable ref to an instance of Ref.
             ref = use_ref()
     """
-
-    _current: T
+    _js_ref: Any
     
     def __getitem__(self, empty_slice: slice) -> T:
         """
@@ -226,9 +225,10 @@ class Ref[T]:
             numbers.
         :return: The value currently stored in ``self``.
         """
+        print('EMPTY SLICE:', empty_slice)
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
-        return self._current.unwrap()
+        return self._js_ref.current.unwrap()
     
     def __setitem__(self, empty_slice: slice, new_value: T):
         """
@@ -260,16 +260,16 @@ class Ref[T]:
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
         try:
-            current = self._current
+            current = self._js_ref.current
         except AttributeError:
             pass
         else:
             current.destroy()
-        self._current = create_proxy(new_value)
+        self._js_ref.current = create_proxy(new_value)
 
     def _cleanup(self):
         try:
-            current = self._current
+            current = self._js_ref.current
         except AttributeError:
             pass
         else:
@@ -320,39 +320,24 @@ def use_ref[T](init: T) -> Ref[T]:
     """
     ref_in: Ref[T] = create_proxy(Ref())
     ref_ref = useRef(ref_in)
-    if ref_in.unwrap() is not ref_ref.current.unwrap():
-        ref_in.destroy()
+    # if ref_in.unwrap() is not ref_ref.current.unwrap():
+    #     ref_in.destroy()
     init_proxy = create_proxy(init)
     value_ref = useRef(init_proxy)
-    if init_proxy.unwrap() is not value_ref.current.unwrap():
-        init_proxy.destroy()
-    ref_ref.current._js_ref = ref_ref
-    use_setup(RefManager(ref_ref.current))
-
-
-def use_element_ref(manager: RefManager):
-    element_ref = useRef(None)
-    manager.ref._element_ref = element_ref
-    manager.ref._update_from_element_ref()
-    
-    @use_effect
-    def _():
-        manager.ref._update_from_element_ref()
-
-
-def use_element_ref_teardown(manager: RefManager):
-    @use_effect
-    def _():
-        yield
-        manager.ref._update_from_element_ref()
+    # if init_proxy.unwrap() is not value_ref.current.unwrap():
+    #     init_proxy.destroy()
+    ref_ref.current._js_ref = value_ref
+    # use_setup(RefManager(ref_ref.current))
+    return ref_ref.current
 
 
 class RefManager[T](HookManager):
     ref: Ref[T] | None = None
 
-    def __init__(self, ref: Ref[T]):
+    def __init__(self, ref: Any):
         super().__init__()
-        self.ref = create_proxy(ref)
+        self.ref = ref
+        #self.ref = create_proxy(ref)
 
     def self_cleanup(self):
         self.ref._cleanup()

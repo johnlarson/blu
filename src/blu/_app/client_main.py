@@ -78,9 +78,12 @@ def get_node(data: Any):
     elif isinstance(data, Iterable):
         return get_array(data)
     elif isinstance(data, HTMLElement):
+        props = {k: v for k, v in data._attrs.items() if k != 'ref'}
+        if 'ref' in data._attrs.keys():
+            props['ref'] = data._attrs['ref']._js_ref
         return react.createElement(
             data._tagname,
-            to_js(data._attrs),
+            to_js(props),
             *get_array(data._children),
         )
     elif data is None:

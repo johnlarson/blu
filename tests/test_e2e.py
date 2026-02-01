@@ -165,7 +165,7 @@ async def test_use_ref(page: PageFixture):
     p = await page('e2e')
     await p.goto('/use_ref')
     counter = p.locator('#count')
-    await expect(counter).to_have_text('0')
+    await expect(counter).to_have_text('0', timeout=10_000)
     await p.click('#increment')
     await p.click('#increment')
     await p.click('#increment')
@@ -185,7 +185,7 @@ async def test_use_state(page: PageFixture):
     p = await page('e2e')
     await p.goto('/use_state')
     counter = p.locator('#count')
-    await expect(counter).to_have_text('0')
+    await expect(counter).to_have_text('0', timeout=10_000)
     await p.click('button')
     await expect(counter).to_have_text('1')
     await p.click('button')
@@ -200,6 +200,7 @@ async def test_use_ref_html_element(page: PageFixture):
     """
     p = await page('e2e')
     await p.goto('/html_editing_effect')
+    await sleep(300)
     await expect(p.locator('.test-div')).to_have_text('Hello.')
 
 

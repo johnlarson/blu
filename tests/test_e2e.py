@@ -13,6 +13,9 @@ from blu import is_client
 from blu._utils import get_available_port
 
 
+type ClientFixture = Callable[[str], Awaitable[aiohttp.ClientSession]]
+
+
 @pytest.fixture
 async def client(patch_app, server: Callable[[], Awaitable[str]]):  # type: ignore
     session: aiohttp.ClientSession | None = None
@@ -224,9 +227,11 @@ async def test_client_side_availability(page: PageFixture):
     await expect(p.locator('#status')).to_have_text('Success!')
 
 
-async def test_static_files():
+async def test_static_files(client: ClientFixture):
     """Static files are accessible as described in the documentation."""
-    ...
+    c = await client('e2e')
+    response = await c.get('/static_file/_dynamic_path_/hello.txt')
+    assert (await response.text()) == 'Hello, World!'
 
 
 async def test_client_file_specifier():

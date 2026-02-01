@@ -9,6 +9,7 @@ from playwright.async_api import (
 import pytest
 import uvicorn
 
+from blu import is_client
 from blu._utils import get_available_port
 
 
@@ -134,11 +135,14 @@ async def test_routing(page: PageFixture):
     await p.goto('/routing/1/2')
     await expect(route).to_have_text('route/_a_/_b_ (1, 2)')
 
-async def test_is_client():
+async def test_is_client(page: PageFixture):
     """
     blu.is_client should be True client-side and False server-side.
     """
-    ...
+    assert not is_client
+    p = await page('e2e')
+    await p.goto('/is_client')
+    await expect(p.locator('#is_client')).to_have_text('True')
 
 
 async def test_wrong_environment_error():

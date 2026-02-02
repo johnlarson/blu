@@ -70,7 +70,7 @@ def _get_pyscript_include() -> ET.Element:
         'script',
         {
             'type': 'module',
-            'src': 'https://pyscript.net/releases/2025.3.1/core.js',
+            'src': 'https://pyscript.net/releases/2026.1.1/core.js',
         },
     )
 

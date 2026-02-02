@@ -1,23 +1,27 @@
-api reference
-get it working
+micropython?
+TODO app
+ensure dev server is working
+2 dev server tests
+set it up to use Black
+Go through and update/fix issues in docs
 README (include info about issues reporting)
+Version it
+license
 ----------------------
-MVP
+Ready to Publish
 ----------------------
-tutorial?
-change HTTP escape hatch?
+Put on PyPI
+Docs on readthedocs
+Make git repo public
+Create issues on GitHub
+Work on it, get feedback from people I know
+micropython?
+Add server functions?
+Work on it, get feedback from people I know
 ----------------------
 Ready
 ----------------------
-Version it
-GitHub
-Docs
-PyPI
-Blog
-Social media accounts
-----------------------
-Next steps
-----------------------
+Social media account(s)
 workshop
 get word out
 get feedback

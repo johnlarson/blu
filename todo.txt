@@ -1,6 +1,4 @@
 micropython?
-TODO app
-ensure dev server is working
 2 dev server tests
 set it up to use Black
 Go through and update/fix issues in docs
@@ -10,6 +8,7 @@ license
 ----------------------
 Ready to Publish
 ----------------------
+Make note about it not being ready?
 Put on PyPI
 Docs on readthedocs
 Make git repo public

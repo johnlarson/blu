@@ -1,9 +1,8 @@
 2 dev server tests
 set it up to use Black
-README (include info about issues reporting)
+Make note about it not being ready (docs and README)?
 Go through and update/fix issues in docs
-license
-Make note about it not being ready?
+Make sure it works
 Version it
 ----------------------
 Ready to Publish

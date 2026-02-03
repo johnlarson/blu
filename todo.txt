@@ -1,8 +1,8 @@
 2 dev server tests
 set it up to use Black
-Make note about it not being ready (docs and README)?
-Go through and update/fix issues in docs
-Make sure it works
+Go through and update/fix issues in docs, adding images and GIFs
+Go through docs making sure everything works as shown
+Add note about not being ready for use? (README and Docs)
 Version it
 ----------------------
 Ready to Publish
@@ -12,7 +12,6 @@ Docs on readthedocs
 Make git repo public
 Create issues on GitHub
 Work on it, get feedback from people I know
-micropython?
 Add server functions?
 Work on it, get feedback from people I know
 ----------------------

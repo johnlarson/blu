@@ -1,14 +1,13 @@
-micropython?
 2 dev server tests
 set it up to use Black
-Go through and update/fix issues in docs
 README (include info about issues reporting)
-Version it
+Go through and update/fix issues in docs
 license
+Make note about it not being ready?
+Version it
 ----------------------
 Ready to Publish
 ----------------------
-Make note about it not being ready?
 Put on PyPI
 Docs on readthedocs
 Make git repo public

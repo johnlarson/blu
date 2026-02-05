@@ -1,2 +1,2 @@
 def __page__():
-    return '_dynamic_/bar'
+    return "_dynamic_/bar"

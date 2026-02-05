@@ -14,8 +14,8 @@ def StateTest():
 
     def click_increment(e):
         set_count(count + 1)
-    
+
     return (
-        div(id='count')[count],
-        button(id='increment', onClick=click_increment)['Increment'],
+        div(id="count")[count],
+        button(id="increment", onClick=click_increment)["Increment"],
     )

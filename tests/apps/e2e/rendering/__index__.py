@@ -6,24 +6,24 @@ __client__ = True
 
 
 def __page__():
-    return del_(id='my-id')[
+    return del_(id="my-id")[
         Simple,
-        span['A'],
-        'B',
-        ('C', 'D'),
-        [Key(1)['E'], Key(2)['F']],
+        span["A"],
+        "B",
+        ("C", "D"),
+        [Key(1)["E"], Key(2)["F"]],
         1,
         2.0,
         None,
         True,
         False,
-        DoubleRender('Y')[span['Z']]
+        DoubleRender("Y")[span["Z"]],
     ]
 
 
 @client
 def Simple():
-    return 'Hello, World!'
+    return "Hello, World!"
 
 
 @client

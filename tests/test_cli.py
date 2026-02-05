@@ -23,19 +23,20 @@ async def dev_server_client():  # type: ignore
     async with get_dev_server_client() as client:
         yield client
 
+
 @contextlib.asynccontextmanager
 async def get_dev_server_client():
     port = get_available_port()
-    with patch('blu._cli.get_available_port', return_value=port):
+    with patch("blu._cli.get_available_port", return_value=port):
         # task = Task(_run_server())
         proc = _run_server()
-        base_url = f'http://127.0.0.1:{port}'
+        base_url = f"http://127.0.0.1:{port}"
         async with aiohttp.ClientSession(base_url) as session:
             # await asyncio.sleep(5)
             for _ in range(25):
-                await asyncio.sleep(.1)
+                await asyncio.sleep(0.1)
                 try:
-                    async with session.get('/'):
+                    async with session.get("/"):
                         pass
                     yield session
                     proc.kill()
@@ -45,16 +46,16 @@ async def get_dev_server_client():
                     pass
         # task.cancel()
         proc.kill()
-        raise TimeoutError('Dev server never started.')
-            
+        raise TimeoutError("Dev server never started.")
+
 
 async def test_dev_server(patch_app):  # type: ignore
     """
     When a `blu` is run, a dev server starts up that serves the app on a
     port that is given by the output to `blu`.
     """
-    patch_app('static_files')
+    patch_app("static_files")
     async with get_dev_server_client() as dev_server_client:
-        url_path = '/path/to/static/file.txt'
+        url_path = "/path/to/static/file.txt"
         async with dev_server_client.get(url_path) as response:
-            assert await response.text() == 'Hello, World!'
+            assert await response.text() == "Hello, World!"

@@ -1,2 +1,2 @@
 def __page__():
-    'LESS SPECIFIC'
+    "LESS SPECIFIC"

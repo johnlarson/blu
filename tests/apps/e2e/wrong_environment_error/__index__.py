@@ -14,10 +14,10 @@ def Foo():
     try:
         app(None, None, None)
     except WrongEnvironmentError:
-        errors.append('app')
+        errors.append("app")
     try:
         Response()
     except WrongEnvironmentError:
-        errors.append('Response')
-    
-    return div(id='errors')[','.join(errors)]
+        errors.append("Response")
+
+    return div(id="errors")[",".join(errors)]

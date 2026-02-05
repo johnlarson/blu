@@ -1,2 +1,2 @@
 def __page__():
-    return 'Hello, World!'
+    return "Hello, World!"

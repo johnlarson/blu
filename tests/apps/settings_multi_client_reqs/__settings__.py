@@ -1,1 +1,1 @@
-CLIENT_REQUIREMENTS = ['requests', 'flask']
+CLIENT_REQUIREMENTS = ["requests", "flask"]

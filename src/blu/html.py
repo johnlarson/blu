@@ -82,4 +82,5 @@ def __getattr__(import_name: str) -> _HTMLElement:
         children.
     """
     from blu._nodes import py_to_html_name
+
     return _HTMLElement(py_to_html_name(import_name), {}, [])

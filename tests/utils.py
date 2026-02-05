@@ -26,7 +26,7 @@ if not is_client:
 
 
 tests = Path(__file__).parent
-projects = tests / 'projects'
+projects = tests / "projects"
 test_projects = projects
 
 
@@ -75,7 +75,7 @@ async def prod_server(app_module: str) -> AsyncGenerator[str]:
 async def dev_cli(app_module: str) -> AsyncGenerator[str]:
     async with copy_app_dir(app_module) as temp_dir:
 
-        with background(['blu', 'dev'], temp_dir) as proc:
+        with background(["blu", "dev"], temp_dir) as proc:
             yield get_app_url(proc)
 
 
@@ -84,9 +84,9 @@ async def prod_cli(app_module: str, build: bool = True) -> AsyncGenerator[str]:
     port = get_available_port()
     async with copy_app_dir(app_module) as temp_dir:
         if build:
-            await run(['blu', 'build'], temp_dir)
+            await run(["blu", "build"], temp_dir)
         with background(
-            ['uvicorn', 'blu:app', '--port', str(port)],
+            ["uvicorn", "blu:app", "--port", str(port)],
             temp_dir,
         ) as proc:
             yield get_app_url(proc)
@@ -95,32 +95,34 @@ async def prod_cli(app_module: str, build: bool = True) -> AsyncGenerator[str]:
 @asynccontextmanager
 async def copy_app_dir(app_module: str) -> AsyncGenerator[Path]:
     module = import_module(app_module)
-    assert hasattr(module, '__path__')
-    src_dir = Path(getattr(module, '__path__')[0])
+    assert hasattr(module, "__path__")
+    src_dir = Path(getattr(module, "__path__")[0])
     with TemporaryDirectory() as temp_dir_str:
         temp_dir = Path(temp_dir_str)
-        shutil.copytree(src_dir, temp_dir / 'app')  # type: ignore
+        shutil.copytree(src_dir, temp_dir / "app")  # type: ignore
         yield temp_dir
 
 
 @asynccontextmanager
 async def _test_serve_old(app: Blu) -> AsyncGenerator[str]:
-    host = '127.0.0.1'
+    host = "127.0.0.1"
     port = get_available_port()
     config = uvicorn.Config(app, host, port)
     server = uvicorn.Server(config)
     task = asyncio.create_task(server.serve())
-    yield f'http://{host}:{port}'
+    yield f"http://{host}:{port}"
     await task
 
 
 @asynccontextmanager
-async def _test_serve(app: asgi.App,) -> AsyncGenerator[str]:
+async def _test_serve(
+    app: asgi.App,
+) -> AsyncGenerator[str]:
     server_task: Optional[asyncio.Task[Any]] = None
     try:
         port = get_available_port()
-        host = '127.0.0.1'
-        location = f'{host}:{port}'
+        host = "127.0.0.1"
+        location = f"{host}:{port}"
         config = uvicorn.Config(app, host, port)
         server = uvicorn.Server(config)
         server_task = asyncio.create_task(server.serve())
@@ -128,8 +130,8 @@ async def _test_serve(app: asgi.App,) -> AsyncGenerator[str]:
             if _ping_server(host, port):
                 break
             else:
-                await asyncio.sleep(.1)
-        yield f'http://{location}'
+                await asyncio.sleep(0.1)
+        yield f"http://{location}"
     except Exception as exc:
         if server_task is not None:
             server_task.cancel()
@@ -157,7 +159,7 @@ def _ping_server(address: str, port: int, timeout: int = 1):
 
 
 async def receive() -> asgi.ReceiveEvent:
-    return {'type': 'http.request'}
+    return {"type": "http.request"}
 
 
 class Sender(asgi.Sender):
@@ -173,41 +175,42 @@ class Sender(asgi.Sender):
         try:
             return self._events.pop(0)
         except IndexError:
-            raise Exception('No more response body.')
+            raise Exception("No more response body.")
 
     def __iter__(self):
         return self
-    
+
     def body(self) -> str:
-        ret_bytes = b''
+        ret_bytes = b""
         for event in self:
-            if event['type'] == 'http.response.body':
-                ret_bytes += event.get('body', b'')
-                if not event.get('more_body', False):
+            if event["type"] == "http.response.body":
+                ret_bytes += event.get("body", b"")
+                if not event.get("more_body", False):
                     break
-        return ret_bytes.decode('utf-8')
+        return ret_bytes.decode("utf-8")
 
 
 async def asgi_get(path: str) -> Sender:
     from blu import app
-    if '?' in path:
-        path, query_str = path.split('?')
-        query = query_str.encode('utf-8')
+
+    if "?" in path:
+        path, query_str = path.split("?")
+        query = query_str.encode("utf-8")
     else:
-        query = b''
+        query = b""
     sender = Sender()
     await app(
         {
-            'asgi': {
-                'version': '1',
-                'spec_version': '2.0',
+            "asgi": {
+                "version": "1",
+                "spec_version": "2.0",
             },
-            'path': path,
-            'headers': [],
-            'type': 'http',
-            'http_version': '1.1',
-            'method': 'GET',
-            'query_string': query,
+            "path": path,
+            "headers": [],
+            "type": "http",
+            "http_version": "1.1",
+            "method": "GET",
+            "query_string": query,
         },
         receive,
         sender,
@@ -226,7 +229,7 @@ def background(
         cwd=cwd,
         stdout=PIPE,
         stderr=PIPE,
-        env={**os.environ, 'PYTHONPATH': ':'.join(sys.path), **env},
+        env={**os.environ, "PYTHONPATH": ":".join(sys.path), **env},
         text=True,
     ) as proc:
         try:
@@ -255,11 +258,10 @@ async def run(
         cwd=cwd,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        env={**os.environ, 'PYTHONPATH': ':'.join(sys.path), **env},
+        env={**os.environ, "PYTHONPATH": ":".join(sys.path), **env},
     )
     stdout, stderr = await proc.communicate()
     return stdout.decode(), stderr.decode()
-
 
 
 def get_app_url(proc: Popen[str]) -> str:
@@ -273,25 +275,23 @@ def get_app_url(proc: Popen[str]) -> str:
     ret = ret_container[0]
     if isinstance(ret, str):
         return ret
-    raise Exception('Unable to set port number.')
+    raise Exception("Unable to set port number.")
 
 
-def _get_app_url_target(
-    proc: Popen[str], ret_container: list[str | None]
-) -> None:
+def _get_app_url_target(proc: Popen[str], ret_container: list[str | None]) -> None:
     for line in cast(Iterable[str], proc.stderr):
-        re_match = re.search(r'(http://127\.0\.0\.1:\d+)', line)
+        re_match = re.search(r"(http://127\.0\.0\.1:\d+)", line)
         if re_match is not None:
             ret_container[0] = re_match[1]
             return
-    raise Exception('Process completed without specifying port in stderr.')
+    raise Exception("Process completed without specifying port in stderr.")
 
 
 class HTMLReactData(TypedDict):
-    type: Literal['html']
+    type: Literal["html"]
     tagname: str
     attrs: Mapping[str, str]
-    children: Iterable['ReactDataNode']
+    children: Iterable["ReactDataNode"]
 
 
 type ReactDataNode = None | bool | int | float | str | HTMLReactData
@@ -318,17 +318,17 @@ def assert_react_html_data(json_data: json.JsonData) -> HTMLReactData:
     if not isinstance(json_data, Mapping):
         raise ValidationError
     try:
-        if json_data['type'] != 'native_element':
+        if json_data["type"] != "native_element":
             raise ValidationError
     except KeyError:
         raise ValidationError
     try:
-        if not isinstance(json_data['tagname'], str):
+        if not isinstance(json_data["tagname"], str):
             raise ValidationError
     except KeyError:
         raise ValidationError
     try:
-        attrs = cast(Any, json_data['props'])
+        attrs = cast(Any, json_data["props"])
     except KeyError:
         raise ValidationError
     if not isinstance(attrs, Mapping):
@@ -340,7 +340,7 @@ def assert_react_html_data(json_data: json.JsonData) -> HTMLReactData:
         if not isinstance(v, str):
             raise ValidationError
     try:
-        children = cast(Any, json_data['children'])
+        children = cast(Any, json_data["children"])
     except KeyError:
         raise ValidationError
     if not isinstance(children, Iterable):
@@ -381,7 +381,8 @@ def node_eq(n1: Node, n2: Node) -> bool:
     if isinstance(n1, Iterable) and not isinstance(n1, str):
         return _iterable_eq(n1, n2)
     return n1 == n2
-    
+
+
 def _client_element_eq(e1: ClientElement, e2: ClientElement) -> bool:
     if e1._renderer != e2._renderer:
         return False
@@ -416,15 +417,12 @@ def _key_eq(e1: Key, e2: Key) -> bool:
 def _iterable_eq(i1: Iterable, i2: Iterable) -> bool:
     if len(i1) != len(i2):
         return False
-    return all(
-        node_eq(x1, i2[i])
-        for i, x1 in enumerate(i1)
-    )
+    return all(node_eq(x1, i2[i]) for i, x1 in enumerate(i1))
 
 
 def patch_app(module_name: str):
-    module = importlib.import_module(f'tests.apps.{module_name}')
-    sys.modules['app'] = module
+    module = importlib.import_module(f"tests.apps.{module_name}")
+    sys.modules["app"] = module
     _get_app_def.cache_clear()
     _get_router.cache_clear()
     settings.cache_clear()

@@ -4,7 +4,6 @@ from blu._utils.typing import Iterator, Mapping
 import urllib.parse
 
 from blu._nodes import Node
-    
 
 type QueryInit = Mapping[str, str | list[str]]
 
@@ -14,7 +13,7 @@ class QueryParams:
     The query parameters in a request URL.
 
     .. code-block:: python
-        
+
         from blu import Request
 
         request = Request('GET', '/?my-query-param=my-value')
@@ -25,23 +24,23 @@ class QueryParams:
     _items: dict[str, list[str]]
 
     @classmethod
-    def from_query_string(cls, query_string: str) -> 'QueryParams':
+    def from_query_string(cls, query_string: str) -> "QueryParams":
         """
         Parse a query string.
 
         :param query_string: The query string to parse, without the
             leading ``?`` character.
-        
+
         :return: The :class:`QueryParams` representation of the query
             string.
         """
-        pair_strings = query_string.split('&') if query_string else []
-        pairs = [x.split('=') for x in pair_strings]
+        pair_strings = query_string.split("&") if query_string else []
+        pairs = [x.split("=") for x in pair_strings]
         query_params_init: dict[str, list[str]] = defaultdict(lambda: [])
         for k, v in pairs:
             decoded = urllib.parse.unquote_plus(v)
             query_params_init[k].append(decoded)
-        return QueryParams({ **query_params_init })
+        return QueryParams({**query_params_init})
 
     def __init__(self, items: QueryInit):
         """
@@ -58,10 +57,7 @@ class QueryParams:
             value, it should be represented as a
             :py:class:`list` of :py:class:`str`\\ s.
         """
-        self._items = {
-            k: v if isinstance(v, list) else [v]
-            for k, v in items.items()
-        }
+        self._items = {k: v if isinstance(v, list) else [v] for k, v in items.items()}
 
     def __getitem__(self, key: str) -> str:
         """
@@ -86,9 +82,9 @@ class QueryParams:
         Get the value of a query parameter.
 
         .. code-block:: python
-        
+
             QueryParams.from_query_string('a=1').get('a') == '1'
-        
+
         :param key: The name of a query parameter.
         :param default: A default value.
 
@@ -106,10 +102,10 @@ class QueryParams:
         Get all values associated with a query parameter key.
 
         .. code-block:: python
-        
+
             q = QueryParams.from_query_string('a=1&a=2')
             q.all('a') == ['1', '2']
-        
+
         :param key: A query parameter key.
 
         :return: A :py:class:`list` of all values associated with the
@@ -120,7 +116,7 @@ class QueryParams:
             constructor.
         """
         return self._items.get(key, [])
-    
+
     def __iter__(self) -> Iterator[tuple[str, list[str]]]:
         """
         Iterate over the keys and value lists of ``self``.
@@ -130,12 +126,12 @@ class QueryParams:
             q = QueryParams.from_query_string('a=1&b=2&b=3')
             for name, values in q:
                 print(f'{name}:', ', '.join(values))
-        
+
         .. code-block:: console
-        
+
             a: 1
             b: 2, 3
-        
+
         :return: An iterator of key-value pairs, where the key is a
             query parameter name, and the value is a list of all string
             values associated with that name in the query string. Pairs
@@ -144,7 +140,7 @@ class QueryParams:
             which they are set in the query string.
         """
         return ((k, v) for k, v in self._items.items())
-    
+
     def to_query_string(self) -> str:
         """
         Serialize ``self`` to a query string.
@@ -153,15 +149,15 @@ class QueryParams:
 
             q = QueryParams.from_query_string('a=1&b=2')
             q.to_query_string() == 'a=1&b=2'
-        
+
         :return: The query string representation of the query parameters
             in ``self``.
         """
         pairs: list[str] = []
         for k, vals in self:
             for v in vals:
-                pairs.append(f'{k}={v}')
-        return '&'.join(pairs)
+                pairs.append(f"{k}={v}")
+        return "&".join(pairs)
 
 
 class Request:
@@ -193,7 +189,7 @@ class Response:
 
     .. code-block:: python
         :caption: __index__.py
-        
+
         def __page__():
             return Response(
                 p['Hello.'],
@@ -203,11 +199,12 @@ class Response:
                     'Last-Modified': 'Tue, 10 Dec 2024 10:00:00 GMT',
                 },
             )
-    
+
     :param body: The React node to render when displaying the page.
     :param status: The status code to send in the HTTP response.
     :param headers: The HTTP headers to send in the HTTP response.
     """
+
     _body: Node
     _status: int
     _headers: dict[str, str]

@@ -12,9 +12,9 @@ def test_args():
 
     @client
     def Hello(first_name, last_name):
-        return f'Hello, {first_name} {last_name}!'
-    
-    assert Hello('Amanda', 'Myers')._args == ('Amanda', 'Myers')  # type: ignore
+        return f"Hello, {first_name} {last_name}!"
+
+    assert Hello("Amanda", "Myers")._args == ("Amanda", "Myers")  # type: ignore
 
 
 def test_kwargs():
@@ -25,11 +25,11 @@ def test_kwargs():
 
     @client
     def Hello(first_name, last_name):
-        return f'Hello, {first_name} {last_name}!'
-    
-    assert Hello(first_name='Amanda', last_name='Myers')._kwargs == {  # type: ignore
-        'first_name': 'Amanda',
-        'last_name': 'Myers',
+        return f"Hello, {first_name} {last_name}!"
+
+    assert Hello(first_name="Amanda", last_name="Myers")._kwargs == {  # type: ignore
+        "first_name": "Amanda",
+        "last_name": "Myers",
     }
 
 
@@ -43,11 +43,11 @@ def test_args_and_kwargs():
 
     @client
     def Hello(first_name, last_name):
-        return f'Hello, {first_name} {last_name}!'
-    
-    element = Hello('Amanda', last_name='Myers')
-    assert element._args == ('Amanda',)  # type: ignore
-    assert element._kwargs == {'last_name': 'Myers'}  # type: ignore
+        return f"Hello, {first_name} {last_name}!"
+
+    element = Hello("Amanda", last_name="Myers")
+    assert element._args == ("Amanda",)  # type: ignore
+    assert element._kwargs == {"last_name": "Myers"}  # type: ignore
 
 
 def test_no_args_or_children():
@@ -55,11 +55,10 @@ def test_no_args_or_children():
     The ClientElement return from the @client decorator will have an
     _args attribute of () and _kwargs attribute of {}
     """
-    
+
     @client
     def Hello():
-        return f'Hello!'
-    
+        return f"Hello!"
 
     assert Hello._args == ()  # type: ignore
     assert Hello._kwargs == {}  # type: ignore
@@ -71,26 +70,27 @@ def test_replace_original_args_and_kwargs():
     of the original positional or keyword arguments will be retained in
     the copy.
     """
-    
+
     @client
     def E(a, b=0, c=0):
         return (a, b, c)
-    
+
     original = E(1, 2, c=3)
     original(4)
     assert original._args == (1, 2)  # type: ignore
-    assert original._kwargs == {'c': 3}  # type: ignore
+    assert original._kwargs == {"c": 3}  # type: ignore
+
 
 def test_key():
     """
     Passing the keyword argument "key" into a ClientElement's __call__
     method results in ClientElement that has the provided key.
     """
-    
+
     @client
     def E():
-        return 'Hello.'
-    
+        return "Hello."
+
     assert E(key=3)._get_key() == 3
 
 
@@ -100,7 +100,7 @@ def test_call_replaces_key():
     that will be the key of the resulting copy, regardless of what the
     original key was.
     """
-    assert client(lambda: 'Hello')(key=1)(key=2)._get_key() == 2
+    assert client(lambda: "Hello")(key=1)(key=2)._get_key() == 2
 
 
 def test_call_does_not_retain_key():
@@ -109,7 +109,7 @@ def test_call_does_not_retain_key():
     resulting copy will not have a key, even if the original did.
     """
     with pytest.raises(LookupError):
-        client(lambda: 'Hello')(key=1)()._get_key()
+        client(lambda: "Hello")(key=1)()._get_key()
 
 
 def test_call_retains_children():
@@ -117,11 +117,11 @@ def test_call_retains_children():
     When a ClientElement is called as a function, the resulting copy has
     the same children as the original.
     """
-    
+
     @client
     def Foo(a):
         return (yield), a
-    
+
     assert Foo[1](2)._children == [1]  # type: ignore
 
 
@@ -144,8 +144,8 @@ def test_children():
     @client
     def Foo():
         return div[(yield)]
-    
-    assert Foo['Hello', 'There']._children == ['Hello', 'There']  # type: ignore
+
+    assert Foo["Hello", "There"]._children == ["Hello", "There"]  # type: ignore
 
 
 def test_no_children():
@@ -153,10 +153,11 @@ def test_no_children():
     If an element's children are not set, its _children attribute will
     be [].
     """
+
     @client
     def Foo():
         return div[(yield)]
-    
+
     assert Foo._children == []  # type: ignore
 
 
@@ -168,8 +169,7 @@ def test_doesnt_take_children():
     """
     Foo = client(lambda x: x)
     with pytest.raises(TypeError):
-        Foo['Hello']
-
+        Foo["Hello"]
 
 
 def test_replace_children():
@@ -177,6 +177,7 @@ def test_replace_children():
     When ClientElement.__getitem__ is called, the resulting copy does
     not retain the original's children.
     """
+
     @client
     def Foo():
         return (yield)
@@ -189,13 +190,14 @@ def test_getitem_retains_original_args_and_kwargs():
     When ClientElement.__getitem__ is called, the resulting copy has the
     same positional and keyword render arguments as the original.
     """
+
     @client
     def Foo(x, y):
         return x, (yield)
-    
+
     element = Foo(1, y=2)[3]
     assert element._args == (1,)  # type: ignore
-    assert element._kwargs == {'y': 2}  # type: ignore
+    assert element._kwargs == {"y": 2}  # type: ignore
 
 
 def test_getitem_retains_key():
@@ -203,9 +205,11 @@ def test_getitem_retains_key():
     When ClientElement.__getitem__ is called, the resulting copy has the
     same key as the original.
     """
+
     @client
     def Foo():
         return (yield)
+
     assert Foo(key=0)[1]._get_key() == 0
 
 
@@ -213,6 +217,7 @@ def test_getitem_does_not_mutate_original():
     """
     ClientElement.__getitem__ does not mutate the original in place.
     """
+
     @client
     def Foo():
         return (yield)
@@ -231,8 +236,8 @@ def test_accepts_any_node_children():
 
     @client
     def Bar():
-        return 'Bar'
-    
+        return "Bar"
+
     fragment = Key(2)
 
     assert Foo[
@@ -241,7 +246,7 @@ def test_accepts_any_node_children():
         fragment,
         (1, 2, 3),
         [4, 5, 6],
-        'Hello',
+        "Hello",
         7,
         8.0,
         True,
@@ -253,7 +258,7 @@ def test_accepts_any_node_children():
         fragment,
         (1, 2, 3),
         [4, 5, 6],
-        'Hello',
+        "Hello",
         7,
         8.0,
         True,

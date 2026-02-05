@@ -7,4 +7,4 @@ __client__ = True
 
 @client
 def Foo():
-    return div(id='status')[A]
+    return div(id="status")[A]

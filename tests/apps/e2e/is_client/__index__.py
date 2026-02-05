@@ -10,4 +10,4 @@ def __page__():
 
 @client
 def IsClient():
-    return div(id='is_client')[is_client]
+    return div(id="is_client")[is_client]

@@ -4,6 +4,7 @@ from blu import HTMLElement
 def test_element_is_instance_of_HTMLElement():
     """Anything imported from blu.html should be an HTMLElement."""
     from blu.html import element
+
     assert isinstance(element, HTMLElement)
 
 
@@ -13,18 +14,21 @@ def test_element_has_imported_tagname():
     imported as.
     """
     from blu.html import blah
-    assert blah._tagname == 'blah'  # type: ignore
+
+    assert blah._tagname == "blah"  # type: ignore
 
 
 def test_element_has_no_props():
     """The imported element has no props."""
     from blu.html import element
+
     assert element._attrs == {}  # type: ignore
 
 
 def test_element_has_no_children():
     """The imported element has no children."""
     from blu.html import element
+
     assert element._children == []  # type: ignore
 
 
@@ -34,7 +38,8 @@ def test_trailing_underscore():
     should not include the trailing underscore in its tag name.
     """
     from blu.html import del_
-    assert del_._tagname == 'del'  # type: ignore
+
+    assert del_._tagname == "del"  # type: ignore
 
 
 def test_non_trailing_underscore():
@@ -43,7 +48,8 @@ def test_non_trailing_underscore():
     name as dashes.
     """
     from blu.html import _my_element
-    assert _my_element._tagname == '-my-element'  # type: ignore
+
+    assert _my_element._tagname == "-my-element"  # type: ignore
 
 
 def test_multiple_trailing_underscores():
@@ -52,4 +58,5 @@ def test_multiple_trailing_underscores():
     one is removed from the tag name; the others show up as dashes.
     """
     from blu.html import blah__
-    assert blah__._tagname == 'blah-'  # type: ignore
+
+    assert blah__._tagname == "blah-"  # type: ignore

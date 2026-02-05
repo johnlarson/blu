@@ -1,1 +1,1 @@
-CLIENT_REQUIREMENTS = ['requests']
+CLIENT_REQUIREMENTS = ["requests"]

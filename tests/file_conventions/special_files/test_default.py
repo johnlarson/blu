@@ -10,7 +10,7 @@ async def test_full_match():
     the value returned by its __page__ function will be loaded in the
     user's browser.
     """
-    response = await router('default_full_match').handle(Request('/a/foo/c'))
+    response = await router("default_full_match").handle(Request("/a/foo/c"))
     assert response._body == 1  # type: ignore
 
 
@@ -19,8 +19,8 @@ async def test_matches_when_one_extra_segment():
     A URL that includes the path to an __default__.py file and contains
     an extra segment results in the file's __page__ handler being used.
     """
-    response = await router('default_extra_segment').handle(Request('/a/b'))
-    assert response._body == 'DEFAULT'  # type: ignore
+    response = await router("default_extra_segment").handle(Request("/a/b"))
+    assert response._body == "DEFAULT"  # type: ignore
 
 
 async def test_matches_when_multiple_extra_segments():
@@ -29,9 +29,9 @@ async def test_matches_when_multiple_extra_segments():
     multiple extra segments results in the file's __page__ handler being
     used.
     """
-    r = router('default_extra_segment')
-    response = await r.handle(Request('/a/b/c/d'))
-    assert response._body == 'DEFAULT'  # type: ignore
+    r = router("default_extra_segment")
+    response = await r.handle(Request("/a/b/c/d"))
+    assert response._body == "DEFAULT"  # type: ignore
 
 
 async def test_matches_start_only_no_match():
@@ -40,7 +40,7 @@ async def test_matches_start_only_no_match():
     does not result that __index__.py file being used.
     """
     with pytest.raises(NotFound):
-        await router('default_incomplete_match').handle(Request('/a/b'))
+        await router("default_incomplete_match").handle(Request("/a/b"))
 
 
 async def test_last_filepath_segment_different_no_match():
@@ -50,7 +50,7 @@ async def test_last_filepath_segment_different_no_match():
     file being used.
     """
     with pytest.raises(NotFound):
-        await router('default_one_segment_off').handle(Request('/a/b/foo'))
+        await router("default_one_segment_off").handle(Request("/a/b/foo"))
 
 
 async def test_only_matches_if_no_other_match():
@@ -58,8 +58,8 @@ async def test_only_matches_if_no_other_match():
     If there's an __index__.py file under a more specific path that
     matches the URL, the __index__.py file will be used instead.
     """
-    response = await router('index_file_priority').handle(Request('/foo/c'))
-    assert response._body == 'INDEX'  # type: ignore
+    response = await router("index_file_priority").handle(Request("/foo/c"))
+    assert response._body == "INDEX"  # type: ignore
 
 
 async def test_more_specific_default_file():
@@ -68,9 +68,9 @@ async def test_more_specific_default_file():
     that matches the URL, that other __default__.py file will be used
     instead.
     """
-    r = router('default_specific_priority')
-    response = await r.handle(Request('/foo/c'))
-    assert response._body == 'MORE SPECIFIC'  # type: ignore
+    r = router("default_specific_priority")
+    response = await r.handle(Request("/foo/c"))
+    assert response._body == "MORE SPECIFIC"  # type: ignore
 
 
 async def test_handler_return_response():
@@ -79,10 +79,10 @@ async def test_handler_return_response():
     response sent to the client will have the body, status code, and
     headers set in the Response object.
     """
-    response = await router('default_response_ret').handle(Request('/'))
-    assert response._body == 'BODY'  # type: ignore
+    response = await router("default_response_ret").handle(Request("/"))
+    assert response._body == "BODY"  # type: ignore
     assert response._status == 401  # type: ignore
-    assert response._headers == {'A': 'b'}  # type: ignore
+    assert response._headers == {"A": "b"}  # type: ignore
 
 
 async def test_handler_only_route_params():
@@ -91,8 +91,8 @@ async def test_handler_only_route_params():
     will capture the value of the dynamic segment whose name matches the
     argument name.
     """
-    response = await router('default_route_params').handle(Request('/1/2/3'))
-    assert response._body == ('1', '2', '3')  # type: ignore
+    response = await router("default_route_params").handle(Request("/1/2/3"))
+    assert response._body == ("1", "2", "3")  # type: ignore
 
 
 async def test_path_param():
@@ -102,8 +102,8 @@ async def test_path_param():
     be populated with the remaining path, with no leading or trailing
     slash.
     """
-    response = await router('default_path_param').handle(Request('/1/2/3'))
-    assert response._body == '1/2/3'  # type: ignore
+    response = await router("default_path_param").handle(Request("/1/2/3"))
+    assert response._body == "1/2/3"  # type: ignore
 
 
 async def test_single_underscore_arg():
@@ -112,7 +112,7 @@ async def test_single_underscore_arg():
     argument whose name is a single underscore, that argument will be
     set to None.
     """
-    response = await router('default_single_underscore').handle(Request('/'))
+    response = await router("default_single_underscore").handle(Request("/"))
     assert response._body == None  # type: ignore
 
 
@@ -124,7 +124,7 @@ async def test_nonexistent_route_params():
     route is accessed through HTTP.
     """
     with pytest.raises(TypeError):
-        await router('def_extra_route_params').handle(Request('/'))
+        await router("def_extra_route_params").handle(Request("/"))
 
 
 async def test_missing_route_params():
@@ -134,9 +134,9 @@ async def test_missing_route_params():
     call signature, the handler will still be called with the route
     parameter argument(s) that it allows.
     """
-    r = router('def_missing_route_params')
-    response = await r.handle(Request('/1/2/3'))
-    assert response._body == '2'  # type: ignore
+    r = router("def_missing_route_params")
+    response = await r.handle(Request("/1/2/3"))
+    assert response._body == "2"  # type: ignore
 
 
 async def test_handler_query_params():
@@ -147,10 +147,10 @@ async def test_handler_query_params():
     parameter name is the argument key, and the query parameter value is
     the argument value.
     """
-    response = await router('def_query').handle(
-        Request('/', query={'a': '1', 'b': '2', 'c': '3'}),
+    response = await router("def_query").handle(
+        Request("/", query={"a": "1", "b": "2", "c": "3"}),
     )
-    assert response._body == ('1', '2', '3')  # type: ignore
+    assert response._body == ("1", "2", "3")  # type: ignore
 
 
 async def test_nonexistent_query_params():
@@ -161,7 +161,7 @@ async def test_nonexistent_query_params():
     raised.
     """
     with pytest.raises(TypeError):
-        await router('def_extra_route_params').handle(Request('/'))
+        await router("def_extra_route_params").handle(Request("/"))
 
 
 async def test_query_param_default_values():
@@ -171,8 +171,8 @@ async def test_query_param_default_values():
     default values for those query parameters, the handler will be run
     with those query parameter arguments' default values.
     """
-    r = router('def_query_params_default')
-    response = await r.handle(Request('/'))
+    r = router("def_query_params_default")
+    response = await r.handle(Request("/"))
     assert response._body == 3  # type: ignore
 
 
@@ -181,8 +181,8 @@ async def test_query_params_not_in_call_signature():
     Any query parameters in the URL that are not captured in the call
     signature of the __page__ handler are ignored.
     """
-    r = router('def_missing_query_params')
-    response = await r.handle(Request('/', query={'a': '1', 'b': '2'}))
+    r = router("def_missing_query_params")
+    response = await r.handle(Request("/", query={"a": "1", "b": "2"}))
     assert response._body == 25  # type: ignore
 
 
@@ -190,10 +190,9 @@ async def test_query_params_kwargs():
     """
     Query parameters can be captured using keyword argument unpacking.
     """
-    r = router('def_query_kwarg')
-    response = await r.handle(Request('/', query={'a': '1', 'b': '2'}))
-    assert response._body == ('1', '2')  # type: ignore
-
+    r = router("def_query_kwarg")
+    response = await r.handle(Request("/", query={"a": "1", "b": "2"}))
+    assert response._body == ("1", "2")  # type: ignore
 
 
 async def test_handler_route_and_query_params():
@@ -202,9 +201,9 @@ async def test_handler_route_and_query_params():
     the left will be treated as route parameters, and arguments on the
     right of it will be treated as query parameters.
     """
-    r = router('def_route_and_query')
-    response = await r.handle(Request('/1/2', {'c': '3', 'd': '4'}))
-    assert response._body == ('1', '2', '3', '4')  # type: ignore
+    r = router("def_route_and_query")
+    response = await r.handle(Request("/1/2", {"c": "3", "d": "4"}))
+    assert response._body == ("1", "2", "3", "4")  # type: ignore
 
 
 async def test_pos_only_path_param():
@@ -215,9 +214,9 @@ async def test_pos_only_path_param():
     matched by the __default__.py file where __page__ is, without a
     leading or trailing /.
     """
-    r = router('def_pos_only_path_param')
-    response = await r.handle(Request('/foo/bar'))
-    assert response._body == 'foo/bar'  # type: ignore
+    r = router("def_pos_only_path_param")
+    response = await r.handle(Request("/foo/bar"))
+    assert response._body == "foo/bar"  # type: ignore
 
 
 async def test_pos_only_single_underscore():
@@ -226,8 +225,8 @@ async def test_pos_only_single_underscore():
     those is named _ (single underscore), then that argument's value
     will be set to None when __page__ is called.
     """
-    r = router('def_pos_only_underscore')
-    response = await r.handle(Request('/'))
+    r = router("def_pos_only_underscore")
+    response = await r.handle(Request("/"))
     assert response._body == None  # type: ignore
 
 
@@ -237,13 +236,13 @@ async def test_handler_dunder_is_empty_string():
     argument with double trailing underscore in its name) is an empty
     string.
     """
-    r = router('def_empty_path_param')
-    response = await r.handle(Request('/a'))
-    assert response._body == ''  # type: ignore
+    r = router("def_empty_path_param")
+    response = await r.handle(Request("/a"))
+    assert response._body == ""  # type: ignore
 
 
 async def test_async_handler():
     """__page__ handler can be an async function."""
-    r = router('def_async_handler')
-    response = await r.handle(Request('/'))
-    assert response._body == 'Works!'  # type: ignore
+    r = router("def_async_handler")
+    response = await r.handle(Request("/"))
+    assert response._body == "Works!"  # type: ignore

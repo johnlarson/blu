@@ -1,2 +1,2 @@
 def __page__():
-    return 'STATIC'
+    return "STATIC"

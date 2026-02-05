@@ -31,7 +31,7 @@ def test_sets_http_status_kw():
 
 def test_sets_headers_positional():
     """Sets HTTP headers to third positional argument in __init__."""
-    assert Response(None, 200, {'A': 'b'})._headers == {'A': 'b'}  # type: ignore
+    assert Response(None, 200, {"A": "b"})._headers == {"A": "b"}  # type: ignore
 
 
 def test_sets_headers_kw():
@@ -39,7 +39,7 @@ def test_sets_headers_kw():
     Allows setting HTTP headers with "headers" keyword argument in
     __init__.
     """
-    assert Response(headers={'A': 'b'})._headers == {'A': 'b'}  # type: ignore
+    assert Response(headers={"A": "b"})._headers == {"A": "b"}  # type: ignore
 
 
 def test_body_status_and_headers():
@@ -47,16 +47,16 @@ def test_body_status_and_headers():
     Correctly sets body, status and headers when all are passed into
     __init__.
     """
-    response = Response(div, status=401, headers={'A': 'a'})
+    response = Response(div, status=401, headers={"A": "a"})
     assert response._body == div  # type: ignore
     assert response._status == 401  # type: ignore
-    assert response._headers == {'A': 'a'}  # type: ignore
+    assert response._headers == {"A": "a"}  # type: ignore
 
 
 def test_body_default_none():
     """Response body defaults to None."""
     assert Response()._body == None  # type: ignore
-    
+
 
 def test_status_default_200():
     """Response status defaults to 200."""

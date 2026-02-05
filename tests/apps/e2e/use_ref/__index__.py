@@ -19,9 +19,9 @@ def RefTest():
 
     def click_rerender(e):
         rerender(render_id + 1)
-    
+
     return (
-        div(id='count')[count_ref[:]],
-        button(id='increment', onClick=click_increment)['Increment'],
-        button(id='rerender', onClick=click_rerender)['Rerender'],
+        div(id="count")[count_ref[:]],
+        button(id="increment", onClick=click_increment)["Increment"],
+        button(id="rerender", onClick=click_rerender)["Rerender"],
     )

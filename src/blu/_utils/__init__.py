@@ -10,7 +10,7 @@ if not is_client:
 
 def get_available_port() -> int:
     s = socket.socket()  # type: ignore
-    s.bind(('', 0))
+    s.bind(("", 0))
     return s.getsockname()[1]
 
 

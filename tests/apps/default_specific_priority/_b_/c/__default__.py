@@ -1,2 +1,2 @@
 def __page__():
-    return 'MORE SPECIFIC'
+    return "MORE SPECIFIC"

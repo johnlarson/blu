@@ -27,7 +27,7 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
 
         @client
         def MyClientElement():
-            
+
             @use_effect
             def setup_and_teardown():
                 do_some_setup()
@@ -35,7 +35,7 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
                 do_some_teardown()
 
             return div['Hello!']
-    
+
     :param callback: A non-generator function or a generator function
         with a single ``yield`` statement.
 
@@ -64,7 +64,7 @@ class HookManager:
 
     def self_effect(self):
         return self.self_cleanup
-    
+
     def self_cleanup(self):
         self.self_effect.destroy()
         self.self_cleanup.destroy()
@@ -99,7 +99,7 @@ class EffectManager(HookManager):
             next(result)
         self.generator = result
         return self.js_cleanup
-    
+
     def js_cleanup(self):
         if self.generator is not None:
             try:
@@ -140,7 +140,7 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
                     f'You\\'ve clicked {click_count} times',
                 ]
             )
-    
+
     :param init: An initial value for the state being managed.
     :return: A tuple containing two items: The current value for the
         state being managed, and a function that takes any value and
@@ -151,7 +151,7 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
         triggered by this state's setter, the first item in the tuple
         will be whatever it was in the previous render. On the initial
         render, the first item in the tuple will be ``init``.
-            
+
     """
     init_proxy = create_proxy(init)
     value_proxy, js_setter = useState(init_proxy)
@@ -202,8 +202,9 @@ class Ref[T]:
             # assigns variable ref to an instance of Ref.
             ref = use_ref()
     """
+
     _js_ref: Any
-    
+
     def __getitem__(self, empty_slice: slice) -> T:
         """
         Get the value currently stored in the :class:`Ref <blu.Ref>`.
@@ -220,13 +221,13 @@ class Ref[T]:
             def TwoButtons():
                 ref = use_ref('Hello')
                 ref[:]  # 'Hello'
-        
+
         :param empty_slice: Must be an empty slice, i.e. when you must
             put a single colon between the square brackets, without any
             numbers.
         :return: The value currently stored in ``self``.
         """
-        print('EMPTY SLICE:', empty_slice)
+        print("EMPTY SLICE:", empty_slice)
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
         current = self._js_ref.current
@@ -234,7 +235,7 @@ class Ref[T]:
             return current.unwrap()
         else:
             return current
-    
+
     def __setitem__(self, empty_slice: slice, new_value: T):
         """
         Set the :class:`Ref <blu.Ref>` to point to a different value.
@@ -299,7 +300,7 @@ def use_ref[T](init: T) -> Ref[T]:
 
         __client__ = True
 
-        
+
         @client
         def MyElement():
             click_count_ref = use_ref(0)
@@ -318,7 +319,7 @@ def use_ref[T](init: T) -> Ref[T]:
         :class:`Ref <blu.Ref>` will be ``init``, but you can set this to
         a new value at any time (see :class:`blu.Ref` for how to set a
         :class:`Ref <blu.Ref>`\\'s value).
-    
+
     .. note::
 
         Setting a :class:`Ref <blu.Ref>`\\'s value does not trigger a
@@ -343,10 +344,9 @@ class RefManager[T](HookManager):
     def __init__(self, ref: Any):
         super().__init__()
         self.ref = ref
-        #self.ref = create_proxy(ref)
+        # self.ref = create_proxy(ref)
 
     def self_cleanup(self):
         self.ref._cleanup()
         self.ref.destroy()
         super().self_cleanup()
-    

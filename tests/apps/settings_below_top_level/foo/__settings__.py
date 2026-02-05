@@ -1,3 +1,1 @@
-
-
-CLIENT_REQUIREMENTS = ['should', 'not', 'be', 'used']
+CLIENT_REQUIREMENTS = ["should", "not", "be", "used"]

@@ -1,4 +1,3 @@
-
 from collections.abc import Callable
 from dataclasses import dataclass, field, fields
 import functools
@@ -19,7 +18,7 @@ def settings():
             except AttributeError:
                 pass
         return Settings(**values)
-    
+
 
 def default[T](factory: Callable[[], Any]):
     return field(default_factory=cast(Callable[[], T], factory))
@@ -27,5 +26,5 @@ def default[T](factory: Callable[[], Any]):
 
 @dataclass
 class Settings:
-    
+
     CLIENT_REQUIREMENTS: list[str] = default(lambda: [])

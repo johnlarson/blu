@@ -18,6 +18,7 @@ requests = "*"
 quart = "*"
 beautifulsoup4 = "*"
 blu = {file = ".", editable = true}
+black = "*"
 
 [requires]
 python_version = "3.13"

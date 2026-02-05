@@ -22,36 +22,36 @@ class RouteNotFound(Exception):
 class Router:
     index_page: Optional[Handler]
     default_page: Optional[Handler]
-    static_segments: dict[str, 'Router']
-    dynamic_segments: dict[str, 'Router']
+    static_segments: dict[str, "Router"]
+    dynamic_segments: dict[str, "Router"]
 
     def __init__(self, dir: Path, package_name: str):
-        print('DIR:', str(dir))
+        print("DIR:", str(dir))
         self.index_page = None
         self.default_page = None
         self.static_segments = {}
         self.dynamic_segments = {}
         for path in dir.iterdir():
             name = path.stem
-            full_name = package_name + '.' + name
-            if path.name == '__index__.py':
+            full_name = package_name + "." + name
+            if path.name == "__index__.py":
                 self.index_page = self._get_page_handler(full_name)
-            elif path.name == '__default__.py':
+            elif path.name == "__default__.py":
                 self.default_page = self._get_page_handler(full_name)
             elif is_static_segment(path):
                 self.static_segments[name] = Router(path, full_name)
             elif is_dynamic_segment(path):
-                nunder = name.strip('_')
+                nunder = name.strip("_")
                 self.dynamic_segments[nunder] = Router(path, full_name)
 
     def _get_page_handler(self, module_name: str) -> Handler:
         module = import_module(module_name)
         return module.__page__
-    
+
     async def handle(self, request: Request) -> Response:
         path = request.path
-        stripped = path.strip('/')
-        segments: list[str] = [] if stripped == '' else stripped.split('/')
+        stripped = path.strip("/")
+        segments: list[str] = [] if stripped == "" else stripped.split("/")
         response = await self.handle_rec(request, segments)
         assert response is not None
         return response
@@ -67,7 +67,7 @@ class Router:
             return response_ret
         else:
             return Response(response_ret)
-        
+
     async def _get_handler_ret(
         self,
         request: Request,
@@ -87,7 +87,7 @@ class Router:
         except NotFound:
             pass
         return await self._handle_default_page(request, path, route_params)
-        
+
     async def _handle_index_page(
         self,
         request: Request,
@@ -110,7 +110,7 @@ class Router:
             path,
         )
         return await awaitable(self.index_page(*args, **kwargs))
-    
+
     def _get_handler_kwargs[**P](
         self,
         handler: Callable[P, Response | Node],
@@ -121,10 +121,7 @@ class Router:
         fn_params = inspect.signature(handler).parameters
         if any(p.kind is p.POSITIONAL_ONLY for p in fn_params.values()):
             if any(p.kind is p.VAR_KEYWORD for p in fn_params.values()):
-                return {
-                    name: query_list[0]
-                    for name, query_list in request.query
-                }
+                return {name: query_list[0] for name, query_list in request.query}
             else:
                 ret = {}
                 for p in fn_params.values():
@@ -132,28 +129,28 @@ class Router:
                         continue
                     value = request.query.get(p.name, p.default)
                     if value is Parameter.empty:
-                       raise TypeError(
-                            f'Unable to process query parameter {p.name} for '
-                            f'URL path {request.path}: __page__ handler has '
+                        raise TypeError(
+                            f"Unable to process query parameter {p.name} for "
+                            f"URL path {request.path}: __page__ handler has "
                             f'no argument named "{p.name}".'
                         )
                     ret[p.name] = value
                 return ret
         ret: dict[str, Any] = {}
         for fn_param in fn_params.values():
-            if fn_param.name == '_':
-                ret['_'] = None
-            elif fn_param.name.endswith('__'):
-                ret[fn_param.name] = '/'.join(path)
+            if fn_param.name == "_":
+                ret["_"] = None
+            elif fn_param.name.endswith("__"):
+                ret[fn_param.name] = "/".join(path)
             else:
                 try:
                     ret[fn_param.name] = route_params[fn_param.name]
                 except KeyError:
                     raise TypeError(
-                        f'__page__ handler {handler} has route '
+                        f"__page__ handler {handler} has route "
                         f'argument "{fn_param.name}", which does not '
-                        'exist for this route (URL path: '
-                        f'{request.path}).'
+                        "exist for this route (URL path: "
+                        f"{request.path})."
                     )
         return ret
 
@@ -217,7 +214,7 @@ class Router:
             path,
         )
         return await awaitable(self.default_page(*args, **kwargs))
-    
+
     def _get_handler_args[**P](
         self,
         default_handler: Callable[P, Response | Node],
@@ -229,10 +226,10 @@ class Router:
         for p in parameters.values():
             if p.kind is not Parameter.POSITIONAL_ONLY:
                 break
-            if p.name == '_':
+            if p.name == "_":
                 ret += (None,)
-            elif p.name.endswith('__'):
-                ret += ('/'.join(path),)
+            elif p.name.endswith("__"):
+                ret += ("/".join(path),)
             else:
                 ret += (route_params[p.name],)
         return ret
@@ -240,28 +237,23 @@ class Router:
 
 def is_static_segment(path: Path) -> bool:
     name = path.stem
-    return (
-        path.is_dir() and
-        len(name) > 0 and
-        name[0] != '_' and
-        name[-1] != '_'
-    )
+    return path.is_dir() and len(name) > 0 and name[0] != "_" and name[-1] != "_"
 
 
 def is_dynamic_segment(path: Path) -> bool:
     name = path.stem
     return (
-        path.is_dir() and
-        len(name) > 2 and
-        name[0] == '_' and
-        name[1] != '_' and
-        name[-1] == '_' and
-        name[-2] != '_'
+        path.is_dir()
+        and len(name) > 2
+        and name[0] == "_"
+        and name[1] != "_"
+        and name[-1] == "_"
+        and name[-2] != "_"
     )
 
 
 def router_from_root_package(module: ModuleType) -> Router:
-    assert hasattr(module, '__path__')
+    assert hasattr(module, "__path__")
     path_str = module.__path__[0]
     path = Path(path_str)
     return Router(path, module.__name__)

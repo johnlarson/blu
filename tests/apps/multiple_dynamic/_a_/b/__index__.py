@@ -1,2 +1,2 @@
 def __page__():
-    return '_a_/b'
+    return "_a_/b"

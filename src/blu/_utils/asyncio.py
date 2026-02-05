@@ -8,6 +8,7 @@ if not is_client:
     from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 else:
     from blu._utils.typing import type_place_holder
+
     Executor = type_place_holder
     ProcessPoolExecutor = type_place_holder
     ThreadPoolExecutor = type_place_holder
@@ -23,6 +24,7 @@ async def awaitable[T](input: T | Awaitable[T]) -> T:
 def to_sync[**P, R](fn: Callable[P, Coroutine[Any, Any, R]]) -> Callable[P, R]:
     def ret(*args: P.args, **kwargs: P.kwargs) -> R:
         return asyncio.run(fn(*args, **kwargs))
+
     return ret
 
 
@@ -44,10 +46,11 @@ def _asyncify[**P, R](
     async def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:
         if is_client:
             raise WrongEnvironmentError(
-                f'{fn} can only be called in a server environment.'
+                f"{fn} can only be called in a server environment."
             )
         loop = asyncio.get_running_loop()
         bound = functools.partial(fn, *args, **kwargs)
         with executor() as pool:  # type: ignore
             return await loop.run_in_executor(pool, bound)
+
     return wrapped

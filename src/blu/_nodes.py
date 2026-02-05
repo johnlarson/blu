@@ -1,6 +1,4 @@
-from collections.abc import (
-    AsyncGenerator, Callable, Generator, Iterable
-)
+from collections.abc import AsyncGenerator, Callable, Generator, Iterable
 import importlib
 import inspect
 from numbers import Number
@@ -11,7 +9,6 @@ from blu._utils.typing import Any, Mapping, Protocol, Sequence, cast
 from blu._utils.client import is_client
 
 from blu._exceptions import WrongEnvironmentError
-
 
 # """
 # JSON-serializable primitive value.
@@ -30,7 +27,7 @@ type Serializable = (
     SerializableItem | Sequence[Serializable] | Mapping[str, Serializable]
 )
 
-type Node = '''
+type Node = """
     ClientElement |
     HTMLElement |
     Key |
@@ -40,7 +37,7 @@ type Node = '''
     float |
     bool |
     None
-'''
+"""
 
 # """Valid value for a prop of a `ReactElement`."""
 type PropValue = Jsonable | Node
@@ -98,7 +95,7 @@ class HTMLElement:
         div(id='my-id')[
             'Hello World!',
         ]
-    
+
     .. code-block:: html
 
         <div id="my-id">Hello World!</div>
@@ -142,9 +139,7 @@ class HTMLElement:
         self._attrs = props
         self._children = children
 
-    def __call__(
-        self, props: Props = {}, /, **kwargs: PropValue
-    ) -> 'HTMLElement':
+    def __call__(self, props: Props = {}, /, **kwargs: PropValue) -> "HTMLElement":
         """
         Create a copy of ``self`` with React props set based on the
         given keyword arguments.
@@ -154,7 +149,7 @@ class HTMLElement:
             from blu.html import div
 
             div(id='my-div')
-        
+
         .. code-block:: html
 
             <div id="my-div"></div>
@@ -202,12 +197,12 @@ class HTMLElement:
             **self._rename_props(kwargs),
         }
         for prop_name in all_props:
-            if not is_client and prop_name.startswith('on'):
+            if not is_client and prop_name.startswith("on"):
                 raise WrongEnvironmentError(
                     f'Could not add attribute "{prop_name}" to {self._tagname} '
                     f'element. Event-handling attributes like "{prop_name}" '
-                    'can only be set in client-side rendering; this code was '
-                    'run server-side.'
+                    "can only be set in client-side rendering; this code was "
+                    "run server-side."
                 )
         return HTMLElement(
             self._tagname,
@@ -215,9 +210,7 @@ class HTMLElement:
             children=self._children,
         )
 
-    def __getitem__(
-        self, children: Node | tuple[Node, ...]
-    ) -> 'HTMLElement':
+    def __getitem__(self, children: Node | tuple[Node, ...]) -> "HTMLElement":
         """
         Create a copy of ``self`` whose child nodes are set to the items
         passed in.
@@ -231,7 +224,7 @@ class HTMLElement:
         .. code-block:: html
 
             <div>Hello World!</div>
-        
+
         :param children: A :type:`blu.Node` or a :py:class:`tuple` of
             :type:`blu.Node`\\ s.
         :return:
@@ -274,7 +267,7 @@ class HTMLElement:
             props=self._attrs,
             children=_index_to_children(children),
         )
-    
+
     def _rename_props(self, props: Props) -> Props:
         return {py_to_html_name(k): v for k, v in props.items()}
 
@@ -358,14 +351,14 @@ class CustomElement:
         self.name = name
         self.props = props
         self.children = children
-    
-    def __call__(self, **kwargs: PropValue) -> 'CustomElement':
+
+    def __call__(self, **kwargs: PropValue) -> "CustomElement":
         """
         Create a copy of :data:`self` with the props specified by
         ``kwargs``.
 
         .. code-block:: python
-        
+
             from blu import import_client
 
             MyComponent = import_client('/MyComponent')
@@ -392,7 +385,7 @@ class CustomElement:
                 MyComponent(my_prop='value')
 
                 MyComponent  # Still <MyComponent />
-        
+
         .. note:: When calling a :class:`CustomElement`, the copy
             returned does not keep any of the original's non-children
             props except those explicitly specified in the call:
@@ -408,7 +401,7 @@ class CustomElement:
 
                 # <MyComponent c={3} d={4} e={5} />
                 second = first(c=3, d=4, e=5)
-        
+
         .. note:: When calling a :class:`CustomElement`, the copy's
             :data:`children` are unchanged from the original's:
 
@@ -423,7 +416,7 @@ class CustomElement:
 
                 # <MyComponent b={2}>Hello!</MyComponent>
                 second = first(b=2)
-        
+
         .. note:: ``children`` is not a valid prop name in Blu. To set
             React children, use the index operator (:data:`[]`).
         """
@@ -437,7 +430,7 @@ class CustomElement:
     def __getitem__(
         self,
         children: Node | tuple[Node, ...],
-    ) -> 'CustomElement':
+    ) -> "CustomElement":
         """
         Create a copy of :data:`self` with the :data:`children`
         specified by :data:`index`.
@@ -453,7 +446,7 @@ class CustomElement:
               span['Hello World!'],
             ]
 
-        
+
         :param index: A :type:`blu.Node`, a :py:class:`tuple` of
             :type:`blu.Node`\\ s, or :py:data:`... <ellipsis>`.
         :return:
@@ -470,7 +463,7 @@ class CustomElement:
               ``[]``.
 
         .. note::
-        
+
             Using the index operator (:data:`[]`) on a
             :class:`CustomComponent` does not mutate the original
             :class:`CustomComponent`; instead, it returns a copy of the
@@ -497,9 +490,7 @@ class CustomElement:
         )
 
 
-def _index_to_children(
-    index: Node | EllipsisType | tuple[Node, ...]
-) -> Children:
+def _index_to_children(index: Node | EllipsisType | tuple[Node, ...]) -> Children:
     if index == ...:
         children = []
     elif isinstance(index, tuple):
@@ -512,11 +503,11 @@ def _index_to_children(
             (HTMLElement, Key, ClientElement, Sequence, str, Number, bool),
         ):
             raise TypeError(
-                'HTMLElement\'s children must be valid nodes, i.e. they '
-                'must be one of the following types: '
-                '`blu.react.HTMLElement`, '
-                '`blu.react.CustomElement`, `typing.Sequence`, '
-                f'`str`, `int`, `float`, `None`. Got {child}'
+                "HTMLElement's children must be valid nodes, i.e. they "
+                "must be one of the following types: "
+                "`blu.react.HTMLElement`, "
+                "`blu.react.CustomElement`, `typing.Sequence`, "
+                f"`str`, `int`, `float`, `None`. Got {child}"
             )
     return children
 
@@ -582,7 +573,7 @@ class Key:
         self._key = key
         self._children = []
 
-    def __getitem__(self, children: Node | tuple[Node]) -> 'Key':
+    def __getitem__(self, children: Node | tuple[Node]) -> "Key":
         """
         Create a copy of ``self`` with the given children.
 
@@ -620,11 +611,9 @@ type ClientRenderer = Callable[..., Node | Generator[None, Node, Node]]
 
 class Element[**P](Protocol):
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> 'Element[P]':
-        ...
-    
-    def __getitem__(self, *children: 'Node') -> 'Element[P]':
-        ...
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> "Element[P]": ...
+
+    def __getitem__(self, *children: "Node") -> "Element[P]": ...
 
 
 UNSET = object()
@@ -646,7 +635,7 @@ class ClientElement:
 
         __client__ = True
 
-        
+
         @client
         def ColorfulText(color, bold):
             colorful_span = span(style={'color': color})[
@@ -657,7 +646,7 @@ class ClientElement:
             else:
                 return colorful_span
 
-                
+
         ColorfulText('red', bold=True)[
             'Danger! The world said hello back.',
         ]
@@ -670,10 +659,10 @@ class ClientElement:
             </span>
         </b>
     """
-    
+
     _args: tuple[Any, ...]
     _kwargs: dict[str, Any]
-    _children: list['Node']
+    _children: list["Node"]
     _renderer: ClientRenderer
     _key: Any
     _has_key: bool
@@ -698,7 +687,7 @@ class ClientElement:
         self,
         *args: Any,
         **kwargs: Any,
-    ) -> 'ClientElement':
+    ) -> "ClientElement":
         """
         Create a copy of ``self`` that will be rendered with the given
         arguments.
@@ -715,7 +704,7 @@ class ClientElement:
             def Greeting(name = 'World'):
                 return div[f'Hello, {name}!']
 
-            
+
             div[
                 Greeting('Arnold'),
                 Greeting(name='Hailey'),
@@ -727,7 +716,7 @@ class ClientElement:
                 <div>Hello, Arnold!</div>
                 <div>Hello, Hailey!</div>
                 <div>Hello, World!</div>
-        
+
         :param args: The positional arguments to pass into the
             element's render function when it is rendered.
         :param kwargs: The keyword arguments to pass into the
@@ -768,7 +757,7 @@ class ClientElement:
             def Greeting(name):
                 return div[f'Hello, {name}!']
 
-            
+
             [Greeting(x['name'], key=x['id']) for x in PEOPLE]
 
         .. code-block:: html
@@ -779,7 +768,7 @@ class ClientElement:
         """
         kwargs_copy = {**kwargs}
         try:
-            del kwargs_copy['key']
+            del kwargs_copy["key"]
         except KeyError:
             pass
         return ClientElement(
@@ -787,14 +776,14 @@ class ClientElement:
             args,
             kwargs,
             self._children,
-            key=kwargs.get('key', None),
-            has_key='key' in kwargs,
+            key=kwargs.get("key", None),
+            has_key="key" in kwargs,
         )
 
     def __getitem__(
         self,
         children: Node | tuple[Node, ...],
-    ) -> 'ClientElement':
+    ) -> "ClientElement":
         """
         Create a copy of ``self`` that will render with the given
         children displayed where the render function uses the ``yield``
@@ -828,7 +817,7 @@ class ClientElement:
             i.e. doesn't contain a ``yield`` statement.
         """
         if not inspect.isgeneratorfunction(self._renderer):
-            raise TypeError('This element does not accept any children.')
+            raise TypeError("This element does not accept any children.")
         return ClientElement(
             self._renderer,
             self._args,
@@ -837,12 +826,12 @@ class ClientElement:
             key=self._key,
             has_key=self._has_key,
         )
-    
+
     def _get_key(self):
         if not self._has_key:
-            raise LookupError('This element has no key.')
+            raise LookupError("This element has no key.")
         return self._key
-    
+
     def __reduce__(self):
         module = self._renderer.__module__
         name = self._renderer.__name__
@@ -860,12 +849,20 @@ class ClientElement:
         )
 
 
-def _import_client_module(module: str, name: str, args: tuple[Any], kwargs: dict[str, Any], children: list[Any], key: Any, has_key: bool):
-    print('MODULE:', module)
-    print('NAME:', name)
+def _import_client_module(
+    module: str,
+    name: str,
+    args: tuple[Any],
+    kwargs: dict[str, Any],
+    children: list[Any],
+    key: Any,
+    has_key: bool,
+):
+    print("MODULE:", module)
+    print("NAME:", name)
     base = getattr(importlib.import_module(module), name)
     if has_key:
-        all_kwargs = {**kwargs, 'key': key}
+        all_kwargs = {**kwargs, "key": key}
     else:
         all_kwargs = kwargs
     with_args = base(*args, **all_kwargs)
@@ -876,7 +873,7 @@ def _import_client_module(module: str, name: str, args: tuple[Any], kwargs: dict
 
 
 def py_to_html_name(py_name: str) -> str:
-    return re.sub('_$', '', py_name).replace('_', '-')
+    return re.sub("_$", "", py_name).replace("_", "-")
 
 
 def create_html_element(tagname: str) -> HTMLElement:
@@ -893,8 +890,8 @@ def create_html_element(tagname: str) -> HTMLElement:
         my_element = create_rare_html_element('my_element-')
 
         my_element(id='my-id')['Hello, World!']
-    
-        
+
+
     .. code-block:: html
 
         <my_element->Hello, World!</my_element->
@@ -946,7 +943,7 @@ def client(renderer: ClientRenderer) -> ClientElement:
         def Greeting(name='World'):
             return f'Hello, {name}!'
 
-        
+
         Greeting('Gary')
 
     .. code-block:: html
@@ -958,7 +955,7 @@ def client(renderer: ClientRenderer) -> ClientElement:
     called with no arguments:
 
     .. code-block:: python
-        
+
         from blu import client
         from blu.html import span
 
@@ -967,7 +964,7 @@ def client(renderer: ClientRenderer) -> ClientElement:
         def Greeting(name='World'):
             return f'Hello, {name}!'
 
-        
+
         Greeting
 
     .. code-block:: html
@@ -1015,7 +1012,7 @@ def client(renderer: ClientRenderer) -> ClientElement:
     .. code-block:: html
 
         <span style='color: red'></span>
-    
+
     """
     element = ClientElement(renderer, (), {}, [], None, False)
     if is_client:

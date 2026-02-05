@@ -8,6 +8,7 @@ __client__ = True
 def Foo():
     try:
         from app.app_pkg_clientside.fail.module import A
-        return div(id='status')[A]
+
+        return div(id="status")[A]
     except ImportError:
-        return div(id='status')['Fail.']
+        return div(id="status")["Fail."]

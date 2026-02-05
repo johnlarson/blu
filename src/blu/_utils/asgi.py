@@ -12,16 +12,16 @@ class LifespanScopeASGIInfo(TypedDict):
 
 
 class LifespanScope(TypedDict):
-    type: Literal['lifespan']
+    type: Literal["lifespan"]
     asgi: LifespanScopeASGIInfo
-    state: NotRequired[dict[str, Any]]  # if missing, the server does not support this feature
+    state: NotRequired[
+        dict[str, Any]
+    ]  # if missing, the server does not support this feature
 
 
 class ConnectionScopeASGIInfo(TypedDict):
     version: str
-    spec_version: NotRequired[
-        Literal['2.0', '2.1', '2.2', '2.3']
-    ]  # default: '2.0'
+    spec_version: NotRequired[Literal["2.0", "2.1", "2.2", "2.3"]]  # default: '2.0'
 
 
 class ConnectionScope(TypedDict):
@@ -32,20 +32,22 @@ class ConnectionScope(TypedDict):
     headers: Iterable[tuple[bytes, bytes]]
     client: NotRequired[tuple[str, int]]  # default: None
     server: NotRequired[tuple[str, Optional[int]]]  # default: None
-    state: NotRequired[dict[str, Any]]  # if missing, the server does not support this feature
+    state: NotRequired[
+        dict[str, Any]
+    ]  # if missing, the server does not support this feature
 
 
 class HTTPConnectionScope(ConnectionScope):
-    type: Literal['http']
-    http_version: Literal['1.0', '1.1', '2']
+    type: Literal["http"]
+    http_version: Literal["1.0", "1.1", "2"]
     method: str
-    scheme: NotRequired[str]  # default: 'http'. Must not be ''. 
+    scheme: NotRequired[str]  # default: 'http'. Must not be ''.
     query_string: bytes
 
 
 class WSConnectionScope(ConnectionScope):
-    type: Literal['websocket']
-    http_version: NotRequired[Literal['1.1', '2']]  # default: '1.1'
+    type: Literal["websocket"]
+    http_version: NotRequired[Literal["1.1", "2"]]  # default: '1.1'
     scheme: NotRequired[str]  # default: 'ws'. Must not be ''.
     subprotocols: NotRequired[Iterable[str]]  # default: []
     query_string: NotRequired[Optional[bytes]]  # if missing or None, Default is ''.
@@ -55,71 +57,67 @@ type Scope = HTTPConnectionScope | WSConnectionScope | LifespanScope
 
 
 class LifespanStartupReceiveEvent(TypedDict):
-    type: Literal['lifespan.startup']
+    type: Literal["lifespan.startup"]
 
 
 class LifespanStartupCompleteSendEvent(TypedDict):
-    type: Literal['lifespan.startup.complete']
+    type: Literal["lifespan.startup.complete"]
 
 
 class LifespanStartupFailedSendEvent(TypedDict):
-    type: Literal['lifespan.startup.failed']
+    type: Literal["lifespan.startup.failed"]
     message: NotRequired[str]  # default: ''
 
 
 class LifespanShutdownReceiveEvent(TypedDict):
-    type: Literal['lifespan.shutdown']
+    type: Literal["lifespan.shutdown"]
 
 
 class LifespanShutdownCompleteSendEvent(TypedDict):
-    type: Literal['lifespan.shutdown.complete']
+    type: Literal["lifespan.shutdown.complete"]
 
 
 class LifespanShutdownFailedSendEvent(TypedDict):
-    type: Literal['lifespan.shutdown.failed']
+    type: Literal["lifespan.shutdown.failed"]
     message: NotRequired[str]  # default: ''
 
 
-type LifespanReceiveEvent = (
-    LifespanStartupReceiveEvent | LifespanShutdownReceiveEvent
-)
+type LifespanReceiveEvent = (LifespanStartupReceiveEvent | LifespanShutdownReceiveEvent)
 
 type LifespanSendEvent = (
-    LifespanStartupCompleteSendEvent |
-    LifespanStartupFailedSendEvent |
-    LifespanShutdownCompleteSendEvent |
-    LifespanShutdownFailedSendEvent
+    LifespanStartupCompleteSendEvent
+    | LifespanStartupFailedSendEvent
+    | LifespanShutdownCompleteSendEvent
+    | LifespanShutdownFailedSendEvent
 )
 
 
 class HTTPRequestReceiveEvent(TypedDict):
-    type: Literal['http.request']
+    type: Literal["http.request"]
     body: NotRequired[bytes]  # default: b''
     more_body: NotRequired[bool]  # default: False
 
 
 class HTTPDisconnectReceiveEvent(TypedDict):
-    type: Literal['http.disconnect']
+    type: Literal["http.disconnect"]
 
 
-type HTTPReceiveEvent = (
-    HTTPRequestReceiveEvent | HTTPDisconnectReceiveEvent
-)
+type HTTPReceiveEvent = (HTTPRequestReceiveEvent | HTTPDisconnectReceiveEvent)
 
 
 class WSConnectReceiveEvent(TypedDict):
-    type: Literal['websocket.connect']
+    type: Literal["websocket.connect"]
 
 
 class WSReceiveReceiveEvent(TypedDict):
-    type: Literal['websocket.receive']
+    type: Literal["websocket.receive"]
     bytes: NotRequired[Optional[bytes]]  # default: None
     test: NotRequired[Optional[str]]  # default: None
     # exactly one of bytes or text must be non-None
 
 
 class WSDisconnectReceiveEvent(TypedDict):
-    type: Literal['websocket.disconnect']
+    type: Literal["websocket.disconnect"]
     code: int
 
 
@@ -136,14 +134,14 @@ class Receiver(Protocol):
 
 
 class HTTPResponseStartSendEvent(TypedDict):
-    type: Literal['http.response.start']
+    type: Literal["http.response.start"]
     status: int
     headers: NotRequired[Iterable[tuple[bytes, bytes]]]  # default: []
     trailers: NotRequired[bool]  # default: False
 
 
 class HTTPResponseBodySendEvent(TypedDict):
-    type: Literal['http.response.body']
+    type: Literal["http.response.body"]
     body: NotRequired[bytes]  # default: b''
     more_body: NotRequired[bool]  # default: False
 
@@ -152,20 +150,20 @@ type HTTPSendEvent = HTTPResponseStartSendEvent | HTTPResponseBodySendEvent
 
 
 class WSAcceptSendEvent(TypedDict):
-    type: Literal['websocket.accept']
+    type: Literal["websocket.accept"]
     subprotocol: NotRequired[str]  # default: None
     headers: NotRequired[Iterable[tuple[bytes, bytes]]]  # default: []
 
 
 class WSSendSendEvent(TypedDict):
-    type: Literal['websocket.send']
+    type: Literal["websocket.send"]
     bytes: NotRequired[Optional[bytes]]  # default: None
     test: NotRequired[Optional[str]]  # default: None
     # exactly one of bytes or text must be non-None
 
 
 class WSCloseSendEvent(TypedDict):
-    type: Literal['websocket.close']
+    type: Literal["websocket.close"]
     code: NotRequired[int]  # default: 1000
     reason: NotRequired[str]  # if missing or None, default is ''.
 
@@ -180,6 +178,4 @@ class Sender(Protocol):
 
 
 class App(Protocol):
-    async def __call__(
-        self, scope: Scope, receive: Receiver, send: Sender
-    ): ...
+    async def __call__(self, scope: Scope, receive: Receiver, send: Sender): ...

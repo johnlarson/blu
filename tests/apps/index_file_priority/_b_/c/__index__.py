@@ -1,2 +1,2 @@
 def __page__():
-    return 'INDEX'
+    return "INDEX"

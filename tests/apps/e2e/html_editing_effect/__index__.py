@@ -15,6 +15,6 @@ def RefTest():
 
     @use_effect
     def _():
-        div_ref[:].innerText = 'Hello.'
-    
-    return div(id='test-div', ref=div_ref)
+        div_ref[:].innerText = "Hello."
+
+    return div(id="test-div", ref=div_ref)

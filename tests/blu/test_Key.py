@@ -12,7 +12,7 @@ def test_uses_key():
 
 def stores_children():
     """Stores children as list in _children attribute."""
-    assert Key(3)['Hello']._children == ['Hello']  # type: ignore
+    assert Key(3)["Hello"]._children == ["Hello"]  # type: ignore
 
 
 def test_no_children():
@@ -49,8 +49,8 @@ def test_accepts_any_node_children():
 
     @client
     def Foo():
-        return 'Foo'
-    
+        return "Foo"
+
     fragment = Key(2)
 
     Key(4)[
@@ -59,7 +59,7 @@ def test_accepts_any_node_children():
         fragment,
         (1, 2, 3),
         [4, 5, 6],
-        'Hello',
+        "Hello",
         7,
         8.0,
         True,
@@ -71,7 +71,7 @@ def test_accepts_any_node_children():
         fragment,
         (1, 2, 3),
         [4, 5, 6],
-        'Hello',
+        "Hello",
         7,
         8.0,
         True,

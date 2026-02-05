@@ -1,3 +1,3 @@
 __client__ = True
 
-A = 'Success!'
+A = "Success!"

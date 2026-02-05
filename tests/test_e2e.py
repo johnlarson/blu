@@ -325,7 +325,7 @@ async def test_dev_server(patch_app: Callable[[str], None]):
                     await p.goto('/dev_server')
                     main_div = p.locator('#main-div')
                     await expect(main_div).to_have_text('ORIGINAL')
-                    index_file = app_dir / '__index__.py'
+                    index_file = app_dir / 'dev_server/__index__.py'
                     new_source = index_file.read_text().replace(
                         'ORIGINAL',
                         'CHANGED',
@@ -339,6 +339,8 @@ async def test_dev_server(patch_app: Callable[[str], None]):
                             await expect(main_div).to_have_text('CHANGED')
                         except AssertionError:
                             pass
+                        else:
+                            return
                     assert False
                 finally:
                     await browser.close() 

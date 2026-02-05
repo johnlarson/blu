@@ -58,8 +58,3 @@ async def test_dev_server(patch_app):  # type: ignore
         url_path = '/path/to/static/file.txt'
         async with dev_server_client.get(url_path) as response:
             assert await response.text() == 'Hello, World!'
-
-
-async def test_reload_on_change():  # type: ignore
-    """The dev server reloads when a Python file is changed."""
-    ...

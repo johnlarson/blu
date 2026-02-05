@@ -1,8 +1,13 @@
 from asyncio import Task, sleep
 import asyncio
 from collections.abc import AsyncGenerator, Awaitable, Callable, Generator
+import os
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 from tempfile import SpooledTemporaryFile, TemporaryDirectory
+import time
 from typing import cast
 from zipfile import ZipFile
 import aiohttp
@@ -11,6 +16,7 @@ from playwright.async_api import (
 )
 import pytest
 import uvicorn
+import re
 
 from blu import is_client
 from blu._utils import get_available_port
@@ -275,7 +281,7 @@ async def test_client_file_specifier_http(client: ClientFixture):
         assert not fail_path.exists()
 
 
-async def test_dev_server():
+async def test_dev_server(patch_app: Callable[[str], None]):
     """
     Running `blu` on the command line causes a dev server to run. The
     output of the command line tells which port it is running on. The
@@ -283,4 +289,56 @@ async def test_dev_server():
     the server reloads any time there is a change to Python files in the
     app package.
     """
-    ...
+    # patch_app('e2e')
+    e2e_app_dir = Path(__file__).parent / 'apps/e2e'
+    with TemporaryDirectory() as temp_dir_str:
+        temp_dir = Path(temp_dir_str)
+        app_dir = temp_dir / 'app'
+        shutil.copytree(e2e_app_dir, app_dir)
+        with subprocess.Popen(
+            ['blu'],
+            cwd=app_dir,
+            stderr=subprocess.PIPE,
+            text=True,
+            env={
+                'PATH': os.environ['PATH'],
+                'PYTHONPATH': f'{str(temp_dir)}:{':'.join(sys.path)}',
+            },
+        ) as proc:
+            assert proc.stderr is not None
+            start = time.time()
+            url: str | None = None
+            for line in proc.stderr:
+                if time.time() > start + 5:
+                    raise TimeoutError('Took too long to get URL.')
+                exp = r'Uvicorn running on (http://127\.0\.0\.1:\d+) '
+                results = re.search(exp, line)
+                if results is not None:
+                    url = results.group(1)
+                    break
+            async with async_playwright() as playwright:
+                chromium = playwright.chromium
+                browser = await chromium.launch(headless=False)
+                context = await browser.new_context(base_url=url)
+                p = await context.new_page()
+                try:
+                    await p.goto('/dev_server')
+                    main_div = p.locator('#main-div')
+                    await expect(main_div).to_have_text('ORIGINAL')
+                    index_file = app_dir / '__index__.py'
+                    new_source = index_file.read_text().replace(
+                        'ORIGINAL',
+                        'CHANGED',
+                    )
+                    index_file.write_text(new_source)
+                    start = time.time()
+                    while time.time() < start + 10:
+                        await sleep(2)
+                        try:
+                            await p.reload()
+                            await expect(main_div).to_have_text('CHANGED')
+                        except AssertionError:
+                            pass
+                    assert False
+                finally:
+                    await browser.close() 

@@ -22,10 +22,6 @@ def _run_server():
             '--reload',
             'blu:app',
         ],
-        # cwd=os.getcwd(),
-        # env={
-        #     'PYTHONPATH': ':'.join(sys.path),
-        # },
     )
     return proc
 

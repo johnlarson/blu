@@ -1,12 +1,12 @@
 2 dev server tests
 set it up to use Black
 Go through and update/fix issues in docs, adding images and GIFs
-Go through docs making sure everything works as shown
-Add note about not being ready for use? (README and Docs)
-Version it
+Go through docs making sure everything works as shown; also add images and GIFs
 ----------------------
 Ready to Publish
 ----------------------
+Add note about not being ready for use? (README and Docs)
+Version it
 Put on PyPI
 Docs on readthedocs
 Make git repo public

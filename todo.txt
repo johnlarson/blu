@@ -1,5 +1,4 @@
-set it up to use Black
-Go through and update/fix issues in docs, adding images and GIFs
+Go through and update/fix issues in docs
 Go through docs making sure everything works as shown; also add images and GIFs
 ----------------------
 Ready to Publish

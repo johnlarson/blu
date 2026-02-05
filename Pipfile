@@ -19,6 +19,7 @@ quart = "*"
 beautifulsoup4 = "*"
 blu = {file = ".", editable = true}
 black = "*"
+pre-commit = "*"
 
 [requires]
 python_version = "3.13"

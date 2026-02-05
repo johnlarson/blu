@@ -390,7 +390,7 @@ def _blu_pkg_zip(zips_root: Path):
 
 
 def _app_pkg_zip(zips_root: Path):
-    print("APP ZIP")
+    print("START APP ZIP")
     import app
 
     assert app.__spec__ is not None

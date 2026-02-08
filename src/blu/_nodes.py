@@ -935,7 +935,6 @@ def client(renderer: ClientRenderer) -> ClientElement:
     .. code-block:: python
 
         from blu import client
-        from blu.html import span
 
 
         @client
@@ -956,7 +955,6 @@ def client(renderer: ClientRenderer) -> ClientElement:
     .. code-block:: python
 
         from blu import client
-        from blu.html import span
 
 
         @client

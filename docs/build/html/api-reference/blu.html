@@ -846,8 +846,8 @@ DOM.</p>
 <p class="admonition-title">Note</p>
 <p>This function is a <em>hook</em>. For more information on hooks and the rules of calling them, see <a class="reference internal" href="#note-on-hooks"><span class="std std-ref">Note on Hooks</span></a>.</p>
 </div>
-<p>Store a value doesn’t change between renders unless explicitly set
-to a new value.</p>
+<p>Store a value that doesn’t change between renders unless explicitly
+set to a new value.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span><span class="p">,</span> <span class="n">is_client</span><span class="p">,</span> <span class="n">use_ref</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">button</span>
 
@@ -864,7 +864,7 @@ to a new value.</p>
     <span class="k">def</span><span class="w"> </span><span class="nf">handle_click</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
         <span class="n">click_count_ref</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">click_count_ref</span><span class="p">[:]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">count</span> <span class="o">=</span> <span class="n">click_count_ref</span><span class="p">[:]</span>
-        <span class="n">alert</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You&#39;</span><span class="n">ve</span> <span class="n">clicked</span> <span class="n">the</span> <span class="n">button</span> <span class="p">{</span><span class="n">count</span><span class="p">}</span> <span class="n">times</span><span class="o">.</span><span class="s1">&#39;)</span>
+        <span class="n">alert</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You</span><span class="se">\&#39;</span><span class="s1">ve clicked the button </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1"> times.&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">button</span><span class="p">[</span><span class="s1">&#39;Click me!&#39;</span><span class="p">]</span>
 </pre></div>

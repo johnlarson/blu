@@ -287,8 +287,8 @@ def use_ref[T](init: T) -> Ref[T]:
     """
     .. include:: /_includes/hook-note.rst
 
-    Store a value doesn't change between renders unless explicitly set
-    to a new value.
+    Store a value that doesn't change between renders unless explicitly
+    set to a new value.
 
     .. code-block:: python
 
@@ -308,7 +308,7 @@ def use_ref[T](init: T) -> Ref[T]:
             def handle_click(e):
                 click_count_ref[:] = click_count_ref[:] + 1
                 count = click_count_ref[:]
-                alert(f'You\'ve clicked the button {count} times.')
+                alert(f'You\\'ve clicked the button {count} times.')
 
             return button['Click me!']
 

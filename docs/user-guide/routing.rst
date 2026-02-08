@@ -11,9 +11,9 @@ This section explains how to serve pages from other paths.
 File-Based Routing
 ------------------
 
-Blu uses file-based routing. This means that the path that a page is served from is based on the file's location in the ``app/``.
+Blu uses file-based routing. This means that the path that a page is served from is based on the file's location in the ``app/`` directory.
 
-For example, if you want to serve the page in the :ref:`Quickstart` guide from ``/path/to/page`` instead of from ``/``, you would move the ``__index__.py`` file from ``app/`` to ``app/path/to/page``:
+For example, if you want to serve the page in the :ref:`Quickstart` guide from ``/path/to/page`` instead of from ``/``, you would move the ``__index__.py`` file from ``app/`` to ``app/path/to/page/``:
 
 .. code-block:: python
     :caption: app/path/to/page/__index__.py
@@ -150,7 +150,7 @@ But visiting ``/foo`` or ``/foo/some/other/path`` or ``/foo/bar/some/other/path`
 Accessing the remaining path
 ++++++++++++++++++++++++++++
 
-To read the remaining, unmatched portion of the URL in a default handler, you can accept a positional-only argument in the *__page__()* function. This is done by adding a slash to *__page__()*'s function signature::
+To read the remaining, unmatched portion of the URL in a default handler, add an argument that ends in a double underscore (``__``) to *__page__()*'s function signature::
 
     app/
       foo/
@@ -162,8 +162,8 @@ To read the remaining, unmatched portion of the URL in a default handler, you ca
     from blu.html import p
 
 
-    def __page__(path, /):
-        return p[f'The remaining path is {path}.']
+    def __page__(path__):
+        return p[f'The remaining path is {path__}.']
 
 In this example, visiting ``/foo/a/b/c`` gives us:
 
@@ -171,7 +171,7 @@ In this example, visiting ``/foo/a/b/c`` gives us:
 
         The remaining path is a/b/c.
 
-Any dynamic route arguments should come after the slash::
+This can be mixed with dynamic route segments::
 
     app/
       _my_param_/
@@ -184,13 +184,13 @@ Any dynamic route arguments should come after the slash::
     from blu.html import b, p
 
 
-    def __page__(path, /, my_param):
+    def __page__(my_param, path__):
         return (
             p[
                 b['my_param value:'], ' ', my_param,
             ],
             p[
-                b['remaining path:'], ' ', path,
+                b['remaining path:'], ' ', path__,
             ],
         )
 
@@ -210,79 +210,7 @@ In this example, visiting ``/my-param-value/a/b/c`` gives us:
 Query Parameters
 ----------------
 
-To access a request's query parameters in an ``__index__.py`` or ``__default__.py`` handler, add keyword-only arguments to the *__page__()* function. This is done by adding an asterisk to the function signature::
-
-    app/
-      foo/
-        __index__.py
-
-.. code-block:: python
-    :caption: app/foo/__index__.py
-
-    from blu.html import b, p
-
-
-    def __page__(*, bar, baz):
-        return (
-            p[
-                b['bar:'], ' ', bar,
-            ],
-            p[
-                b['baz:'], ' ', baz,
-            ],
-        )
-
-In this example, visiting ``/foo?bar=A&baz=B`` gives us:
-
-    .. raw:: html
-
-        <p>
-            <b>bar:</b> A
-        </p>
-        <p>
-            <b>baz:</b> B
-        </p>
-
-The *__page__()* function can also accept a keyword argument :py:class:`dict`::
-
-    app/
-      foo/
-        __index__.py
-
-.. code-block:: python
-    :caption: app/foo/__index__.py
-
-    from blu.html import b, p
-
-
-    def __page__(*, bar, **kwargs):
-        return (
-            p[
-                b['bar:'], ' ', bar,
-            ],
-            p[
-                b['baz:'], ' ', kwargs['baz'],
-            ],
-            p[
-                b['hello:'], ' ', kwargs['hello']
-            ],
-        )
-
-In this example, visiting ``/foo?bar=A&baz=B&hello=C`` gives us:
-
-    .. raw:: html
-
-        <p>
-            <b>bar:</b> A
-        </p>
-        <p>
-            <b>baz:</b> B
-        </p>
-        <p>
-            <b>hello:</b> C
-        </p>
-
-If there are dynamic route arguments, those should come before the asterisk::
+You can also capture query parameters in an ``__index__.py`` or ``__default__.py`` handler. These must be separated from route parameters with a ``/``:
 
     app/
       _foo_/
@@ -294,7 +222,7 @@ If there are dynamic route arguments, those should come before the asterisk::
     from blu.html import b, p
 
 
-    def __page__(foo, *, bar, baz):
+    def __page__(foo, /, bar, baz):
         return (
             p[
                 b['foo:'], ' ', foo,
@@ -319,6 +247,78 @@ In this example, visiting ``/A?bar=B&baz=C`` gives us:
         </p>
         <p>
             <b>baz:</b> C
+        </p>
+
+A python function's arguments cannot start with ``/``. To create a route with query parameters but no route parameters, put a single underscore (``_``) before the ``/``::
+
+    app/
+      foo/
+        __index__.py
+
+.. code-block:: python
+    :caption: app/foo/__index__.py
+
+    from blu.html import b, p
+
+
+    def __page__(_, /, bar, baz):
+        return (
+            p[
+                b['bar:'], ' ', bar,
+            ],
+            p[
+                b['baz:'], ' ', baz,
+            ],
+        )
+
+In this example, visiting ``/foo?bar=A&baz=B`` gives us:
+
+    .. raw:: html
+
+        <p>
+            <b>bar:</b> A
+        </p>
+        <p>
+            <b>baz:</b> B
+        </p>
+
+The *__page__()* function can also accept query parameters using keyword argument packing::
+
+    app/
+      foo/
+        __index__.py
+
+.. code-block:: python
+    :caption: app/foo/__index__.py
+
+    from blu.html import b, p
+
+
+    def __page__(_, /, bar, **kwargs):
+        return (
+            p[
+                b['bar:'], ' ', bar,
+            ],
+            p[
+                b['baz:'], ' ', kwargs['baz'],
+            ],
+            p[
+                b['hello:'], ' ', kwargs['hello']
+            ],
+        )
+
+In this example, visiting ``/foo?bar=A&baz=B&hello=C`` gives us:
+
+    .. raw:: html
+
+        <p>
+            <b>bar:</b> A
+        </p>
+        <p>
+            <b>baz:</b> B
+        </p>
+        <p>
+            <b>hello:</b> C
         </p>
 
 

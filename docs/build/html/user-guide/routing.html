@@ -44,8 +44,8 @@
 <p>This section explains how to serve pages from other paths.</p>
 <section id="file-based-routing">
 <h2>File-Based Routing<a class="headerlink" href="#file-based-routing" title="Link to this heading">¶</a></h2>
-<p>Blu uses file-based routing. This means that the path that a page is served from is based on the file’s location in the <code class="docutils literal notranslate"><span class="pre">app/</span></code>.</p>
-<p>For example, if you want to serve the page in the <a class="reference internal" href="../quickstart.html#quickstart"><span class="std std-ref">Quickstart</span></a> guide from <code class="docutils literal notranslate"><span class="pre">/path/to/page</span></code> instead of from <code class="docutils literal notranslate"><span class="pre">/</span></code>, you would move the <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code> file from <code class="docutils literal notranslate"><span class="pre">app/</span></code> to <code class="docutils literal notranslate"><span class="pre">app/path/to/page</span></code>:</p>
+<p>Blu uses file-based routing. This means that the path that a page is served from is based on the file’s location in the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory.</p>
+<p>For example, if you want to serve the page in the <a class="reference internal" href="../quickstart.html#quickstart"><span class="std std-ref">Quickstart</span></a> guide from <code class="docutils literal notranslate"><span class="pre">/path/to/page</span></code> instead of from <code class="docutils literal notranslate"><span class="pre">/</span></code>, you would move the <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code> file from <code class="docutils literal notranslate"><span class="pre">app/</span></code> to <code class="docutils literal notranslate"><span class="pre">app/path/to/page/</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">app/path/to/page/__index__.py</span><a class="headerlink" href="#id2" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">body</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">html</span>
@@ -166,7 +166,7 @@
 <div><p>This is the default page.</p></div></blockquote>
 <section id="accessing-the-remaining-path">
 <h3>Accessing the remaining path<a class="headerlink" href="#accessing-the-remaining-path" title="Link to this heading">¶</a></h3>
-<p>To read the remaining, unmatched portion of the URL in a default handler, you can accept a positional-only argument in the <em>__page__()</em> function. This is done by adding a slash to <em>__page__()</em>’s function signature:</p>
+<p>To read the remaining, unmatched portion of the URL in a default handler, add an argument that ends in a double underscore (<code class="docutils literal notranslate"><span class="pre">__</span></code>) to <em>__page__()</em>’s function signature:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
   <span class="n">foo</span><span class="o">/</span>
     <span class="n">__default__</span><span class="o">.</span><span class="n">py</span>
@@ -177,15 +177,15 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">/</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;The remaining path is </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">]</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">path__</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;The remaining path is </span><span class="si">{</span><span class="n">path__</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/foo/a/b/c</span></code> gives us:</p>
 <blockquote>
 <div>The remaining path is a/b/c.</div></blockquote>
-<p>Any dynamic route arguments should come after the slash:</p>
+<p>This can be mixed with dynamic route segments:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
   <span class="n">_my_param_</span><span class="o">/</span>
     <span class="n">__default__</span><span class="o">.</span><span class="n">py</span>
@@ -196,13 +196,13 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">my_param</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">my_param</span><span class="p">,</span> <span class="n">path__</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">p</span><span class="p">[</span>
             <span class="n">b</span><span class="p">[</span><span class="s1">&#39;my_param value:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">my_param</span><span class="p">,</span>
         <span class="p">],</span>
         <span class="n">p</span><span class="p">[</span>
-            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;remaining path:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;remaining path:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">path__</span><span class="p">,</span>
         <span class="p">],</span>
     <span class="p">)</span>
 </pre></div>
@@ -220,86 +220,22 @@
 </section>
 <section id="query-parameters">
 <h2>Query Parameters<a class="headerlink" href="#query-parameters" title="Link to this heading">¶</a></h2>
-<p>To access a request’s query parameters in an <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code> or <code class="docutils literal notranslate"><span class="pre">__default__.py</span></code> handler, add keyword-only arguments to the <em>__page__()</em> function. This is done by adding an asterisk to the function signature:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
-  <span class="n">foo</span><span class="o">/</span>
-    <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
+<p>You can also capture query parameters in an <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code> or <code class="docutils literal notranslate"><span class="pre">__default__.py</span></code> handler. These must be separated from route parameters with a <code class="docutils literal notranslate"><span class="pre">/</span></code>:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>app/</dt><dd><dl class="simple">
+<dt>_foo_/</dt><dd><p>__index__.py</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
 <div class="literal-block-wrapper docutils container" id="id10">
-<div class="code-block-caption"><span class="caption-text">app/foo/__index__.py</span><a class="headerlink" href="#id10" title="Link to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">app/_foo_/__index__.py</span><a class="headerlink" href="#id10" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="n">baz</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">p</span><span class="p">[</span>
-            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;bar:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">p</span><span class="p">[</span>
-            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;baz:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">baz</span><span class="p">,</span>
-        <span class="p">],</span>
-    <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/foo?bar=A&amp;baz=B</span></code> gives us:</p>
-<blockquote>
-<div><p>
-    <b>bar:</b> A
-</p>
-<p>
-    <b>baz:</b> B
-</p></div></blockquote>
-<p>The <em>__page__()</em> function can also accept a keyword argument <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
-  <span class="n">foo</span><span class="o">/</span>
-    <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<div class="literal-block-wrapper docutils container" id="id11">
-<div class="code-block-caption"><span class="caption-text">app/foo/__index__.py</span><a class="headerlink" href="#id11" title="Link to this code">¶</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">p</span><span class="p">[</span>
-            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;bar:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">p</span><span class="p">[</span>
-            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;baz:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;baz&#39;</span><span class="p">],</span>
-        <span class="p">],</span>
-        <span class="n">p</span><span class="p">[</span>
-            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;hello:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;hello&#39;</span><span class="p">]</span>
-        <span class="p">],</span>
-    <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/foo?bar=A&amp;baz=B&amp;hello=C</span></code> gives us:</p>
-<blockquote>
-<div><p>
-    <b>bar:</b> A
-</p>
-<p>
-    <b>baz:</b> B
-</p>
-<p>
-    <b>hello:</b> C
-</p></div></blockquote>
-<p>If there are dynamic route arguments, those should come before the asterisk:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
-  <span class="n">_foo_</span><span class="o">/</span>
-    <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<div class="literal-block-wrapper docutils container" id="id12">
-<div class="code-block-caption"><span class="caption-text">app/_foo_/__index__.py</span><a class="headerlink" href="#id12" title="Link to this code">¶</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">foo</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="n">baz</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">foo</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="n">baz</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">p</span><span class="p">[</span>
             <span class="n">b</span><span class="p">[</span><span class="s1">&#39;foo:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">foo</span><span class="p">,</span>
@@ -324,6 +260,74 @@
 </p>
 <p>
     <b>baz:</b> C
+</p></div></blockquote>
+<p>A python function’s arguments cannot start with <code class="docutils literal notranslate"><span class="pre">/</span></code>. To create a route with query parameters but no route parameters, put a single underscore (<code class="docutils literal notranslate"><span class="pre">_</span></code>) before the <code class="docutils literal notranslate"><span class="pre">/</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">foo</span><span class="o">/</span>
+    <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">app/foo/__index__.py</span><a class="headerlink" href="#id11" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="n">baz</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;bar:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;baz:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">baz</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/foo?bar=A&amp;baz=B</span></code> gives us:</p>
+<blockquote>
+<div><p>
+    <b>bar:</b> A
+</p>
+<p>
+    <b>baz:</b> B
+</p></div></blockquote>
+<p>The <em>__page__()</em> function can also accept query parameters using keyword argument packing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">foo</span><span class="o">/</span>
+    <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id12">
+<div class="code-block-caption"><span class="caption-text">app/foo/__index__.py</span><a class="headerlink" href="#id12" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;bar:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;baz:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;baz&#39;</span><span class="p">],</span>
+        <span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;hello:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;hello&#39;</span><span class="p">]</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/foo?bar=A&amp;baz=B&amp;hello=C</span></code> gives us:</p>
+<blockquote>
+<div><p>
+    <b>bar:</b> A
+</p>
+<p>
+    <b>baz:</b> B
+</p>
+<p>
+    <b>hello:</b> C
 </p></div></blockquote>
 </section>
 <section id="return-values">

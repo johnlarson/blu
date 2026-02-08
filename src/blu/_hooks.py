@@ -222,8 +222,8 @@ class Ref[T]:
                 ref = use_ref('Hello')
                 ref[:]  # 'Hello'
 
-        :param empty_slice: Must be an empty slice, i.e. when you must
-            put a single colon between the square brackets, without any
+        :param empty_slice: Must be an empty slice, i.e. you must put a
+            single colon between the square brackets, without any
             numbers.
         :return: The value currently stored in ``self``.
         """
@@ -254,8 +254,8 @@ class Ref[T]:
                 ref[:] = 'Goodbye'
                 ref[:]  # 'Goodbye'
 
-        :param empty_slice: Must be an empty slice, i.e. when you must
-            put a single colon between the square brackets, without any
+        :param empty_slice: Must be an empty slice, i.e. you must put a
+            single colon between the square brackets, without any
             numbers.
         :param new_value: The new value that should be stored in
             ``self``.

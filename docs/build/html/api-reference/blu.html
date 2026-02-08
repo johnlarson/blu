@@ -241,13 +241,13 @@ is the usual way to specify props.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>A copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> with the same children props set as
-follows:</p>
+<dd class="field-even"><p><p>A copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> with the same children, but with
+props set as follows:</p>
 <ol class="arabic">
-<li><p>For any key-value pair in the <code class="xref py py-data docutils literal notranslate"><span class="pre">props</span></code> argument, the
+<li><p>For any key-value pair in the <code class="docutils literal notranslate"><span class="pre">props</span></code> argument, the
 prop named by the key will be set to the value.</p>
-<p>For example, <code class="xref py py-data docutils literal notranslate"><span class="pre">div(props={'my_prop_':</span> <span class="pre">45})</span></code>
-results in the React element <code class="docutils literal notranslate"><span class="pre">&lt;div</span> <span class="pre">my_prop_={45}</span> <span class="pre">/&gt;</span></code></p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">div(props={'my_prop_':</span> <span class="pre">45})</span></code> results in
+the React element <code class="docutils literal notranslate"><span class="pre">&lt;div</span> <span class="pre">my_prop_={45}</span> <span class="pre">/&gt;</span></code></p>
 </li>
 <li><p>For any keyword argument, the value will be set to a key
 derived from:</p>
@@ -255,17 +255,17 @@ derived from:</p>
 <li><p>Removing the last trailing underscore (if any).</p></li>
 <li><p>Replacing all other underscores with dashes.</p></li>
 </ul>
-<p>For example, <code class="xref py py-data docutils literal notranslate"><span class="pre">div(my_prop_=45)</span></code> results in the
-React element <code class="docutils literal notranslate"><span class="pre">&lt;div</span> <span class="pre">my-prop={45}</span> <span class="pre">/&gt;</span></code>.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">div(my_prop_=45)</span></code> results in the React
+element <code class="docutils literal notranslate"><span class="pre">&lt;div</span> <span class="pre">my-prop={45}</span> <span class="pre">/&gt;</span></code>.</p>
 </li>
-<li><p>If there is any conflict between the <code class="xref py py-data docutils literal notranslate"><span class="pre">attributes</span></code>
-argument and the keyword arguments, the prop that has the
-conflict will be set based on the <code class="xref py py-data docutils literal notranslate"><span class="pre">props</span></code>
-argument as described in (1). Any props that do not have
-conflicts will be set the same way they otherwise would,
-irrespective of the props that do have conflicts.</p>
+<li><p>If there is any conflict between the <code class="docutils literal notranslate"><span class="pre">props</span></code> argument
+and the keyword arguments, the prop that has the conflict
+will be set based on the <code class="docutils literal notranslate"><span class="pre">props</span></code> argument as described
+in (1). Any props that do not have conflicts will be set
+the same way they otherwise would, irrespective of the
+props that do have conflicts.</p>
 <p>For example,
-<code class="xref py py-data docutils literal notranslate"><span class="pre">div(props={'props-only':</span> <span class="pre">'props',</span> <span class="pre">'shared':</span> <span class="pre">'props'},</span> <span class="pre">shared='kw',</span> <span class="pre">kw_only='kw')</span></code>
+<code class="docutils literal notranslate"><span class="pre">div(props={'props-only':</span> <span class="pre">'props',</span> <span class="pre">'shared':</span> <span class="pre">'props'},</span> <span class="pre">shared='kw',</span> <span class="pre">kw_only='kw')</span></code>
 results in the React element
 <code class="docutils literal notranslate"><span class="pre">&lt;div</span> <span class="pre">props-only=&quot;props&quot;</span> <span class="pre">shared=&quot;props&quot;</span> <span class="pre">kw-only=&quot;kw&quot;</span> <span class="pre">/&gt;</span></code></p>
 </li>
@@ -429,8 +429,8 @@ children are <code class="docutils literal notranslate"><span class="pre">[child
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>empty_slice</strong> – Must be an empty slice, i.e. when you must
-put a single colon between the square brackets, without any
+<dd class="field-odd"><p><strong>empty_slice</strong> – Must be an empty slice, i.e. you must put a
+single colon between the square brackets, without any
 numbers.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -459,8 +459,8 @@ numbers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>empty_slice</strong> – Must be an empty slice, i.e. when you must
-put a single colon between the square brackets, without any
+<li><p><strong>empty_slice</strong> – Must be an empty slice, i.e. you must put a
+single colon between the square brackets, without any
 numbers.</p></li>
 <li><p><strong>new_value</strong> – The new value that should be stored in
 <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p></li>

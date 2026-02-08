@@ -1,6 +1,5 @@
 ``blu``
 =======
-
   
 .. automodule:: blu
     :exclude-members: HTMLElement, ClientElement, Key, Ref

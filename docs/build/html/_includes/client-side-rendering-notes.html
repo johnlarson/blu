@@ -41,6 +41,14 @@
 <p>Why does the code in the previous example include the line <code class="docutils literal notranslate"><span class="pre">__client__</span> <span class="pre">=</span> <span class="pre">True</span></code>?</p>
 <p>By default, none of the <cite>.py</cite> files in your app will be sent to the user’s web browser and therefore cannot be run client-side. To allow a module to run client-side, you must explicitly mark it by setting the module-level attribute <code class="docutils literal notranslate"><span class="pre">__client__</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 <p>In order for the client element to be rendered client-side, the code to do so must be available to the user’s web browser, so the module where the client element is found, as well as any of its dependencies, must include <code class="docutils literal notranslate"><span class="pre">__client__</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
+<p>Because Blu checks for <code class="docutils literal notranslate"><span class="pre">__client__</span> <span class="pre">=</span> <span class="pre">True</span></code>, using static analysis, the module must include the exact text <code class="docutils literal notranslate"><span class="pre">__client__</span> <span class="pre">=</span> <span class="pre">True</span></code> at the top level of its source code. For example, the following will <em>not</em> work:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__client__</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
 <p>If you’re familiar with full stack React frameworks for JavaScript, note that this is <em>not</em> the same as the <code class="docutils literal notranslate"><span class="pre">&quot;use</span> <span class="pre">client&quot;</span></code> directive in JavaScript React applications.</p>
 </div>
 <div class="admonition note">

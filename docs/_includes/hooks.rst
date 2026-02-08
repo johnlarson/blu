@@ -31,7 +31,7 @@ Breaking either of these rules will result in undefined behavior.
         return use_ref()
 
     
-    # Wrong! Hook called in an conditional block.
+    # Wrong! Hook called in a conditional block.
     @client
     def SomeClientElement(some_condition):
         if some_condition:

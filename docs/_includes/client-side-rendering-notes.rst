@@ -6,6 +6,18 @@
 
     In order for the client element to be rendered client-side, the code to do so must be available to the user's web browser, so the module where the client element is found, as well as any of its dependencies, must include ``__client__ = True``.
 
+    Because Blu checks for ``__client__ = True``, using static analysis, the module must include the exact text ``__client__ = True`` at the top level of its source code. For example, the following will *not* work:
+
+    .. code:: python
+
+        __client__ = 1 + 1 == 2
+
+
+    .. code:: python
+        
+        if 1 + 1 == 2:
+            __client__ = True
+
     If you're familiar with full stack React frameworks for JavaScript, note that this is *not* the same as the ``"use client"`` directive in JavaScript React applications.
 
 .. note::

@@ -45,16 +45,16 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_hello</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello!&#39;</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">html</span><span class="p">[</span>
         <span class="n">head</span><span class="p">,</span>
         <span class="n">body</span><span class="p">[</span>
             <span class="n">button</span><span class="p">(</span><span class="n">onClick</span><span class="o">=</span><span class="n">say_hello</span><span class="p">),</span>
         <span class="p">],</span>
     <span class="p">]</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">say_hello</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello!&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>visiting the page will result in a 500 error and a message like this in the log:</p>
@@ -62,7 +62,7 @@
 <p class="admonition-title">Todo</p>
 <p>Add message.</p>
 </div>
-<p>What’s going on here is that, under the hood, Blu serializes all of the HTML elements returned from <em>__page__()</em> and sends them to the client to be rendered. This means every attribute of every element has to be serializeable.</p>
+<p>What’s going on here is that, under the hood, Blu pickes all of the HTML elements returned from <em>__page__()</em> and sends them to the client to be rendered. This means every attribute of every element has to be pickleable.</p>
 <p>To solve this, you create a <em>client element</em>. A client element is an custom element that is rendered on the client.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">button</span>
@@ -115,6 +115,14 @@
 <p>Why does the code in the previous example include the line <code class="docutils literal notranslate"><span class="pre">__client__</span> <span class="pre">=</span> <span class="pre">True</span></code>?</p>
 <p>By default, none of the <cite>.py</cite> files in your app will be sent to the user’s web browser and therefore cannot be run client-side. To allow a module to run client-side, you must explicitly mark it by setting the module-level attribute <code class="docutils literal notranslate"><span class="pre">__client__</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 <p>In order for the client element to be rendered client-side, the code to do so must be available to the user’s web browser, so the module where the client element is found, as well as any of its dependencies, must include <code class="docutils literal notranslate"><span class="pre">__client__</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
+<p>Because Blu checks for <code class="docutils literal notranslate"><span class="pre">__client__</span> <span class="pre">=</span> <span class="pre">True</span></code>, using static analysis, the module must include the exact text <code class="docutils literal notranslate"><span class="pre">__client__</span> <span class="pre">=</span> <span class="pre">True</span></code> at the top level of its source code. For example, the following will <em>not</em> work:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__client__</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
 <p>If you’re familiar with full stack React frameworks for JavaScript, note that this is <em>not</em> the same as the <code class="docutils literal notranslate"><span class="pre">&quot;use</span> <span class="pre">client&quot;</span></code> directive in JavaScript React applications.</p>
 </div>
 <div class="admonition note">
@@ -388,7 +396,7 @@
     <span class="k">return</span> <span class="n">use_ref</span><span class="p">()</span>
 
 
-<span class="c1"># Wrong! Hook called in an conditional block.</span>
+<span class="c1"># Wrong! Hook called in a conditional block.</span>
 <span class="nd">@client</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">SomeClientElement</span><span class="p">(</span><span class="n">some_condition</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">some_condition</span><span class="p">:</span>
@@ -470,7 +478,7 @@
 <li><p>We use <a class="reference internal" href="../api-reference/blu.html#blu.use_state" title="blu.use_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">use_state</span></code></a> to create a state container for the number of clicks whose initial value is 0.</p></li>
 <li><p><a class="reference internal" href="../api-reference/blu.html#blu.use_state" title="blu.use_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">use_state</span></code></a> returns a tuple containing the current value and a function that we can use to change the value.</p></li>
 <li><p>We set the onClick attribute of our button element to our <em>increment_click_count()</em> function.</p></li>
-<li><p>When the element renders, the current value for the state is 0, so the button will say “Click Count: 0”.</p></li>
+<li><p>The first time the element renders, the current value for the state is 0, so the button will say “Click Count: 0”.</p></li>
 <li><p>When the user clicks the button, <em>increment_click_count()</em> is called.</p></li>
 <li><p>Within the function body of <em>increment_click_count()</em>, <em>set_click_count()</em> is called with <em>click_count + 1</em> as the new value. <em>click_count</em> was 0, so the new value is 1.</p></li>
 <li><p>React sets the state value to 1, and then calls <em>MyClientElement</em>’s render function again. This time, the current value is 1, so <em>click_count</em> is 1, so the button will say “Click Count: 1”.</p></li>
@@ -609,7 +617,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">window_click_handlers</span><span class="p">():</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">handle_click_anywhere</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
-            <span class="n">set_click_count</span><span class="p">(</span><span class="n">click_click</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">set_click_count</span><span class="p">(</span><span class="n">click_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="n">window</span><span class="o">.</span><span class="n">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="n">handle_click_anywhere</span><span class="p">)</span>
         <span class="k">yield</span>

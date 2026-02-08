@@ -9,6 +9,10 @@ You may have noticed that when you try to set an event handler on an html elemen
 
 
     def __page__():
+
+        def say_hello(e):
+            print('Hello!')
+        
         return html[
             head,
             body[
@@ -16,16 +20,12 @@ You may have noticed that when you try to set an event handler on an html elemen
             ],
         ]
 
-    
-    def say_hello(e):
-        print('Hello!')
-
 
 visiting the page will result in a 500 error and a message like this in the log:
 
 .. todo:: Add message.
 
-What's going on here is that, under the hood, Blu serializes all of the HTML elements returned from *__page__()* and sends them to the client to be rendered. This means every attribute of every element has to be serializeable.
+What's going on here is that, under the hood, Blu pickes all of the HTML elements returned from *__page__()* and sends them to the client to be rendered. This means every attribute of every element has to be pickleable.
 
 To solve this, you create a *client element*. A client element is an custom element that is rendered on the client.
 
@@ -212,7 +212,7 @@ What's going on here is:
 1. We use :func:`use_state <blu.use_state>` to create a state container for the number of clicks whose initial value is 0.
 2. :func:`use_state <blu.use_state>` returns a tuple containing the current value and a function that we can use to change the value.
 3. We set the onClick attribute of our button element to our *increment_click_count()* function.
-4. When the element renders, the current value for the state is 0, so the button will say "Click Count: 0".
+4. The first time the element renders, the current value for the state is 0, so the button will say "Click Count: 0".
 5. When the user clicks the button, *increment_click_count()* is called.
 6. Within the function body of *increment_click_count()*, *set_click_count()* is called with *click_count + 1* as the new value. *click_count* was 0, so the new value is 1.
 7. React sets the state value to 1, and then calls *MyClientElement*'s render function again. This time, the current value is 1, so *click_count* is 1, so the button will say "Click Count: 1".
@@ -339,7 +339,7 @@ What's happening here:
             def window_click_handlers():
 
                 def handle_click_anywhere(e):
-                    set_click_count(click_click + 1)
+                    set_click_count(click_count + 1)
                 
                 window.addEventListener('click', handle_click_anywhere)
                 yield

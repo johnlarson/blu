@@ -35,7 +35,6 @@ type Node = """
     str |
     int |
     float |
-    bool |
     None
 """
 

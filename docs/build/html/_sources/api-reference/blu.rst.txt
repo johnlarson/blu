@@ -39,7 +39,6 @@
         .. code-block:: python
 
             from blu import client
-            from blu.html import span
 
 
             @client
@@ -49,7 +48,7 @@
         For more details on how :type:`ClientRenderer <blu.ClientRenderer>` functions are used, see :func:`client() <blu.client>`.
 
     .. py:type:: Node
-        :canonical: ClientElement | HTMLElement | Key | Iterable[Node] | str | int | float | bool | None
+        :canonical: ClientElement | HTMLElement | Key | Iterable[Node] | str | int | float | None
 
         A valid child of a React element. Nodes are rendered as follows:
             
@@ -147,25 +146,6 @@
 
                 1.0
             
-        - :py:data:`True` is rendered as an HTML text node with the text ``true``.
-
-            .. code-block:: python
-
-                True
-            
-            .. code-block:: html
-
-                true
-            
-        - :py:data:`False` is rendered as an HTML text node with the text ``false``.
-
-            .. code-block:: python
-
-                False
-
-            .. code-block:: html
-
-                false
             
         - :py:data:`None` is rendered as nothing. It is rendered in React as the JavaScript ``null`` value.
 

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>File Conventions &#8212; Blu 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles.css?v=7e7517f3" />
+    <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=35a8b989"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Command Line Interface" href="cli.html" />
+    <link rel="prev" title="pyscript (client-only)" href="pyscript.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+  
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="file-conventions">
+<h1>File Conventions<a class="headerlink" href="#file-conventions" title="Link to this heading">¶</a></h1>
+<p>A Blu app is defined by the <a class="reference internal" href="#special-files"><span class="std std-ref">special files</span></a> under its <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory. The <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory should be placed in the project root (this is where you run <code class="docutils literal notranslate"><span class="pre">blu</span> <span class="pre">dev</span></code> from).</p>
+<p>Note that some special files’ behavior is influenced by <a class="reference internal" href="#directories"><span class="std std-ref">the directories in their paths</span></a>, relative to the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory.</p>
+<p>You can also put <a class="reference internal" href="../user-guide/static-files.html#static-files"><span class="std std-ref">static files</span></a> in the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory.</p>
+<section id="directories">
+<h2>Directories<a class="headerlink" href="#directories" title="Link to this heading">¶</a></h2>
+<p>Any directory placed under the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory is used for file-based routing. Each directory represents one of the slash-separated segments in an HTTP request’s URL path (see examples for each directory type).</p>
+<p>The behavior of certain special files like __index__.py is influenced by the paths of the segment directories they are under.</p>
+<p>Each directory type follows a specified pattern for directory name and has set behavior.</p>
+<section id="literal-segment">
+<h3><strong>{</strong><em>literal_segment</em><strong>}</strong><a class="headerlink" href="#literal-segment" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">^(?P&lt;literal_segment&gt;(?!_).\*[^_])$</span></code></p>
+<p>(no leading or trailing underscores; <em>literal_segment</em> is the directory name)</p>
+<p>A static route segment. Matches a URL path segment that equals <em>literal_segment</em>.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">app/hello/__index__.py</span><a class="headerlink" href="#id2" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Hello, World!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">GET /hello</span><a class="headerlink" href="#id3" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Hello, World!<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="route-param-name">
+<h3><strong>_{</strong><em>route_param_name</em><strong>}_</strong><a class="headerlink" href="#route-param-name" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">^_(?P&lt;route_param_name&gt;[^\\W\\d_]|[^\\W\\d_][\\w]*[^\\W_])_$</span></code></p>
+<p>(<em>route_param_name</em>, surrounded by single underscores, where <em>route_param_name</em> is a valid python identifier that doesn’t start or end with an underscore)</p>
+<p>A dynamic route segment. Matches any path segment.</p>
+<p><em>route_param_name</em> is passed down to the handler under this segment that matches the URL path, if any.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">app/_slug_/__index__.py</span><a class="headerlink" href="#id4" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">slug</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The slug value is: &#39;</span><span class="p">,</span> <span class="n">slug</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">GET /some-slug-value</span><a class="headerlink" href="#id5" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The slug value is: some-slug-value<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="special-files">
+<h2>Special Files<a class="headerlink" href="#special-files" title="Link to this heading">¶</a></h2>
+<p>These files specify the behavior of your app. Some handle routes based on the location of the special file; others go at the top-level of the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory and specify app-wide behavior.</p>
+<section id="index-py">
+<h3>__index__.py<a class="headerlink" href="#index-py" title="Link to this heading">¶</a></h3>
+<p>Handles a request whose full URL matches all directories in the path to this file from the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">foo</span><span class="o">/</span>
+    <span class="n">bar</span><span class="o">/</span>
+      <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+
+<span class="c1"># Matches</span>
+<span class="o">/</span><span class="n">foo</span><span class="o">/</span><span class="n">bar</span>
+
+<span class="c1"># Doesn&#39;t match</span>
+<span class="o">/</span>
+<span class="o">/</span><span class="n">foo</span>
+<span class="o">/</span><span class="n">foo</span><span class="o">/</span><span class="n">baz</span>
+<span class="o">/</span><span class="n">foo</span><span class="o">/</span><span class="n">some</span><span class="o">/</span><span class="n">other</span><span class="o">/</span><span class="n">path</span>
+</pre></div>
+</div>
+<section id="top-level-functions">
+<h4>Top-level functions<a class="headerlink" href="#top-level-functions" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="page__">
+<span class="sig-name descname"><span class="pre">__page__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">***url</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blu.Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="blu.html#blu.Response" title="blu.Response"><span class="pre">blu.Response</span></a></span></span><a class="headerlink" href="#page__" title="Link to this definition">¶</a></dt>
+<dd><p>Handle a request whose URL path is matched by this file.</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">app/static_segment/_slug_/__index__.py</span><a class="headerlink" href="#id6" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">__</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The slug value is: &#39;</span><span class="p">,</span> <span class="n">slug</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The query param value is: &#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">GET /static_segment/some-slug-value?q=some-query-value</span><a class="headerlink" href="#id7" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The slug value is: some-slug-value<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The query param value is: some-query-value<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>url</strong> – (see <a class="reference internal" href="#file-conventions-files-what-does-triple-start-url-mean"><span class="std std-ref">What does ***url mean?</span></a>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If an instance of <a class="reference internal" href="blu.html#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a>, the page that should be sent in the HTTP response.</p></li>
+<li><p>If an instance of <a class="reference internal" href="blu.html#blu.Response" title="blu.Response"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Response</span></code></a>, the HTTP response that should be sent.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="default-py">
+<h3>__default__.py<a class="headerlink" href="#default-py" title="Link to this heading">¶</a></h3>
+<p>Handles a request for which the directories in the path to this file from the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory match a prefix of the URL path, if no other handler file at or below this level matches the URL.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+    <span class="n">foo</span><span class="o">/</span>
+      <span class="n">__default__</span><span class="o">.</span><span class="n">py</span>
+      <span class="n">bar</span><span class="o">/</span>
+        <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+
+
+<span class="c1"># Matches</span>
+<span class="o">/</span><span class="n">foo</span>
+<span class="o">/</span><span class="n">foo</span><span class="o">/</span><span class="n">baz</span>
+<span class="o">/</span><span class="n">foo</span><span class="o">/</span><span class="n">some</span><span class="o">/</span><span class="n">other</span><span class="o">/</span><span class="n">path</span>
+
+<span class="c1"># Doesn&#39;t match</span>
+<span class="o">/</span><span class="n">foo</span><span class="o">/</span><span class="n">bar</span>
+<span class="o">/</span>
+<span class="o">/</span><span class="n">hello</span>
+</pre></div>
+</div>
+<section id="id1">
+<h4>Top-level functions<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">__page__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">***url</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">blu.Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="blu.html#blu.Response" title="blu.Response"><span class="pre">blu.Response</span></a></span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd><p>Handle a request whose URL path is matched by this file.</p>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">app/static_segment/_slug_/__default__.py</span><a class="headerlink" href="#id8" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">__</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The remaining path is: &#39;</span><span class="p">,</span> <span class="n">__</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The slug value is: &#39;</span><span class="p">,</span> <span class="n">slug</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The query param value is: &#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">app/static_segment/_slug_/__default__.py</span><a class="headerlink" href="#id9" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The remaining path is: &#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The slug value is: &#39;</span><span class="p">,</span> <span class="n">slug</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The query param value is: &#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">app/static_segment/_slug_/__default__.py</span><a class="headerlink" href="#id10" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">path__</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The remaining path is: &#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The slug value is: &#39;</span><span class="p">,</span> <span class="n">slug</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;The query param value is: &#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">GET /static_segment/some-slug-value/some/extra/path?q=some-query-value</span><a class="headerlink" href="#id11" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The remaining path is: some/extra/path<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The slug value is: some-slug-value<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The query param value is: some-query-value<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>url</strong> – (see <a class="reference internal" href="#file-conventions-files-what-does-triple-start-url-mean"><span class="std std-ref">What does ***url mean?</span></a>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If an instance of <a class="reference internal" href="blu.html#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a>, the page that should be sent in the HTTP response.</p></li>
+<li><p>If an instance of <a class="reference internal" href="blu.html#blu.Response" title="blu.Response"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Response</span></code></a>, the HTTP response that should be sent.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="settings-py">
+<h3>__settings__.py<a class="headerlink" href="#settings-py" title="Link to this heading">¶</a></h3>
+<p>Configuration for your Blu app.</p>
+<p>Should be placed in the root of the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory, i.e. the app directory should be the immediate parent directory of __settings__.py.</p>
+<div class="literal-block-wrapper docutils container" id="id12">
+<div class="code-block-caption"><span class="caption-text">app/__settings__.py</span><a class="headerlink" href="#id12" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CLIENT_REQUIREMENTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;arrr&#39;</span><span class="p">,</span> <span class="s1">&#39;aiohttp&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>You can configure your Blu app by creating a __settings__.py file and assigning configuration values at the top level of the file. For example, the __settings__.py file above sets the <em>CLIENT_REQUIREMENTS</em> configuration property to <code class="docutils literal notranslate"><span class="pre">['arrr',</span> <span class="pre">'aiohttp']</span></code>.</p>
+<p>A __settings__.py file is not required, and an app without a __settings__.py file will be treated the same as an app whose __settings__.py is empty.</p>
+<p>A __settings__.py file can have any of the following settings:</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="CLIENT_REQUIREMENTS">
+<span class="sig-name descname"><span class="pre">CLIENT_REQUIREMENTS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#CLIENT_REQUIREMENTS" title="Link to this definition">¶</a></dt>
+<dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CLIENT_REQUIREMENTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;arrr&#39;</span><span class="p">,</span> <span class="s1">&#39;aiohttp&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The Python libraries that Blu should install in the client environment. For example, if you have code running client-side that uses <a class="reference external" href="https://pypi.org/project/aiohttp/">aiohttp</a>, you must add aiohttp to the client-side requirements:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CLIENT_REQUIREMENTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;aiohttp&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Blu uses a tool called PyScript to run Python client-side. PyScript gives the option of a more feature-complete but less-efficient Python interpreter called Pyodide, or a faster interpreter called MicroPython.</p>
+<p>Blu is configured to use MicroPython, so many PyPI packages are not compatible with Blu’s client-side environment.</p>
+<p>For more information, see <a class="reference external" href="https://docs.pyscript.net/2024.11.1/user-guide/architecture/#interpreters">https://docs.pyscript.net/2024.11.1/user-guide/architecture/#interpreters</a>.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="what-does-url-mean">
+<span id="file-conventions-files-what-does-triple-start-url-mean"></span><h3>What does <em>***url</em> mean?<a class="headerlink" href="#what-does-url-mean" title="Link to this heading">¶</a></h3>
+<p>In this document, when a handler has <code class="docutils literal notranslate"><span class="pre">***url</span></code> in its call signature, that means that when you create that type of handler, you can capture information from the page URL in the function signature as follows:</p>
+<section id="capturing-route-parameters">
+<h4>Capturing route parameters<a class="headerlink" href="#capturing-route-parameters" title="Link to this heading">¶</a></h4>
+<p>You can capture route parameters from dynamic route segments by passing them in as arguments:</p>
+<div class="literal-block-wrapper docutils container" id="id13">
+<div class="code-block-caption"><span class="caption-text">app/employees/_employee_id_/time_punch/_date_/__index__.py</span><a class="headerlink" href="#id13" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">employee_id</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span>
+        <span class="s1">&#39;Time punch info for employee #&#39;</span><span class="p">,</span>
+        <span class="n">employee_id</span><span class="p">,</span>
+        <span class="s1">&#39; on &#39;</span><span class="p">,</span>
+        <span class="n">date</span><span class="p">,</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id14">
+<div class="code-block-caption"><span class="caption-text">GET /employees/2345820390/time_punch/2024-12-01</span><a class="headerlink" href="#id14" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Time punch info for employee #2345820390 on 2024-12-01<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="capturing-query-parameters">
+<h4>Capturing query parameters<a class="headerlink" href="#capturing-query-parameters" title="Link to this heading">¶</a></h4>
+<p>Any arguments specified after <code class="docutils literal notranslate"><span class="pre">__</span></code> (a double underscore) in your call signature will capture query parameters instead of route parameters:</p>
+<div class="literal-block-wrapper docutils container" id="id15">
+<div class="code-block-caption"><span class="caption-text">app/greet_me/__index__.py</span><a class="headerlink" href="#id15" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">__</span><span class="p">,</span> <span class="n">my_name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Hello &#39;</span><span class="p">,</span> <span class="n">my_name</span><span class="p">,</span> <span class="s1">&#39;!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id16">
+<div class="code-block-caption"><span class="caption-text">GET /greet_me?my_name=Kevin</span><a class="headerlink" href="#id16" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Hello Kevin!<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>You can set default values for query parameters:</p>
+<div class="literal-block-wrapper docutils container" id="id17">
+<div class="code-block-caption"><span class="caption-text">app/greet_me/__index__.py</span><a class="headerlink" href="#id17" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">__</span><span class="p">,</span> <span class="n">my_name</span><span class="o">=</span><span class="s1">&#39;World&#39;</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Hello &#39;</span><span class="p">,</span> <span class="n">my_name</span><span class="p">,</span> <span class="s1">&#39;!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id18">
+<div class="code-block-caption"><span class="caption-text">GET /greet_me?my_name=Kevin</span><a class="headerlink" href="#id18" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Hello World!<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>You can also use <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> for query parameters:</p>
+<div class="literal-block-wrapper docutils container" id="id19">
+<div class="code-block-caption"><span class="caption-text">app/greet_me/__index__.py</span><a class="headerlink" href="#id19" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">__</span><span class="p">,</span> <span class="n">my_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">greeting</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;greeting&#39;</span><span class="p">,</span> <span class="s1">&#39;Hello&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="n">greeting</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">my_name</span><span class="p">,</span> <span class="s1">&#39;!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id20">
+<div class="code-block-caption"><span class="caption-text">GET /greet_me?my_name=Kevin&amp;greeting=Hi</span><a class="headerlink" href="#id20" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Hi Kevin!<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>If you also have route parameters, place them before <code class="docutils literal notranslate"><span class="pre">__</span></code>:</p>
+<div class="literal-block-wrapper docutils container" id="id21">
+<div class="code-block-caption"><span class="caption-text">app/_id_/__index__.py</span><a class="headerlink" href="#id21" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">__</span><span class="p">,</span> <span class="n">foo</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;ID: &#39;</span><span class="p">,</span> <span class="nb">id</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;foo:&#39;</span><span class="p">,</span> <span class="n">foo</span><span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id22">
+<div class="code-block-caption"><span class="caption-text">GET /123?foo=3</span><a class="headerlink" href="#id22" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>ID: 123<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>foo: 3<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="capturing-the-remaining-path">
+<h4>Capturing the remaining path<a class="headerlink" href="#capturing-the-remaining-path" title="Link to this heading">¶</a></h4>
+<p>Since a call to a <code class="docutils literal notranslate"><span class="pre">__page__</span></code> handler in a <code class="docutils literal notranslate"><span class="pre">__default__.py</span></code> file usually results from a partial URL match rather than a full match, it can be useful to access the remaining, unmatched portion at the end of the URL path. You can capture this using the <code class="docutils literal notranslate"><span class="pre">__</span></code> (double underscore) argument:</p>
+<div class="literal-block-wrapper docutils container" id="id23">
+<div class="code-block-caption"><span class="caption-text">app/foo/__default__.py</span><a class="headerlink" href="#id23" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">__</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Remaining path: &#39;</span><span class="p">,</span> <span class="n">__</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id24">
+<div class="code-block-caption"><span class="caption-text">GET /foo/bar/baz</span><a class="headerlink" href="#id24" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Remaining path: bar/baz<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>This can be used alongside route parameters and query parameters:</p>
+<div class="literal-block-wrapper docutils container" id="id25">
+<div class="code-block-caption"><span class="caption-text">app/_id_/__default__.py</span><a class="headerlink" href="#id25" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">__</span><span class="p">,</span> <span class="n">baz</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;ID: &#39;</span><span class="p">,</span> <span class="nb">id</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Remaining path:&#39;</span><span class="p">,</span> <span class="n">__</span><span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;baz:&#39;</span><span class="p">,</span> <span class="n">baz</span><span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id26">
+<div class="code-block-caption"><span class="caption-text">GET /123/foo/bar?baz=3</span><a class="headerlink" href="#id26" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>ID: 123<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Remaining path: foo/bar<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>baz: 3<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<p>An <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code> file, however, is only matched using a full match, so it never has any remaining, unmatched URL path segments. Because of this, <code class="docutils literal notranslate"><span class="pre">__</span></code> will always evaluate to <code class="docutils literal notranslate"><span class="pre">''</span></code> in an <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code> file’s <code class="docutils literal notranslate"><span class="pre">__page__</span></code> handler:</p>
+<div class="literal-block-wrapper docutils container" id="id27">
+<div class="code-block-caption"><span class="caption-text">app/foo/__index__.py</span><a class="headerlink" href="#id27" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">__</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Remaining path: &#39;</span><span class="p">,</span> <span class="n">__</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id28">
+<div class="code-block-caption"><span class="caption-text">GET /foo/bar/baz</span><a class="headerlink" href="#id28" title="Link to this code">¶</a></div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Remaining path: <span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="all-python-modules">
+<h2>All Python Modules<a class="headerlink" href="#all-python-modules" title="Link to this heading">¶</a></h2>
+<p>The following module-level attribute has special meaning in any Python module under the <code class="docutils literal notranslate"><span class="pre">app</span></code> module:</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="client__">
+<span class="sig-name descname"><span class="pre">__client__</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#client__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Hello</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s1">&#39;Hello, World!&#39;</span>
+</pre></div>
+</div>
+<p>Set a module’s <code class="docutils literal notranslate"><span class="pre">__client__</span></code> attribute to <code class="docutils literal notranslate"><span class="pre">True</span></code> in order to make the module available client-side.</p>
+<p>If a module does not have a <code class="docutils literal notranslate"><span class="pre">__client__</span></code> attribute set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, it will not be available to run client-side. For example, trying to use the <a class="reference internal" href="blu.html#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-func docutils literal notranslate"><span class="pre">ClientElement</span></code></a> <code class="docutils literal notranslate"><span class="pre">Hello</span></code> shown in the following example will fail, because the user’s browser will attempt to render <code class="docutils literal notranslate"><span class="pre">Hello</span></code>, but will raise an <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImportError</span></code></a> when trying to import <code class="docutils literal notranslate"><span class="pre">Hello</span></code> because the module it is in doesn’t exist in the client environment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Hello</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s1">&#39;Hello, World!&#39;</span>
+</pre></div>
+</div>
+<p>To fix this, use the <code class="docutils literal notranslate"><span class="pre">__client__</span></code> module attribute:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Hello</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s1">&#39;Hello, World!&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="static-files">
+<h2>Static Files<a class="headerlink" href="#static-files" title="Link to this heading">¶</a></h2>
+<p>Any non-Python file under the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory will be treated as a static file and will be served from the path it is at relative to the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory.</p>
+<p>For example, if you have a text file at <code class="docutils literal notranslate"><span class="pre">app/path/to/file.txt</span></code>, you will be able to download that file from <code class="docutils literal notranslate"><span class="pre">/path/to/file.txt</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Static files are served statically even if they are under a dynamic route. So if you have a file at <code class="docutils literal notranslate"><span class="pre">app/_id_/file.txt</span></code>, then sending a request to <code class="docutils literal notranslate"><span class="pre">/some-id/file.txt</span></code> will result in an HTTP 404 error. Instead, you would access the file at <code class="docutils literal notranslate"><span class="pre">/_id_/file.txt</span></code>.</p>
+</div>
+<p>Blu serves static files in production as well as in development, but if you want to serve static files from a separate service, you can access them in the <code class="docutils literal notranslate"><span class="pre">static/</span></code> directory (this will be in your project root, in the same parent directory as <code class="docutils literal notranslate"><span class="pre">app/</span></code>) after <a class="reference internal" href="../user-guide/deploying-your-app.html#building-your-app"><span class="std std-ref">building your app for production</span></a>.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+  <ul class="footer-nav">
+      <li class="prev">
+        <a href="pyscript.html">&lt; <code class="docutils literal notranslate"><span class="pre">pyscript</span></code> (client-only)</a>
+      </li>
+    
+      <li class="next">
+        <a href="cli.html">Command Line Interface &gt;</a>
+      </li>
+  </ul>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Blu</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user-guide/index.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="blu.html"><code class="docutils literal notranslate"><span class="pre">blu</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="blu.html.html"><code class="docutils literal notranslate"><span class="pre">blu.html</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="js.html"><code class="docutils literal notranslate"><span class="pre">js</span></code> (client-only)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscript.html"><code class="docutils literal notranslate"><span class="pre">pyscript</span></code> (client-only)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">File Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">API Reference</a><ul>
+      <li>Previous: <a href="pyscript.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">pyscript</span></code> (client-only)</a></li>
+      <li>Next: <a href="cli.html" title="next chapter">Command Line Interface</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, John Larson.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api-reference/file-conventions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

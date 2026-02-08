@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Contributing &#8212; Blu 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles.css?v=7e7517f3" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=35a8b989"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Command Line Interface" href="api-reference/cli.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+  
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">¶</a></h1>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Fork the repository on GitHub.</p></li>
+<li><p>Ensure <a class="reference external" href="https://www.python.org/downloads/">Python 3.13</a> is installed.</p></li>
+<li><p>Ensure <a class="reference external" href="https://pipenv.pypa.io">Pipenv</a> is installed.</p></li>
+<li><p>cd into the repository root and run <code class="docutils literal notranslate"><span class="pre">pipenv</span> <span class="pre">install</span></code>.</p></li>
+<li><p>Run tests with <code class="docutils literal notranslate"><span class="pre">pipenv</span> <span class="pre">run</span> <span class="pre">pytest</span></code>. If the tests pass, you have successfully set up your development environment and are ready to make a change to the codebase.</p></li>
+</ol>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Add link to repository on GitHub</p>
+</div>
+</section>
+<section id="making-changes">
+<h2>Making Changes<a class="headerlink" href="#making-changes" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Update the <a class="reference internal" href="api-reference/index.html#api-reference"><span class="std std-ref">API Reference</span></a> to reflect intended changes. The <a class="reference internal" href="api-reference/index.html#api-reference"><span class="std std-ref">API Reference</span></a> should be treated as the single source of truth for requirements; any expected functionality should be documented there.</p></li>
+<li><p>As appropriate, update the <a class="reference internal" href="user-guide/index.html#user-guide"><span class="std std-ref">User Guide</span></a> to reflect intended changes. This will be necessary if the change invalidates part of the <a class="reference internal" href="user-guide/index.html#user-guide"><span class="std std-ref">User Guide</span></a>, is difficult to understand with the <a class="reference internal" href="api-reference/index.html#api-reference"><span class="std std-ref">API Reference</span></a> alone, or affects core functionality.</p></li>
+<li><p>Update tests to reflect changes to <a class="reference internal" href="api-reference/index.html#api-reference"><span class="std std-ref">API Reference</span></a>. These tests ensure the package works as expected.</p></li>
+<li><p>As necessary, update the User Guide tests to reflect changes made to the <a class="reference internal" href="user-guide/index.html#user-guide"><span class="std std-ref">User Guide</span></a>. This will be necessary if you made changes to code examples in the User Guide or added new code examples. These tests ensure the User Guide is accurate.</p></li>
+<li><p>Ensure the tests you wrote or changed fail.</p></li>
+<li><p>Get all tests to pass.</p></li>
+<li><p>If you haven’t already, make a pull request.</p></li>
+</ol>
+</section>
+<section id="make-a-pull-request-early">
+<h2>Make a Pull Request Early<a class="headerlink" href="#make-a-pull-request-early" title="Link to this heading">¶</a></h2>
+<p>You don’t have to wait until your changes are ready to merge to make a pull request. In fact, making a pull request early allows you to get early feedback, preventing you from doing significant work that is later rejected. For example, a pull request with just proposed documentation changes allows revisions to be made before anything is implemented, and a pull request with initial work allows revisions to be made to implementation stategy before more work has been put into the implementation.</p>
+</section>
+<section id="end-to-end-tests">
+<h2>End-to-End Tests<a class="headerlink" href="#end-to-end-tests" title="Link to this heading">¶</a></h2>
+<p>If you submit a pull request that changes core functionality or the way elements are rendered to the DOM, you may be asked to update end-to-end tests to reflect these changes. Generally, you should assume this is not necessary, but know that it may be requested after you make a pull request.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+  <ul class="footer-nav">
+      <li class="prev">
+        <a href="api-reference/cli.html">&lt; Command Line Interface</a>
+      </li>
+    
+  </ul>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Blu</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-guide/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-reference/index.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#making-changes">Making Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#make-a-pull-request-early">Make a Pull Request Early</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#end-to-end-tests">End-to-End Tests</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="api-reference/cli.html" title="previous chapter">Command Line Interface</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, John Larson.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/contributing.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

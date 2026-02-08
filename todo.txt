@@ -1,5 +1,7 @@
 Go through and update/fix issues in docs
 Go through docs making sure everything works as shown; also add images and GIFs
+Move to GitHub?
+Create GitHub issues?
 ----------------------
 Ready to Publish
 ----------------------

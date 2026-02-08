@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Routing &#8212; Blu 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles.css?v=7e7517f3" />
+    <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=35a8b989"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Client-Side Rendering" href="client-side-rendering.html" />
+    <link rel="prev" title="Creating Pages" href="creating-pages.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+  
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="routing">
+<span id="id1"></span><h1>Routing<a class="headerlink" href="#routing" title="Link to this heading">¶</a></h1>
+<p>The <a class="reference internal" href="../quickstart.html#quickstart"><span class="std std-ref">Quickstart</span></a> guide shows how to serve a page from <code class="docutils literal notranslate"><span class="pre">/</span></code> using Blu.</p>
+<p>This section explains how to serve pages from other paths.</p>
+<section id="file-based-routing">
+<h2>File-Based Routing<a class="headerlink" href="#file-based-routing" title="Link to this heading">¶</a></h2>
+<p>Blu uses file-based routing. This means that the path that a page is served from is based on the file’s location in the <code class="docutils literal notranslate"><span class="pre">app/</span></code>.</p>
+<p>For example, if you want to serve the page in the <a class="reference internal" href="../quickstart.html#quickstart"><span class="std std-ref">Quickstart</span></a> guide from <code class="docutils literal notranslate"><span class="pre">/path/to/page</span></code> instead of from <code class="docutils literal notranslate"><span class="pre">/</span></code>, you would move the <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code> file from <code class="docutils literal notranslate"><span class="pre">app/</span></code> to <code class="docutils literal notranslate"><span class="pre">app/path/to/page</span></code>:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">app/path/to/page/__index__.py</span><a class="headerlink" href="#id2" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">body</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">html</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">html</span><span class="p">[</span>
+        <span class="n">head</span><span class="p">,</span>
+        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">],</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>After this change, your project directory would look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">path</span><span class="o">/</span>
+    <span class="n">to</span><span class="o">/</span>
+      <span class="n">page</span><span class="o">/</span>
+        <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</section>
+<section id="dynamic-route-segments">
+<h2>Dynamic Route Segments<a class="headerlink" href="#dynamic-route-segments" title="Link to this heading">¶</a></h2>
+<p>To add a dynamic route segment, create a directory whose name is surrounded by single underscores, like the <code class="docutils literal notranslate"><span class="pre">_employee_id_</span></code> directory in this example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">employees</span><span class="o">/</span>
+    <span class="n">_employee_id_</span><span class="o">/</span>
+      <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">app/employees/_employee_id_/__index__.py</span><a class="headerlink" href="#id3" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;This is an employee profile page.&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Now, if you go to <code class="docutils literal notranslate"><span class="pre">/employees/325832</span></code>, or to <code class="docutils literal notranslate"><span class="pre">/employees/839481</span></code>, or even to <code class="docutils literal notranslate"><span class="pre">/employees/cheese</span></code>, you’ll get something like this:</p>
+<blockquote>
+<div><p>This is an employee profile page.</p></div></blockquote>
+<p>Dynamic route segments usually aren’t that useful unless there’s actual dyanmic content, so let’s use that employee id from the URL path in our page:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">app/employees/_employee_id_/__index__.py</span><a class="headerlink" href="#id4" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">employee_id</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;This is the profile page for employee #</span><span class="si">{</span><span class="n">employee_id</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Now, visiting <code class="docutils literal notranslate"><span class="pre">/employees/325832</span></code> gives us:</p>
+<blockquote>
+<div><p>This is the profile page for employee #325832.</p></div></blockquote>
+<p>Notice that the <em>__page__()</em> function now has the argument <em>employee_id</em>. Because of this, Blu looks for a route segment in <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code>’s URL path that matches the argument name, with single underscores around it, and takes the value of that segment in the actual URL to pass in as that argument.</p>
+<p>A route can have multiple dynamic segments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">employees</span><span class="o">/</span>
+    <span class="n">_employee_id_</span><span class="o">/</span>
+      <span class="n">time_card</span><span class="o">/</span>
+        <span class="n">_date_</span><span class="o">/</span>
+          <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">app/employees/_employee_id_/time_card/_date_/__index__.py</span><a class="headerlink" href="#id5" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">employee_id</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;This is employee #</span><span class="si">{</span><span class="n">employee_id</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">s time card for </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>In this case, visiting <code class="docutils literal notranslate"><span class="pre">/employees/325832/time_card/2024-12-10</span></code> gives us:</p>
+<blockquote>
+<div><p>This is employee #325832's time card for 2024-12-10.</p></div></blockquote>
+</section>
+<section id="default-handlers">
+<h2>Default Handlers<a class="headerlink" href="#default-handlers" title="Link to this heading">¶</a></h2>
+<p>You can add a catch-all handler to a route segment that handles a request if the route is matched up to that point but no <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code> file is on a path that exactly matches the URL. You do this by creating a <code class="docutils literal notranslate"><span class="pre">__default__.py</span></code> file with a <em>__page__()</em> function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">foo</span><span class="o">/</span>
+    <span class="n">__default__</span><span class="o">.</span><span class="n">py</span>
+    <span class="n">bar</span><span class="o">/</span>
+      <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">app/foo/__default__.py</span><a class="headerlink" href="#id6" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;This is the default page.&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">app/foo/bar/__index__.py</span><a class="headerlink" href="#id7" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;This is the page for /foo/bar.&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/foo/bar</span></code> will give us:</p>
+<blockquote>
+<div><p>This is the page for /foo/bar.</p></div></blockquote>
+<p>But visiting <code class="docutils literal notranslate"><span class="pre">/foo</span></code> or <code class="docutils literal notranslate"><span class="pre">/foo/some/other/path</span></code> or <code class="docutils literal notranslate"><span class="pre">/foo/bar/some/other/path</span></code> will give us:</p>
+<blockquote>
+<div><p>This is the default page.</p></div></blockquote>
+<section id="accessing-the-remaining-path">
+<h3>Accessing the remaining path<a class="headerlink" href="#accessing-the-remaining-path" title="Link to this heading">¶</a></h3>
+<p>To read the remaining, unmatched portion of the URL in a default handler, you can accept a positional-only argument in the <em>__page__()</em> function. This is done by adding a slash to <em>__page__()</em>’s function signature:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">foo</span><span class="o">/</span>
+    <span class="n">__default__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">app/foo/__default__.py</span><a class="headerlink" href="#id8" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">/</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;The remaining path is </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/foo/a/b/c</span></code> gives us:</p>
+<blockquote>
+<div>The remaining path is a/b/c.</div></blockquote>
+<p>Any dynamic route arguments should come after the slash:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">_my_param_</span><span class="o">/</span>
+    <span class="n">__default__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">app/_my_param_/__default__.py</span><a class="headerlink" href="#id9" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">my_param</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;my_param value:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">my_param</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;remaining path:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/my-param-value/a/b/c</span></code> gives us:</p>
+<blockquote>
+<div><p>
+    <b>my_param value:</b> my-param-value
+</p>
+<p>
+    <b>remaining path:</b> a/b/c
+</p></div></blockquote>
+</section>
+</section>
+<section id="query-parameters">
+<h2>Query Parameters<a class="headerlink" href="#query-parameters" title="Link to this heading">¶</a></h2>
+<p>To access a request’s query parameters in an <code class="docutils literal notranslate"><span class="pre">__index__.py</span></code> or <code class="docutils literal notranslate"><span class="pre">__default__.py</span></code> handler, add keyword-only arguments to the <em>__page__()</em> function. This is done by adding an asterisk to the function signature:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">foo</span><span class="o">/</span>
+    <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">app/foo/__index__.py</span><a class="headerlink" href="#id10" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="n">baz</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;bar:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;baz:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">baz</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/foo?bar=A&amp;baz=B</span></code> gives us:</p>
+<blockquote>
+<div><p>
+    <b>bar:</b> A
+</p>
+<p>
+    <b>baz:</b> B
+</p></div></blockquote>
+<p>The <em>__page__()</em> function can also accept a keyword argument <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">foo</span><span class="o">/</span>
+    <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">app/foo/__index__.py</span><a class="headerlink" href="#id11" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;bar:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;baz:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;baz&#39;</span><span class="p">],</span>
+        <span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;hello:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;hello&#39;</span><span class="p">]</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/foo?bar=A&amp;baz=B&amp;hello=C</span></code> gives us:</p>
+<blockquote>
+<div><p>
+    <b>bar:</b> A
+</p>
+<p>
+    <b>baz:</b> B
+</p>
+<p>
+    <b>hello:</b> C
+</p></div></blockquote>
+<p>If there are dynamic route arguments, those should come before the asterisk:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">/</span>
+  <span class="n">_foo_</span><span class="o">/</span>
+    <span class="fm">__index__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id12">
+<div class="code-block-caption"><span class="caption-text">app/_foo_/__index__.py</span><a class="headerlink" href="#id12" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">(</span><span class="n">foo</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="n">baz</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;foo:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">foo</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;bar:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">p</span><span class="p">[</span>
+            <span class="n">b</span><span class="p">[</span><span class="s1">&#39;baz:&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">baz</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In this example, visiting <code class="docutils literal notranslate"><span class="pre">/A?bar=B&amp;baz=C</span></code> gives us:</p>
+<blockquote>
+<div><p>
+    <b>foo:</b> A
+</p>
+<p>
+    <b>bar:</b> B
+</p>
+<p>
+    <b>baz:</b> C
+</p></div></blockquote>
+</section>
+<section id="return-values">
+<h2>Return Values<a class="headerlink" href="#return-values" title="Link to this heading">¶</a></h2>
+<p>A <em>__page__()</em> function can return any valid child of an HTML element (see the <a class="reference internal" href="creating-pages.html#children"><span class="std std-ref">Children</span></a> subsection of <a class="reference internal" href="creating-pages.html#creating-pages"><span class="std std-ref">Creating Pages</span></a>). The same rules apply for <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>s (again, see the <a class="reference internal" href="creating-pages.html#children"><span class="std std-ref">Children</span></a> subsection of <a class="reference internal" href="creating-pages.html#creating-pages"><span class="std std-ref">Creating Pages</span></a>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">Key</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="c1"># Wrong! All Iterables except strings and tuples must be keyed.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span>
+        <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">],</span>
+    <span class="p">]</span>
+
+<span class="c1"># Right. The list is keyed.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="n">Key</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="s1">&#39;A&#39;</span><span class="p">],</span>
+            <span class="n">Key</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="s1">&#39;B&#39;</span><span class="p">],</span>
+            <span class="n">Key</span><span class="p">(</span><span class="mi">2</span><span class="p">)[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span>
+        <span class="p">],</span>
+    <span class="p">]</span>
+
+<span class="c1"># Right. Strings don&#39;t have to be keyed, even though they are iterable.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;ABC&#39;</span><span class="p">]</span>
+
+<span class="c1"># Right. Tuples don&#39;t have to be keyed, even though they are iterable.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>You can also return a <a class="reference internal" href="../api-reference/blu.html#blu.Response" title="blu.Response"><code class="xref py py-class docutils literal notranslate"><span class="pre">blu.Response</span></code></a> to set the status code and/or response headers of the page:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Hello.&#39;</span><span class="p">],</span>
+        <span class="n">status</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;Cache-Control&#39;</span><span class="p">:</span> <span class="s1">&#39;no-cache&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Last-Modified&#39;</span><span class="p">:</span> <span class="s1">&#39;Tue, 10 Dec 2024 10:00:00 GMT&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+  <ul class="footer-nav">
+      <li class="prev">
+        <a href="creating-pages.html">&lt; Creating Pages</a>
+      </li>
+    
+      <li class="next">
+        <a href="client-side-rendering.html">Client-Side Rendering &gt;</a>
+      </li>
+  </ul>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Blu</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="creating-pages.html">Creating Pages</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Routing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client-side-rendering.html">Client-Side Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-files.html">Static Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploying-your-app.html">Deploying Your App</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api-reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">User Guide</a><ul>
+      <li>Previous: <a href="creating-pages.html" title="previous chapter">Creating Pages</a></li>
+      <li>Next: <a href="client-side-rendering.html" title="next chapter">Client-Side Rendering</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, John Larson.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/user-guide/routing.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

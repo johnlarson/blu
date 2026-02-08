@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>blu &#8212; Blu 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles.css?v=7e7517f3" />
+    <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=35a8b989"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="blu.html" href="blu.html.html" />
+    <link rel="prev" title="API Reference" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+  
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-blu">
+<span id="blu"></span><h1><code class="docutils literal notranslate"><span class="pre">blu</span></code><a class="headerlink" href="#module-blu" title="Link to this heading">¶</a></h1>
+<p>A full stack React framework for Python.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="blu.ClientElement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">ClientElement</span></span><a class="headerlink" href="#blu.ClientElement" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A custom element to be rendered client-side. Created using the
+<a class="reference internal" href="#blu.client" title="blu.client"><code class="xref py py-func docutils literal notranslate"><span class="pre">blu.client()</span></code></a> decorator.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span><span class="p">,</span> <span class="n">span</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ColorfulText</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">bold</span><span class="p">):</span>
+    <span class="n">colorful_span</span> <span class="o">=</span> <span class="n">span</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">color</span><span class="p">})[</span>
+        <span class="p">(</span><span class="k">yield</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">bold</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">b</span><span class="p">[</span><span class="n">colorful_span</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">colorful_span</span>
+
+
+<span class="n">ColorfulText</span><span class="p">(</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span>
+    <span class="s1">&#39;Danger! The world said hello back.&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">span</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;color: red&quot;</span><span class="p">&gt;</span>
+        Danger! The world said hello back.
+    <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="blu.ClientElement.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blu.ClientElement" title="blu._nodes.ClientElement"><span class="pre">ClientElement</span></a></span></span><a class="headerlink" href="#blu.ClientElement.__call__" title="Link to this definition">¶</a></dt>
+<dd><p>Create a copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> that will be rendered with the given
+arguments.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">div</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Greeting</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;World&#39;</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">div</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">]</span>
+
+
+<span class="n">div</span><span class="p">[</span>
+    <span class="n">Greeting</span><span class="p">(</span><span class="s1">&#39;Arnold&#39;</span><span class="p">),</span>
+    <span class="n">Greeting</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Hailey&#39;</span><span class="p">),</span>
+    <span class="n">Greeting</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>Hello, Arnold!<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>Hello, Hailey!<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>Hello, World!<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – The positional arguments to pass into the
+element’s render function when it is rendered.</p></li>
+<li><p><strong>kwargs</strong> – The keyword arguments to pass into the
+element’s render function when it is rendered, as well as an
+optional keyword argument <code class="docutils literal notranslate"><span class="pre">key</span></code>, which will be used by
+React to uniquely identify the element when it is rendered.
+Usually, you won’t need to pass in a <code class="docutils literal notranslate"><span class="pre">key</span></code>, but it’s
+required for any <a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientElement</span></code></a> that is
+rendered as an item in an
+<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a> (unless that
+<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a> is a
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> that will be rendered by calling its
+render function with <code class="docutils literal notranslate"><span class="pre">*args</span></code> and <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>, with the
+exception that the keyword argument <code class="docutils literal notranslate"><span class="pre">key</span></code> will not be
+passed on to the render function and will instead be used by
+React to identify the new element. If the original had a
+key, it will not be retained in the copy, and the copy will
+have a key if and only if <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> contains the <code class="docutils literal notranslate"><span class="pre">key</span></code>
+argument.</p>
+</dd>
+</dl>
+<p>Below is an example of using the <code class="docutils literal notranslate"><span class="pre">key</span></code> argument:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">div</span>
+
+<span class="n">PEOPLE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Allison&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Bill&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Carrie&#39;</span><span class="p">},</span>
+<span class="p">]</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Greeting</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">div</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">]</span>
+
+
+<span class="p">[</span><span class="n">Greeting</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">PEOPLE</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>Hello, Allison!<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>Hello, Bill!<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>Hello, Carrie!<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blu.ClientElement.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blu.ClientElement" title="blu._nodes.ClientElement"><span class="pre">ClientElement</span></a></span></span><a class="headerlink" href="#blu.ClientElement.__getitem__" title="Link to this definition">¶</a></dt>
+<dd><p>Create a copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> that will render with the given
+children displayed where the render function uses the <code class="docutils literal notranslate"><span class="pre">yield</span></code>
+keyword.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">span</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">RedText</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">span</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;red&#39;</span><span class="p">})[(</span><span class="k">yield</span><span class="p">)]</span>
+
+
+<span class="n">RedText</span><span class="p">[</span><span class="s1">&#39;Danger! This text is red.&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">span</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;color: red&quot;</span><span class="p">&gt;</span>Danger! This text is red.<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>children</strong> – Any valid <a class="reference internal" href="#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a> or a
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of <a class="reference internal" href="#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a>s.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> that will render with <code class="docutils literal notranslate"><span class="pre">children</span></code>
+displayed where the element’s render function uses the
+<code class="docutils literal notranslate"><span class="pre">yield</span></code> keyword. If no children were specified, nothing
+will be rendered where the <code class="docutils literal notranslate"><span class="pre">yield</span></code> keyword is used.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a> if element’s rendering function
+is not a <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code></a>,
+i.e. doesn’t contain a <code class="docutils literal notranslate"><span class="pre">yield</span></code> statement.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blu.HTMLElement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">HTMLElement</span></span><a class="headerlink" href="#blu.HTMLElement" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A <a class="reference external" href="https://react.dev/reference/react-dom/components">React DOM component instance</a>. Created using
+the <a class="reference internal" href="blu.html.html#module-blu.html" title="blu.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">blu.html</span></code></a> module.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">div</span>
+
+<span class="n">div</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;my-id&#39;</span><span class="p">)[</span>
+    <span class="s1">&#39;Hello World!&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;my-id&quot;</span><span class="p">&gt;</span>Hello World!<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="blu.HTMLElement.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">props</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Props</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PropValue</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blu.HTMLElement" title="blu._nodes.HTMLElement"><span class="pre">HTMLElement</span></a></span></span><a class="headerlink" href="#blu.HTMLElement.__call__" title="Link to this definition">¶</a></dt>
+<dd><p>Create a copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> with React props set based on the
+given keyword arguments.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">div</span>
+
+<span class="n">div</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;my-div&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;my-div&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>props</strong> – A mapping of prop names to prop values. This is an
+escape hatch for cases when the prop name can’t be
+represented as a keyword argument name.</p></li>
+<li><p><strong>kwargs</strong> – The new props, where the argument name is the
+prop’s key and the argument value is the prop’s value. This
+is the usual way to specify props.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A copy of <code class="xref py py-data docutils literal notranslate"><span class="pre">self</span></code> with the same <code class="xref py py-data docutils literal notranslate"><span class="pre">children</span></code>
+but with <code class="xref py py-data docutils literal notranslate"><span class="pre">props</span></code> set as follows:</p>
+<ol class="arabic">
+<li><p>For any key-value pair in the <code class="xref py py-data docutils literal notranslate"><span class="pre">props</span></code> argument, the
+prop named by the key will be set to the value.</p>
+<p>For example, <code class="xref py py-data docutils literal notranslate"><span class="pre">div(props={'my_prop_':</span> <span class="pre">45})</span></code>
+results in the React element <code class="docutils literal notranslate"><span class="pre">&lt;div</span> <span class="pre">my_prop_={45}</span> <span class="pre">/&gt;</span></code></p>
+</li>
+<li><p>For any keyword argument, the value will be set to a key
+derived from:</p>
+<ul class="simple">
+<li><p>Removing the last trailing underscore (if any).</p></li>
+<li><p>Replacing all other underscores with dashes.</p></li>
+</ul>
+<p>For example, <code class="xref py py-data docutils literal notranslate"><span class="pre">div(my_prop_=45)</span></code> results in the
+React element <code class="docutils literal notranslate"><span class="pre">&lt;div</span> <span class="pre">my-prop={45}</span> <span class="pre">/&gt;</span></code>.</p>
+</li>
+<li><p>If there is any conflict between the <code class="xref py py-data docutils literal notranslate"><span class="pre">attributes</span></code>
+argument and the keyword arguments, the prop that has the
+conflict will be set based on the <code class="xref py py-data docutils literal notranslate"><span class="pre">props</span></code>
+argument as described in (1). Any props that do not have
+conflicts will be set the same way they otherwise would,
+irrespective of the props that do have conflicts.</p>
+<p>For example,
+<code class="xref py py-data docutils literal notranslate"><span class="pre">div(props={'props-only':</span> <span class="pre">'props',</span> <span class="pre">'shared':</span> <span class="pre">'props'},</span> <span class="pre">shared='kw',</span> <span class="pre">kw_only='kw')</span></code>
+results in the React element
+<code class="docutils literal notranslate"><span class="pre">&lt;div</span> <span class="pre">props-only=&quot;props&quot;</span> <span class="pre">shared=&quot;props&quot;</span> <span class="pre">kw-only=&quot;kw&quot;</span> <span class="pre">/&gt;</span></code></p>
+</li>
+</ol>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blu.HTMLElement.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blu.HTMLElement" title="blu._nodes.HTMLElement"><span class="pre">HTMLElement</span></a></span></span><a class="headerlink" href="#blu.HTMLElement.__getitem__" title="Link to this definition">¶</a></dt>
+<dd><p>Create a copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> whose child nodes are set to the items
+passed in.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">div</span>
+
+<span class="n">div</span><span class="p">[</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>Hello World!<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>children</strong> – A <a class="reference internal" href="#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a> or a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of
+<a class="reference internal" href="#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a>s.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">children</span></code> is a <a class="reference internal" href="#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a>: A copy of
+<code class="xref py py-data docutils literal notranslate"><span class="pre">self</span></code> whose children are set to <code class="docutils literal notranslate"><span class="pre">[children]</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">children</span></code> is a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of
+<a class="reference internal" href="#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a>s: A copy of <code class="xref py py-data docutils literal notranslate"><span class="pre">self</span></code> whose
+children are set to <code class="docutils literal notranslate"><span class="pre">list(children)</span></code>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blu.Key">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">Key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blu.Key" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A keyed fragment of React nodes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">Key</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span>
+
+<span class="n">Key</span><span class="p">(</span><span class="s1">&#39;my-id&#39;</span><span class="p">)[</span>
+    <span class="s1">&#39;Hello, &#39;</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">[</span><span class="s1">&#39;World&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;!&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>Hello, <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>World<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>!
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> – A key to be used by React to uniquely identify the
+fragment.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An empty fragment identified by <code class="docutils literal notranslate"><span class="pre">key</span></code>.</p>
+</dd>
+</dl>
+<p>In most cases, you won’t need to use <a class="reference internal" href="#blu.Key" title="blu.Key"><code class="xref py py-class docutils literal notranslate"><span class="pre">blu.Key</span></code></a>, but it is
+required when rendering an item in an
+<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a> (unless that
+<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a> is a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>
+or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">Key</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span>
+
+<span class="n">PEOPLE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Andy&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Brittany&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Calvin&#39;</span><span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">Key</span><span class="p">(</span><span class="n">person</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])[</span>
+    <span class="s1">&#39;Hello, &#39;</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">[</span><span class="n">person</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]],</span>
+    <span class="s1">&#39;!&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">PEOPLE</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>Hello, <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>Andy<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>!
+Hello, <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>Brittany<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>!
+Hello, <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>Calvin<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>!
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="blu.Key.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blu.Key" title="blu._nodes.Key"><span class="pre">Key</span></a></span></span><a class="headerlink" href="#blu.Key.__getitem__" title="Link to this definition">¶</a></dt>
+<dd><p>Create a copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> with the given children.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">Key</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">b</span>
+
+<span class="n">Key</span><span class="p">(</span><span class="s1">&#39;my-id&#39;</span><span class="p">)[</span>
+    <span class="s1">&#39;Hello, &#39;</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">[</span><span class="s1">&#39;World&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;!&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>Hello, <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>World<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>!
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>children</strong> – A <a class="reference internal" href="#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of
+<a class="reference internal" href="#blu.Node" title="blu.Node"><code class="xref py py-type docutils literal notranslate"><span class="pre">blu.Node</span></code></a>s.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If <code class="docutils literal notranslate"><span class="pre">children</span></code> is a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>, a frament whose
+children are <code class="docutils literal notranslate"><span class="pre">list(children)</span></code>. Otherwise, a fragment whose
+children are <code class="docutils literal notranslate"><span class="pre">[children]</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blu.Ref">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">Ref</span></span><a class="headerlink" href="#blu.Ref" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code></a></p>
+<p>The object returned by <a class="reference internal" href="#blu.use_ref" title="blu.use_ref"><code class="xref py py-func docutils literal notranslate"><span class="pre">blu.use_ref()</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.tml</span><span class="w"> </span><span class="kn">import</span> <span class="n">button</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">TwoButtons</span><span class="p">():</span>
+    <span class="c1"># assigns variable ref to an instance of Ref.</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">use_ref</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="blu.Ref.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">empty_slice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)"><span class="pre">slice</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="headerlink" href="#blu.Ref.__getitem__" title="Link to this definition">¶</a></dt>
+<dd><p>Get the value currently stored in the <a class="reference internal" href="#blu.Ref" title="blu.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">button</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">TwoButtons</span><span class="p">():</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">use_ref</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">)</span>
+    <span class="n">ref</span><span class="p">[:]</span>  <span class="c1"># &#39;Hello&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>empty_slice</strong> – Must be an empty slice, i.e. when you must
+put a single colon between the square brackets, without any
+numbers.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value currently stored in <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blu.Ref.__setitem__">
+<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">empty_slice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)"><span class="pre">slice</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blu.Ref.__setitem__" title="Link to this definition">¶</a></dt>
+<dd><p>Set the <a class="reference internal" href="#blu.Ref" title="blu.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a> to point to a different value.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.tml</span><span class="w"> </span><span class="kn">import</span> <span class="n">button</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">TwoButtons</span><span class="p">():</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">use_ref</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">)</span>
+    <span class="n">ref</span><span class="p">[:]</span> <span class="o">=</span> <span class="s1">&#39;Goodbye&#39;</span>
+    <span class="n">ref</span><span class="p">[:]</span>  <span class="c1"># &#39;Goodbye&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>empty_slice</strong> – Must be an empty slice, i.e. when you must
+put a single colon between the square brackets, without any
+numbers.</p></li>
+<li><p><strong>new_value</strong> – The new value that should be stored in
+<code class="docutils literal notranslate"><span class="pre">self</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Once this method has been called, the <a class="reference internal" href="#blu.Ref" title="blu.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a>'s
+stored value will be set to <code class="docutils literal notranslate"><span class="pre">new_value</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="blu.is_client">
+<span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">is_client</span></span><em class="property"><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#blu.is_client" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if running in a web browser environment, <code class="docutils literal notranslate"><span class="pre">False</span></code> if running in server environment.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_client</span>
+
+<span class="k">if</span> <span class="n">is_client</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from your web browser!&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from your web app server!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py type">
+<dt class="sig sig-object py" id="blu.ClientRenderer">
+<em class="property"><span class="pre">type</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">ClientRenderer</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><span class="pre">collections.abc.Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">blu.Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#blu.ClientRenderer" title="Link to this definition">¶</a></dt>
+<dd><p>A function that defines how a <a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientElement</span></code></a> is rendered. This type of function is passed into the <a class="reference internal" href="#blu.client" title="blu.client"><code class="xref py py-func docutils literal notranslate"><span class="pre">client</span></code></a> decorator to create a <a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientElement</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">span</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Greeting</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s1">&#39;Hello, World!&#39;</span>
+</pre></div>
+</div>
+<p>For more details on how <a class="reference internal" href="#blu.ClientRenderer" title="blu.ClientRenderer"><code class="xref py py-type docutils literal notranslate"><span class="pre">ClientRenderer</span></code></a> functions are used, see <a class="reference internal" href="#blu.client" title="blu.client"><code class="xref py py-func docutils literal notranslate"><span class="pre">client()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py type">
+<dt class="sig sig-object py" id="blu.Node">
+<em class="property"><span class="pre">type</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">Node</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><span class="pre">ClientElement</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#blu.HTMLElement" title="blu.HTMLElement"><span class="pre">HTMLElement</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#blu.Key" title="blu.Key"><span class="pre">Key</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#blu.Node" title="Link to this definition">¶</a></dt>
+<dd><p>A valid child of a React element. Nodes are rendered as follows:</p>
+<ul>
+<li><p>A <a class="reference internal" href="#blu.HTMLElement" title="blu.HTMLElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">blu.HTMLElement</span></code></a> is rendered as described <a class="reference external" href="https://react.dev/reference/react-dom/components">here</a>.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">span</span>
+
+<span class="n">span</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;my-id&#39;</span><span class="p">)[</span><span class="s1">&#39;Hello, World!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">span</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;my-id&quot;</span><span class="p">&gt;</span>Hello, World!<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><dl>
+<dt>A <a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">blu.ClientElement</span></code></a> is rendered as the return value of its rendering function. See <a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">blu.ClientElement</span></code></a> for more details.</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">span</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">WorldGreeting</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">span</span><span class="p">[</span><span class="s1">&#39;Hello, World!&#39;</span><span class="p">]</span>
+
+
+<span class="n">WorldGreeting</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>Hello, World!<span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>A <a class="reference internal" href="#blu.Key" title="blu.Key"><code class="xref py py-class docutils literal notranslate"><span class="pre">blu.Key</span></code></a> is rendered as a keyed <a class="reference external" href="https://react.dev/reference/react/Fragment">React fragment</a> whose key is the same as the key passed in to the <a class="reference internal" href="#blu.Key" title="blu.Key"><code class="xref py py-class docutils literal notranslate"><span class="pre">Key</span></code></a> object’s constructor.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">Key</span>
+
+<span class="n">Key</span><span class="p">(</span><span class="mi">125</span><span class="p">)[</span>
+    <span class="n">span</span><span class="p">[</span><span class="s1">&#39;Hello, World!&#39;</span><span class="p">],</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>Hello, World!<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> is rendered as an HTML text node.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;Hello, World!&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>Hello, World!
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> is rendered as a <a class="reference external" href="https://react.dev/reference/react/Fragment">React fragment</a> without a key.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="s1">&#39;Hello,&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;World!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>Hello, World!
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Any other <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a> is rendered in React as JavaScript arrays.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;Hello,&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;World!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>Hello, World!
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>A <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> is rendered as an HTML text node.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>1
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>A <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> is rendered as an HTML text node.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="mf">1.0</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>1.0
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code></a> is rendered as an HTML text node with the text <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kc">True</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>true
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code></a> is rendered as an HTML text node with the text <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kc">False</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>false
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> is rendered as nothing. It is rendered in React as the JavaScript <code class="docutils literal notranslate"><span class="pre">null</span></code> value.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kc">None</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blu.Response">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">Response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.14)"><span class="pre">Mapping</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blu.Response" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>An HTTP response for a page in a web application. Return a
+<a class="reference internal" href="#blu.Response" title="blu.Response"><code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code></a> from a <code class="docutils literal notranslate"><span class="pre">__page__</span></code> function (see
+<a class="reference internal" href="file-conventions.html#file-conventions"><span class="std std-ref">File Conventions</span></a>) to set HTTP status and headers for that
+page.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">__index__.py</span><a class="headerlink" href="#id3" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">__page__</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span>
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;Hello.&#39;</span><span class="p">],</span>
+        <span class="n">status</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;Cache-Control&#39;</span><span class="p">:</span> <span class="s1">&#39;no-cache&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Last-Modified&#39;</span><span class="p">:</span> <span class="s1">&#39;Tue, 10 Dec 2024 10:00:00 GMT&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>body</strong> – The React node to render when displaying the page.</p></li>
+<li><p><strong>status</strong> – The status code to send in the HTTP response.</p></li>
+<li><p><strong>headers</strong> – The HTTP headers to send in the HTTP response.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="blu.WrongEnvironmentError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">WrongEnvironmentError</span></span><a class="headerlink" href="#blu.WrongEnvironmentError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Raised when an attempt is made to perform a server-only action on
+the client, or a client-only action on the server.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blu.app">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Scope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sender</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blu.app" title="Link to this definition">¶</a></dt>
+<dd><p>An <a class="reference external" href="https://asgi.readthedocs.io/en/latest/">ASGI</a> app that runs
+the Blu application defined in your current Python environment’s
+<code class="docutils literal notranslate"><span class="pre">app</span></code> package (for most ASGI servers, running the server in the
+parent directory of your project’s <code class="docutils literal notranslate"><span class="pre">app</span></code> directory will put your
+project’s <code class="docutils literal notranslate"><span class="pre">app</span></code> package in the Python environment).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>uvicorn<span class="w"> </span>blu:app
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>hypercorn<span class="w"> </span>blu:app
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>daphne<span class="w"> </span>blu:app
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blu.client">
+<span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">renderer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClientRenderer</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blu.ClientElement" title="blu._nodes.ClientElement"><span class="pre">ClientElement</span></a></span></span><a class="headerlink" href="#blu.client" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator that converts a rendering function into a
+<a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">blu.ClientElement</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">span</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ColoredText</span><span class="p">(</span><span class="n">color</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">span</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">color</span><span class="p">})[(</span><span class="k">yield</span><span class="p">)]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>renderer</strong> – The function that should be used to render the
+<a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientElement</span></code></a>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An element that will be rendered client-side using
+<code class="docutils literal notranslate"><span class="pre">renderer</span></code>.</p>
+</dd>
+</dl>
+<p>When a <a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientElement</span></code></a> is rendered, the
+rendering function it was created from is called with whatever
+arguments were passed in using <a class="reference internal" href="#blu.ClientElement.__call__" title="blu.ClientElement.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ClientElement.__call__()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">span</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Greeting</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;World&#39;</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+
+
+<span class="n">Greeting</span><span class="p">(</span><span class="s1">&#39;Gary&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>Hello, Gary!
+</pre></div>
+</div>
+<p>If arguments were never set using <a class="reference internal" href="#blu.ClientElement.__call__" title="blu.ClientElement.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ClientElement.__call__()</span></code></a>, then the render function will be
+called with no arguments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">span</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Greeting</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;World&#39;</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+
+
+<span class="n">Greeting</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>Hello, World!
+</pre></div>
+</div>
+<p>A render function may use the yield keyword (only once) to get the
+children set using <a class="reference internal" href="#blu.ClientElement.__getitem__" title="blu.ClientElement.__getitem__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ClientElement.__getitem__()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">span</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">RedText</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">span</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;red&#39;</span><span class="p">})[(</span><span class="k">yield</span><span class="p">)]</span>
+
+
+<span class="n">RedText</span><span class="p">[</span><span class="s1">&#39;Danger!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">span</span> <span class="na">style</span><span class="o">=</span><span class="s">&#39;color: red&#39;</span><span class="p">&gt;</span>Danger!<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>If the element’s children were never set using
+<a class="reference internal" href="#blu.ClientElement.__getitem__" title="blu.ClientElement.__getitem__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ClientElement.__getitem__()</span></code></a>,
+it won’t have any children:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">span</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">RedText</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">span</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;red&#39;</span><span class="p">})[(</span><span class="k">yield</span><span class="p">)]</span>
+
+
+<span class="n">RedText</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">span</span> <span class="na">style</span><span class="o">=</span><span class="s">&#39;color: red&#39;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blu.create_rare_html_element">
+<span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">create_rare_html_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tagname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blu.HTMLElement" title="blu._nodes.HTMLElement"><span class="pre">HTMLElement</span></a></span></span><a class="headerlink" href="#blu.create_rare_html_element" title="Link to this definition">¶</a></dt>
+<dd><p>Create an HTML element. Usually, you will use the <a class="reference internal" href="blu.html.html#module-blu.html" title="blu.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">blu.html</span></code></a>
+module to create HTML elements, but in rare cases where you cannot
+import the tag name you need from <a class="reference internal" href="blu.html.html#module-blu.html" title="blu.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">blu.html</span></code></a>, you can use this
+function to create an HTML element from any valid tag name.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rare_html_element</span>
+
+<span class="n">my_element</span> <span class="o">=</span> <span class="n">create_rare_html_element</span><span class="p">(</span><span class="s1">&#39;my_element-&#39;</span><span class="p">)</span>
+
+<span class="n">my_element</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;my-id&#39;</span><span class="p">)[</span><span class="s1">&#39;Hello, World!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">my_element-</span><span class="p">&gt;</span>Hello, World!<span class="p">&lt;/</span><span class="nt">my_element-</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tagname</strong> – A valid HTML tag name.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#blu.HTMLElement" title="blu.HTMLElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">blu.HTMLElement</span></code></a> whose tag name is <code class="docutils literal notranslate"><span class="pre">tagname</span></code>,
+with no props set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blu.use_effect">
+<span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">use_effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" title="(in Python v3.14)"><span class="pre">Generator</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blu.use_effect" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is a <em>hook</em>. For more information on hooks and the rules of calling them, see <a class="reference internal" href="#note-on-hooks"><span class="std std-ref">Note on Hooks</span></a>.</p>
+</div>
+<p>Perform set-up actions immediately after a <a class="reference internal" href="#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientElement</span></code></a> is rendered to the DOM and/or tear-down actions
+immediately before it is removed from the DOM.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span><span class="p">,</span> <span class="n">use_effect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">div</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">MyClientElement</span><span class="p">():</span>
+
+    <span class="nd">@use_effect</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_and_teardown</span><span class="p">():</span>
+        <span class="n">do_some_setup</span><span class="p">()</span>
+        <span class="k">yield</span>
+        <span class="n">do_some_teardown</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">div</span><span class="p">[</span><span class="s1">&#39;Hello!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>callback</strong> – A non-generator function or a generator function
+with a single <code class="docutils literal notranslate"><span class="pre">yield</span></code> statement.</p>
+</dd>
+</dl>
+<p>If <code class="docutils literal notranslate"><span class="pre">callback</span></code> is generator function, it will be run right up until
+the <code class="docutils literal notranslate"><span class="pre">yield</span></code> statement immediately after the element is initially
+rendered to the DOM. The rest of the function will be run
+immediately before the element is removed from the DOM.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">callback</span></code> is not a generator function, <code class="docutils literal notranslate"><span class="pre">callback</span></code> will be
+called immediately after the element is initially rendered to the
+DOM.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blu.use_ref">
+<span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">use_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#blu.Ref" title="blu._hooks.Ref"><span class="pre">Ref</span></a></span></span><a class="headerlink" href="#blu.use_ref" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is a <em>hook</em>. For more information on hooks and the rules of calling them, see <a class="reference internal" href="#note-on-hooks"><span class="std std-ref">Note on Hooks</span></a>.</p>
+</div>
+<p>Store a value doesn’t change between renders unless explicitly set
+to a new value.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span><span class="p">,</span> <span class="n">is_client</span><span class="p">,</span> <span class="n">use_ref</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">button</span>
+
+<span class="k">if</span> <span class="n">is_client</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">js</span><span class="w"> </span><span class="kn">import</span> <span class="n">alert</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">MyElement</span><span class="p">():</span>
+    <span class="n">click_count_ref</span> <span class="o">=</span> <span class="n">use_ref</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_click</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+        <span class="n">click_count_ref</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">click_count_ref</span><span class="p">[:]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">click_count_ref</span><span class="p">[:]</span>
+        <span class="n">alert</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You&#39;</span><span class="n">ve</span> <span class="n">clicked</span> <span class="n">the</span> <span class="n">button</span> <span class="p">{</span><span class="n">count</span><span class="p">}</span> <span class="n">times</span><span class="o">.</span><span class="s1">&#39;)</span>
+
+    <span class="k">return</span> <span class="n">button</span><span class="p">[</span><span class="s1">&#39;Click me!&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>init</strong> – Any value.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#blu.Ref" title="blu.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a>. This will be the same
+<a class="reference internal" href="#blu.Ref" title="blu.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a> object on every render of the same
+element. On the initial render, the value stored in the
+<a class="reference internal" href="#blu.Ref" title="blu.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a> will be <code class="docutils literal notranslate"><span class="pre">init</span></code>, but you can set this to
+a new value at any time (see <a class="reference internal" href="#blu.Ref" title="blu.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">blu.Ref</span></code></a> for how to set a
+<a class="reference internal" href="#blu.Ref" title="blu.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a>'s value).</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting a <a class="reference internal" href="#blu.Ref" title="blu.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a>'s value does not trigger a
+re-render.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blu.use_state">
+<span class="sig-prename descclassname"><span class="pre">blu.</span></span><span class="sig-name descname"><span class="pre">use_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#blu.use_state" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is a <em>hook</em>. For more information on hooks and the rules of calling them, see <a class="reference internal" href="#note-on-hooks"><span class="std std-ref">Note on Hooks</span></a>.</p>
+</div>
+<p>Handle state management for an element.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">button</span>
+
+<span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">MyElement</span><span class="p">():</span>
+    <span class="n">click_count</span><span class="p">,</span> <span class="n">set_click_count</span> <span class="o">=</span> <span class="n">use_state</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_click</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+        <span class="n">set_click_count</span><span class="p">(</span><span class="n">click_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">button</span><span class="p">(</span><span class="n">onClick</span><span class="o">=</span><span class="n">handle_click</span><span class="p">)[</span>
+            <span class="sa">f</span><span class="s1">&#39;You</span><span class="se">\&#39;</span><span class="s1">ve clicked </span><span class="si">{</span><span class="n">click_count</span><span class="si">}</span><span class="s1"> times&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>init</strong> – An initial value for the state being managed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing two items: The current value for the
+state being managed, and a function that takes any value and
+causes the element whose render function <code class="docutils literal notranslate"><span class="pre">use_state</span></code> was
+called in to re-render. On a re-render triggered by this setter,
+the first item in the tuple will be whatever was passed into the
+setter when the re-render was triggered. On a re-render not
+triggered by this state’s setter, the first item in the tuple
+will be whatever it was in the previous render. On the initial
+render, the first item in the tuple will be <code class="docutils literal notranslate"><span class="pre">init</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="note-on-hooks">
+<span id="id2"></span><h2>Note on Hooks<a class="headerlink" href="#note-on-hooks" title="Link to this heading">¶</a></h2>
+<p>Blu is a React framework, and React provides a special type of function called a <em>hook</em>. These are the functions you import from Blu whose names start with <code class="docutils literal notranslate"><span class="pre">use</span></code>. They are used for managing UI state and adding callbacks for lifecycle phases, and there are certain restrictions on how they can be used:</p>
+<ol class="arabic simple">
+<li><p>A hook can only be called in the scope of a client element’s rendering function body, or the scope of a custom hook’s function body (a <em>custom hook</em> is any function whose name starts with <code class="docutils literal notranslate"><span class="pre">use</span></code> that calls other hooks).</p></li>
+<li><p>A client element rendering function or custom hook must call the same hooks in the same order <em>every time</em> the rendering function or custom hook is called. The best way to follow this rule is just to never call a hook in a conditional block or loop.</p></li>
+</ol>
+<p>Breaking either of these rules will result in undefined behavior.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span><span class="p">,</span> <span class="n">use_ref</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blu.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">p</span>
+
+
+<span class="c1"># Wrong! This function is not a client element or custom hook, so</span>
+<span class="c1"># it can&#39;t call hooks.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">some_function</span><span class="p">():</span>
+    <span class="n">some_ref</span> <span class="o">=</span> <span class="n">use_ref</span><span class="p">()</span>
+
+
+<span class="c1"># Right. This is a client element whose rendering function calls</span>
+<span class="c1"># the use_ref hook.</span>
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">SomeClientElement</span><span class="p">():</span>
+    <span class="n">some_ref</span> <span class="o">=</span> <span class="n">use_ref</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;(client element content)&#39;</span><span class="p">]</span>
+
+
+<span class="c1"># Right. Because this function&#39;s name starts with &quot;use&quot;, it is a</span>
+<span class="c1"># valid custom hook and can call other hooks.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">use_some_hook</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">use_ref</span><span class="p">()</span>
+
+
+<span class="c1"># Wrong! Hook called in an conditional block.</span>
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">SomeClientElement</span><span class="p">(</span><span class="n">some_condition</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">some_condition</span><span class="p">:</span>
+        <span class="n">my_ref</span> <span class="o">=</span> <span class="n">use_ref</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">my_ref</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;(client element content)&#39;</span><span class="p">]</span>
+
+
+<span class="c1"># Wrong! Hook called in a conditional block.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">use_some_hook</span><span class="p">(</span><span class="n">some_condition</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">some_condition</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">use_ref</span><span class="p">()</span>
+
+
+<span class="c1"># Wrong! Hook called in a loop.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">use_some_hook</span><span class="p">(</span><span class="n">some_list</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">some_list</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">use_ref</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="c1"># Wrong! Hook called in a loop.</span>
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">SomeClientElement</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">num_iterations</span><span class="p">:</span>
+        <span class="n">my_ref</span> <span class="o">=</span> <span class="n">use_ref</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;(client element content)&#39;</span><span class="p">]</span>
+
+
+<span class="c1"># Wrong! use_my_custom_hook is a custom hook, so it must *not* be</span>
+<span class="c1"># called in a conditinal block.</span>
+<span class="nd">@client</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">SomeClientElement</span><span class="p">(</span><span class="n">some_condition</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">some_condition</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">use_my_custom_hook</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;(client element content)&#39;</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">use_my_custom_hook</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">use_ref</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+  <ul class="footer-nav">
+      <li class="prev">
+        <a href="index.html">&lt; API Reference</a>
+      </li>
+    
+      <li class="next">
+        <a href="blu.html.html"><code class="docutils literal notranslate"><span class="pre">blu.html</span></code> &gt;</a>
+      </li>
+  </ul>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Blu</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user-guide/index.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">blu</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="blu.html.html"><code class="docutils literal notranslate"><span class="pre">blu.html</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="js.html"><code class="docutils literal notranslate"><span class="pre">js</span></code> (client-only)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscript.html"><code class="docutils literal notranslate"><span class="pre">pyscript</span></code> (client-only)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-conventions.html">File Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">API Reference</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">API Reference</a></li>
+      <li>Next: <a href="blu.html.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">blu.html</span></code></a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, John Larson.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api-reference/blu.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

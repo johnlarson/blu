@@ -701,7 +701,7 @@ class ClientElement:
 
 
             @client
-            def Greeting(name = 'World'):
+            def Greeting(name='World'):
                 return div[f'Hello, {name}!']
 
 

@@ -162,14 +162,14 @@ class HTMLElement:
             prop's key and the argument value is the prop's value. This
             is the usual way to specify props.
 
-        :return: A copy of :data:`self` with the same :data:`children`
-            but with :data:`props` set as follows:
+        :return: A copy of ``self`` with the same children, but with
+            props set as follows:
 
-            1. For any key-value pair in the :data:`props` argument, the
+            1. For any key-value pair in the ``props`` argument, the
                prop named by the key will be set to the value.
 
-               For example, :data:`div(props={'my_prop_': 45})`
-               results in the React element ``<div my_prop_={45} />``
+               For example, ``div(props={'my_prop_': 45})`` results in
+               the React element ``<div my_prop_={45} />``
 
             2. For any keyword argument, the value will be set to a key
                derived from:
@@ -177,18 +177,18 @@ class HTMLElement:
                - Removing the last trailing underscore (if any).
                - Replacing all other underscores with dashes.
 
-               For example, :data:`div(my_prop_=45)` results in the
-               React element ``<div my-prop={45} />``.
+               For example, ``div(my_prop_=45)`` results in the React
+               element ``<div my-prop={45} />``.
 
-            3. If there is any conflict between the :data:`attributes`
-               argument and the keyword arguments, the prop that has the
-               conflict will be set based on the :data:`props`
-               argument as described in (1). Any props that do not have
-               conflicts will be set the same way they otherwise would,
-               irrespective of the props that do have conflicts.
+            3. If there is any conflict between the ``props`` argument
+               and the keyword arguments, the prop that has the conflict
+               will be set based on the ``props`` argument as described
+               in (1). Any props that do not have conflicts will be set
+               the same way they otherwise would, irrespective of the
+               props that do have conflicts.
 
                For example,
-               :data:`div(props={'props-only': 'props', 'shared': 'props'}, shared='kw', kw_only='kw')`
+               ``div(props={'props-only': 'props', 'shared': 'props'}, shared='kw', kw_only='kw')``
                results in the React element
                ``<div props-only="props" shared="props" kw-only="kw" />``
         """

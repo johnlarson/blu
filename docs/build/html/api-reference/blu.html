@@ -88,7 +88,7 @@ arguments.</p>
 
 
 <span class="nd">@client</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">Greeting</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;World&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Greeting</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;World&#39;</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">div</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">]</span>
 
 
@@ -241,8 +241,8 @@ is the usual way to specify props.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>A copy of <code class="xref py py-data docutils literal notranslate"><span class="pre">self</span></code> with the same <code class="xref py py-data docutils literal notranslate"><span class="pre">children</span></code>
-but with <code class="xref py py-data docutils literal notranslate"><span class="pre">props</span></code> set as follows:</p>
+<dd class="field-even"><p><p>A copy of <code class="docutils literal notranslate"><span class="pre">self</span></code> with the same children props set as
+follows:</p>
 <ol class="arabic">
 <li><p>For any key-value pair in the <code class="xref py py-data docutils literal notranslate"><span class="pre">props</span></code> argument, the
 prop named by the key will be set to the value.</p>

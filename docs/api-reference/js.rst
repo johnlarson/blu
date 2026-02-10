@@ -32,4 +32,4 @@ This module allows access to the JavaScript environment's global namespace:
 
 The ``js`` module allows you to work with native JavaScript web APIs within your client-side code.
 
-PyScript provides the choice of two Python interpreters: Pyodide and MicroPython. While Blu uses MicroPython, MicroPython follows the same rules as Pyodide when converting JavasScript objects to Python objects, so you can view the `Type translations <https://pyodide.org/en/stable/usage/type-conversions.html>`_ section in Pyodide's documentation to learn more about how JavaScript objects are converted when imported into a Python scope.
+PyScript provides the choice of two Python interpreters: Pyodide and MicroPython. Blu uses Pyodide. You can view the `Type translations <https://pyodide.org/en/stable/usage/type-conversions.html>`_ section in Pyodide's documentation to learn more about how JavaScript objects are converted when imported into a Python scope.

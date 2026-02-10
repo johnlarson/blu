@@ -40,12 +40,12 @@
             
   <section id="file-conventions">
 <h1>File Conventions<a class="headerlink" href="#file-conventions" title="Link to this heading">¶</a></h1>
-<p>A Blu app is defined by the <a class="reference internal" href="#special-files"><span class="std std-ref">special files</span></a> under its <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory. The <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory should be placed in the project root (this is where you run <code class="docutils literal notranslate"><span class="pre">blu</span> <span class="pre">dev</span></code> from).</p>
+<p>A Blu app is defined by the <a class="reference internal" href="#special-files"><span class="std std-ref">special files</span></a> under its <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory. The <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory should be placed in the project root (this is the working directory where you run the development server using the <code class="docutils literal notranslate"><span class="pre">blu</span></code> command).</p>
 <p>Note that some special files’ behavior is influenced by <a class="reference internal" href="#directories"><span class="std std-ref">the directories in their paths</span></a>, relative to the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory.</p>
-<p>You can also put <a class="reference internal" href="../user-guide/static-files.html#static-files"><span class="std std-ref">static files</span></a> in the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory.</p>
+<p>You can also put <a class="reference internal" href="#static-files"><span class="std std-ref">static files</span></a> in the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory.</p>
 <section id="directories">
 <h2>Directories<a class="headerlink" href="#directories" title="Link to this heading">¶</a></h2>
-<p>Any directory placed under the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory is used for file-based routing. Each directory represents one of the slash-separated segments in an HTTP request’s URL path (see examples for each directory type).</p>
+<p>Any directory placed under the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory is used for file-based routing. Each directory represents one of the slash-separated segments in an HTTP request’s URL path.</p>
 <p>The behavior of certain special files like __index__.py is influenced by the paths of the segment directories they are under.</p>
 <p>Each directory type follows a specified pattern for directory name and has set behavior.</p>
 <section id="literal-segment">
@@ -72,7 +72,7 @@
 </section>
 <section id="route-param-name">
 <h3><strong>_{</strong><em>route_param_name</em><strong>}_</strong><a class="headerlink" href="#route-param-name" title="Link to this heading">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">^_(?P&lt;route_param_name&gt;[^\\W\\d_]|[^\\W\\d_][\\w]*[^\\W_])_$</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">^_(?P&lt;route_param_name&gt;[^\W\d_]|[^\W\d_][\w]*[^\W_])_$</span></code></p>
 <p>(<em>route_param_name</em>, surrounded by single underscores, where <em>route_param_name</em> is a valid python identifier that doesn’t start or end with an underscore)</p>
 <p>A dynamic route segment. Matches any path segment.</p>
 <p><em>route_param_name</em> is passed down to the handler under this segment that matches the URL path, if any.</p>
@@ -492,7 +492,7 @@
 <p class="admonition-title">Note</p>
 <p>Static files are served statically even if they are under a dynamic route. So if you have a file at <code class="docutils literal notranslate"><span class="pre">app/_id_/file.txt</span></code>, then sending a request to <code class="docutils literal notranslate"><span class="pre">/some-id/file.txt</span></code> will result in an HTTP 404 error. Instead, you would access the file at <code class="docutils literal notranslate"><span class="pre">/_id_/file.txt</span></code>.</p>
 </div>
-<p>Blu serves static files in production as well as in development, but if you want to serve static files from a separate service, you can access them in the <code class="docutils literal notranslate"><span class="pre">static/</span></code> directory (this will be in your project root, in the same parent directory as <code class="docutils literal notranslate"><span class="pre">app/</span></code>) after <a class="reference internal" href="../user-guide/deploying-your-app.html#building-your-app"><span class="std std-ref">building your app for production</span></a>.</p>
+<p>Blu serves static files in production as well as in development, but if you want to serve static files from a separate service, you can access them in the <code class="docutils literal notranslate"><span class="pre">static/</span></code> directory (this will be in your project root, in the same parent directory as <code class="docutils literal notranslate"><span class="pre">app/</span></code>) after <span class="xref std std-ref">building your app for production</span>.</p>
 </section>
 </section>
 

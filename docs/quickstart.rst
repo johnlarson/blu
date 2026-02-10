@@ -26,7 +26,7 @@ To start up a development instance of your app, enter the following in a termina
 
 .. code-block:: console
    
-   $ blu dev
+   $ blu
 
 This will start up the app and output a url where you can access it (``http://127.0.0.1:{some port}``). Visit this url in a web browser, and you should see the following:
 

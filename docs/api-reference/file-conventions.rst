@@ -1,7 +1,7 @@
 File Conventions
 ================
 
-A Blu app is defined by the :ref:`special files <Special Files>` under its ``app/`` directory. The ``app/`` directory should be placed in the project root (this is where you run ``blu dev`` from).
+A Blu app is defined by the :ref:`special files <Special Files>` under its ``app/`` directory. The ``app/`` directory should be placed in the project root (this is the working directory where you run the development server using the ``blu`` command).
 
 Note that some special files' behavior is influenced by :ref:`the directories in their paths <Directories>`, relative to the ``app/`` directory.
 
@@ -11,7 +11,7 @@ You can also put :ref:`static files <Static Files>` in the ``app/`` directory.
 Directories
 -----------
 
-Any directory placed under the ``app/`` directory is used for file-based routing. Each directory represents one of the slash-separated segments in an HTTP request's URL path (see examples for each directory type).
+Any directory placed under the ``app/`` directory is used for file-based routing. Each directory represents one of the slash-separated segments in an HTTP request's URL path.
 
 The behavior of certain special files like __index__.py is influenced by the paths of the segment directories they are under.
 
@@ -43,7 +43,7 @@ A static route segment. Matches a URL path segment that equals *literal_segment*
 **_{**\ *route_param_name*\ **}_**
 ++++++++++++++++++++++++++++++++++
 
-``^_(?P<route_param_name>[^\\W\\d_]|[^\\W\\d_][\\w]*[^\\W_])_$``
+``^_(?P<route_param_name>[^\W\d_]|[^\W\d_][\w]*[^\W_])_$``
 
 (*route_param_name*, surrounded by single underscores, where *route_param_name* is a valid python identifier that doesn't start or end with an underscore)
 

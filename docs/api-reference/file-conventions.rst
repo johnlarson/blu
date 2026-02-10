@@ -90,6 +90,7 @@ Handles a request whose full URL matches all directories in the path to this fil
     /foo
     /foo/baz
     /foo/some/other/path
+    /foo/bar/extra/segments
 
 Top-level functions
 ^^^^^^^^^^^^^^^^^^^
@@ -104,7 +105,7 @@ Top-level functions
         from blu.html import p
 
         
-        def __page__(slug, __, q):
+        def __page__(slug, /, q):
             return (
                 p['The slug value is: ', slug],
                 p['The query param value is: ', q],
@@ -116,7 +117,7 @@ Top-level functions
         <p>The slug value is: some-slug-value</p>
         <p>The query param value is: some-query-value</p>
 
-    :param url: (see :ref:`file-conventions/files/what-does-triple-start-url-mean`)
+    :param url: (see :ref:`file-conventions/files/what-does-triple-star-url-mean`)
     
     :return: - If an instance of :type:`blu.Node`, the page that should be sent in the HTTP response.
 
@@ -154,32 +155,6 @@ Top-level functions
 .. py:function:: __page__(***url) -> blu.Node | blu.Response
 
     Handle a request whose URL path is matched by this file.
-
-    .. code-block:: python
-        :caption: app/static_segment/_slug_/__default__.py
-
-        from blu.html import p
-
-        
-        def __page__(slug, __, q):
-            return (
-                p['The remaining path is: ', __],
-                p['The slug value is: ', slug],
-                p['The query param value is: ', q],
-            )
-    
-    .. code-block:: python
-        :caption: app/static_segment/_slug_/__default__.py
-
-        from blu.html import p
-
-        
-        def __page__(path, _, slug, /, q):
-            return (
-                p['The remaining path is: ', path],
-                p['The slug value is: ', slug],
-                p['The query param value is: ', q],
-            )
     
     .. code-block:: python
         :caption: app/static_segment/_slug_/__default__.py
@@ -189,19 +164,19 @@ Top-level functions
         
         def __page__(slug, path__, /, q):
             return (
-                p['The remaining path is: ', path],
                 p['The slug value is: ', slug],
+                p['The remaining path is: ', path],
                 p['The query param value is: ', q],
             )
 
     .. code-block:: html
         :caption: GET /static_segment/some-slug-value/some/extra/path?q=some-query-value
 
-        <p>The remaining path is: some/extra/path</p>
         <p>The slug value is: some-slug-value</p>
+        <p>The remaining path is: some/extra/path</p>
         <p>The query param value is: some-query-value</p>
 
-    :param url: (see :ref:`file-conventions/files/what-does-triple-start-url-mean`)
+    :param url: (see :ref:`file-conventions/files/what-does-triple-star-url-mean`)
 
     :return: - If an instance of :type:`blu.Node`, the page that should be sent in the HTTP response.
 
@@ -214,14 +189,14 @@ __settings__.py
 
 Configuration for your Blu app.
 
-Should be placed in the root of the ``app/`` directory, i.e. the app directory should be the immediate parent directory of __settings__.py.
+Should be placed in the root of the ``app/`` directory, i.e. the app directory should be the immediate parent of __settings__.py.
 
 .. code-block:: python
     :caption: app/__settings__.py
 
     CLIENT_REQUIREMENTS = ['arrr', 'aiohttp']
 
-You can configure your Blu app by creating a __settings__.py file and assigning configuration values at the top level of the file. For example, the __settings__.py file above sets the *CLIENT_REQUIREMENTS* configuration property to ``['arrr', 'aiohttp']``.
+You can configure your Blu app by creating a __settings__.py file and assigning configuration values at the top level of the file. For example, the __settings__.py file above sets the ``CLIENT_REQUIREMENTS`` configuration property to ``['arrr', 'aiohttp']``.
 
 A __settings__.py file is not required, and an app without a __settings__.py file will be treated the same as an app whose __settings__.py is empty.
 
@@ -241,17 +216,8 @@ A __settings__.py file can have any of the following settings:
 
         CLIENT_REQUIREMENTS = ['aiohttp']
 
-    
-    .. note::
-        
-        Blu uses a tool called PyScript to run Python client-side. PyScript gives the option of a more feature-complete but less-efficient Python interpreter called Pyodide, or a faster interpreter called MicroPython.
 
-        Blu is configured to use MicroPython, so many PyPI packages are not compatible with Blu's client-side environment.
-
-        For more information, see https://docs.pyscript.net/2024.11.1/user-guide/architecture/#interpreters.
-
-
-.. _file-conventions/files/what-does-triple-start-url-mean:
+.. _file-conventions/files/what-does-triple-star-url-mean:
 
 What does *\*\*\*url* mean?
 +++++++++++++++++++++++++++
@@ -285,7 +251,27 @@ You can capture route parameters from dynamic route segments by passing them in 
 Capturing query parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Any arguments specified after ``__`` (a double underscore) in your call signature will capture query parameters instead of route parameters:
+Any arguments specified after ``/`` in your call signature will capture query parameters instead of route parameters:
+
+.. code-block:: python
+    :caption: app/_id_/__index__.py
+
+    from blu.html import p
+
+    def __page__(id, /, foo):
+        return (
+            p['ID: ', id],
+            p['foo:', foo],
+        )
+
+.. code-block:: html
+    :caption: GET /123?foo=3
+
+    <p>ID: 123</p>
+    <p>foo: 3</p>
+
+
+Python doesn't allow a ``/`` at the beginning of the call signature, so use ``_`` (single underscore) before the ``/`` if there are no route parameters:
 
 .. code-block:: python
     :caption: app/greet_me/__index__.py
@@ -293,7 +279,7 @@ Any arguments specified after ``__`` (a double underscore) in your call signatur
     from blu.html import p
 
 
-    def __page__(__, my_name):
+    def __page__(_, /, my_name):
         return p['Hello ', my_name, '!']
 
 .. code-block:: html
@@ -309,11 +295,11 @@ You can set default values for query parameters:
     from blu.html import p
 
 
-    def __page__(__, my_name='World'):
+    def __page__(_, /, my_name='World'):
         return p['Hello ', my_name, '!']
 
 .. code-block:: html
-    :caption: GET /greet_me?my_name=Kevin
+    :caption: GET /greet_me
 
     <p>Hello World!</p>
 
@@ -325,7 +311,7 @@ You can also use ``**kwargs`` for query parameters:
     from blu.html import p
 
 
-    def __page__(__, my_name, **kwargs):
+    def __page__(_, /, my_name, **kwargs):
         greeting = kwargs.get('greeting', 'Hello')
         return p[greeting, ' ', my_name, '!']
 
@@ -334,52 +320,33 @@ You can also use ``**kwargs`` for query parameters:
 
     <p>Hi Kevin!</p>
 
-If you also have route parameters, place them before ``__``:
-
-.. code-block:: python
-    :caption: app/_id_/__index__.py
-
-    from blu.html import p
-
-    def __page__(id, __, foo):
-        return (
-            p['ID: ', id],
-            p['foo:', foo],
-        )
-
-.. code-block:: html
-    :caption: GET /123?foo=3
-
-    <p>ID: 123</p>
-    <p>foo: 3</p>
-
 
 Capturing the remaining path
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since a call to a ``__page__`` handler in a ``__default__.py`` file usually results from a partial URL match rather than a full match, it can be useful to access the remaining, unmatched portion at the end of the URL path. You can capture this using the ``__`` (double underscore) argument:
+Since a call to a ``__page__`` handler in a ``__default__.py`` file usually results from a partial URL match rather than a full match, it can be useful to access the remaining, unmatched portion at the end of the URL path. You can capture this by including an argument whose name ends with ``__`` (double underscore):
 
 .. code-block:: python
     :caption: app/foo/__default__.py
 
     from blu.html import p
 
-    def __page__(__):
-        return p['Remaining path: ', __]
+    def __page__(path__):
+        return p['Remaining path: ', path__]
 
 .. code-block:: html
     :caption: GET /foo/bar/baz
 
     <p>Remaining path: bar/baz</p>
 
-This can be used alongside route parameters and query parameters:
+This can be used alongside route parameters and query parameters. In this case, it should come before the ``/``:
 
 .. code-block:: python
     :caption: app/_id_/__default__.py
 
     from blu.html import p
 
-    def __page__(id, __, baz):
+    def __page__(id, path__, /, baz):
         return (
             p['ID: ', id],
             p['Remaining path:', __],
@@ -393,15 +360,15 @@ This can be used alongside route parameters and query parameters:
     <p>Remaining path: foo/bar</p>
     <p>baz: 3</p>
 
-An ``__index__.py`` file, however, is only matched using a full match, so it never has any remaining, unmatched URL path segments. Because of this, ``__`` will always evaluate to ``''`` in an ``__index__.py`` file's ``__page__`` handler:
+An ``__index__.py`` file, however, is only matched using a full match, so it never has any remaining, unmatched URL path segments. Because of this, the remaining path argument will always evaluate to ``''`` in an ``__index__.py`` file's ``__page__`` handler:
 
 .. code-block:: python
     :caption: app/foo/__index__.py
 
     from blu.html import p
 
-    def __page__(__):
-        return p['Remaining path: ', __]
+    def __page__(path__):
+        return p['Remaining path: ', path__]
 
 .. code-block:: html
     :caption: GET /foo/bar/baz

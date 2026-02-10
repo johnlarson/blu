@@ -399,6 +399,20 @@ The following module-level attribute has special meaning in any Python module un
 
 Set a module's ``__client__`` attribute to ``True`` in order to make the module available client-side.
 
+.. note::
+    Because Blu uses static analysis to read ``__client__``'s value, the source code must include the exact text ``__client__ = True`` as a top-level statement in order for the module to be available client-side. For example, the following will *not* work:
+
+    .. code:: python
+
+        __client__ = 1 + 1 == 2
+
+
+    .. code:: python
+        
+        if 1 + 1 == 2:
+            __client__ = True
+
+
 If a module does not have a ``__client__`` attribute set to ``True``, it will not be available to run client-side. For example, trying to use the :func:`ClientElement <blu.ClientElement>` ``Hello`` shown in the following example will fail, because the user's browser will attempt to render ``Hello``, but will raise an :class:`ImportError` when trying to import ``Hello`` because the module it is in doesn't exist in the client environment:
 
 .. code-block:: python

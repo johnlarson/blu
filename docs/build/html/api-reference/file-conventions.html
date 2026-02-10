@@ -430,6 +430,17 @@
 </pre></div>
 </div>
 <p>Set a module’s <code class="docutils literal notranslate"><span class="pre">__client__</span></code> attribute to <code class="docutils literal notranslate"><span class="pre">True</span></code> in order to make the module available client-side.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Because Blu uses static analysis to read <code class="docutils literal notranslate"><span class="pre">__client__</span></code>’s value, the source code must include the exact text <code class="docutils literal notranslate"><span class="pre">__client__</span> <span class="pre">=</span> <span class="pre">True</span></code> as a top-level statement in order for the module to be available client-side. For example, the following will <em>not</em> work:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__client__</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">__client__</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
 <p>If a module does not have a <code class="docutils literal notranslate"><span class="pre">__client__</span></code> attribute set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, it will not be available to run client-side. For example, trying to use the <a class="reference internal" href="blu.html#blu.ClientElement" title="blu.ClientElement"><code class="xref py py-func docutils literal notranslate"><span class="pre">ClientElement</span></code></a> <code class="docutils literal notranslate"><span class="pre">Hello</span></code> shown in the following example will fail, because the user’s browser will attempt to render <code class="docutils literal notranslate"><span class="pre">Hello</span></code>, but will raise an <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImportError</span></code></a> when trying to import <code class="docutils literal notranslate"><span class="pre">Hello</span></code> because the module it is in doesn’t exist in the client environment:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blu</span><span class="w"> </span><span class="kn">import</span> <span class="n">client</span>
 

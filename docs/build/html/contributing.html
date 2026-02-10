@@ -56,10 +56,8 @@
 <section id="making-changes">
 <h2>Making Changes<a class="headerlink" href="#making-changes" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Update the <a class="reference internal" href="api-reference/index.html#api-reference"><span class="std std-ref">API Reference</span></a> to reflect intended changes. The <a class="reference internal" href="api-reference/index.html#api-reference"><span class="std std-ref">API Reference</span></a> should be treated as the single source of truth for requirements; any expected functionality should be documented there.</p></li>
-<li><p>As appropriate, update the <a class="reference internal" href="user-guide/index.html#user-guide"><span class="std std-ref">User Guide</span></a> to reflect intended changes. This will be necessary if the change invalidates part of the <a class="reference internal" href="user-guide/index.html#user-guide"><span class="std std-ref">User Guide</span></a>, is difficult to understand with the <a class="reference internal" href="api-reference/index.html#api-reference"><span class="std std-ref">API Reference</span></a> alone, or affects core functionality.</p></li>
-<li><p>Update tests to reflect changes to <a class="reference internal" href="api-reference/index.html#api-reference"><span class="std std-ref">API Reference</span></a>. These tests ensure the package works as expected.</p></li>
-<li><p>As necessary, update the User Guide tests to reflect changes made to the <a class="reference internal" href="user-guide/index.html#user-guide"><span class="std std-ref">User Guide</span></a>. This will be necessary if you made changes to code examples in the User Guide or added new code examples. These tests ensure the User Guide is accurate.</p></li>
+<li><p>Update the <a class="reference internal" href="api-reference/index.html#api-reference"><span class="std std-ref">API Reference</span></a> (and <a class="reference internal" href="user-guide/index.html#user-guide"><span class="std std-ref">User Guide</span></a>, if appropriate) to reflect intended changes.</p></li>
+<li><p>Write tests or update existing ones to test the feature or bug fix you are implementing.</p></li>
 <li><p>Ensure the tests you wrote or changed fail.</p></li>
 <li><p>Get all tests to pass.</p></li>
 <li><p>If you haven’t already, make a pull request.</p></li>
@@ -68,10 +66,6 @@
 <section id="make-a-pull-request-early">
 <h2>Make a Pull Request Early<a class="headerlink" href="#make-a-pull-request-early" title="Link to this heading">¶</a></h2>
 <p>You don’t have to wait until your changes are ready to merge to make a pull request. In fact, making a pull request early allows you to get early feedback, preventing you from doing significant work that is later rejected. For example, a pull request with just proposed documentation changes allows revisions to be made before anything is implemented, and a pull request with initial work allows revisions to be made to implementation stategy before more work has been put into the implementation.</p>
-</section>
-<section id="end-to-end-tests">
-<h2>End-to-End Tests<a class="headerlink" href="#end-to-end-tests" title="Link to this heading">¶</a></h2>
-<p>If you submit a pull request that changes core functionality or the way elements are rendered to the DOM, you may be asked to update end-to-end tests to reflect these changes. Generally, you should assume this is not necessary, but know that it may be requested after you make a pull request.</p>
 </section>
 </section>
 
@@ -118,7 +112,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#setup">Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#making-changes">Making Changes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#make-a-pull-request-early">Make a Pull Request Early</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#end-to-end-tests">End-to-End Tests</a></li>
 </ul>
 </li>
 </ul>

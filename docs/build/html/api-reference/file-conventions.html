@@ -470,7 +470,6 @@
 <p class="admonition-title">Note</p>
 <p>Static files are served statically even if they are under a dynamic route. So if you have a file at <code class="docutils literal notranslate"><span class="pre">app/_id_/file.txt</span></code>, then sending a request to <code class="docutils literal notranslate"><span class="pre">/some-id/file.txt</span></code> will result in an HTTP 404 error. Instead, you would access the file at <code class="docutils literal notranslate"><span class="pre">/_id_/file.txt</span></code>.</p>
 </div>
-<p>Blu serves static files in production as well as in development, but if you want to serve static files from a separate service, you can access them in the <code class="docutils literal notranslate"><span class="pre">static/</span></code> directory (this will be in your project root, in the same parent directory as <code class="docutils literal notranslate"><span class="pre">app/</span></code>) after <span class="xref std std-ref">building your app for production</span>.</p>
 </section>
 </section>
 

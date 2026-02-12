@@ -38,7 +38,7 @@
         div[
             [
                 Key(person["id"])[
-                    f'Hello, {person["name"]',
+                    f'Hello, {person["name"]}',
                 ]
                 for person in PEOPLE
             ],

@@ -53,7 +53,7 @@ async def page(
 ) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
     async with async_playwright() as playwright:
         chromium = playwright.chromium
-        browser = await chromium.launch(headless=True)
+        browser = await chromium.launch(headless=False)
 
         async def ret(app_name: str) -> Page:
             patch_app(app_name)
@@ -357,3 +357,21 @@ async def test_dev_server(patch_app: Callable[[str], None]):
                     assert False
                 finally:
                     await browser.close()
+
+
+async def test_unusual_root_nodes(page: PageFixture):
+    p = await page("e2e")
+    await p.goto("/unusual_root_nodes/float")
+    await expect(p.get_by_text("1.23485")).to_be_visible()
+    await p.goto("/unusual_root_nodes/int")
+    await expect(p.get_by_text("234857")).to_be_visible()
+    await p.goto("/unusual_root_nodes/iterable")
+    await expect(p.get_by_text("ABC")).to_be_visible()
+    await p.goto("/unusual_root_nodes/key")
+    await expect(p.get_by_text("Hello!")).to_be_visible()
+    await p.goto("/unusual_root_nodes/none")
+    await expect(p.get_by_text(re.compile(r".+"))).to_have_count(0)
+    await p.goto("/unusual_root_nodes/str")
+    await expect(p.get_by_text("Hello!")).to_be_visible()
+    await p.goto("/unusual_root_nodes/tuple")
+    await expect(p.get_by_text("ABC")).to_be_visible()

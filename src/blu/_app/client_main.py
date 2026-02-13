@@ -3,6 +3,7 @@ print("Hello, World!")
 import base64
 from collections import defaultdict
 import pickle
+from types import NoneType
 from blu._utils.typing import Generator
 
 print("defaultdic:", defaultdict)
@@ -23,6 +24,7 @@ from pyscript import js_import  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
 
 from blu._nodes import ClientRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
+from blu.html import div
 
 # react_dom = await js_import('https://esm.sh/react-dom/client')
 # react = await js_import('https://esm.sh/react')
@@ -36,6 +38,12 @@ async def main():
     b64_bytes = b64_str.encode("ascii")
     pickled = base64.b64decode(b64_bytes)
     unpickled = pickle.loads(pickled)
+    if not isinstance(
+        unpickled,
+        (HTMLElement, ClientElement, Key, tuple, NoneType),
+    ):
+        if isinstance(unpickled, str) or not isinstance(unpickled, Iterable):
+            unpickled = div[unpickled]
     root_node = get_node(unpickled)
     print("ROOT NODE:", root_node.to_py())
     if isinstance(root_node, dict) and root_node.get("type", None) == "html":

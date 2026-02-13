@@ -1,6 +1,10 @@
-Go through and update/fix issues in docs
-Go through docs making sure everything works as shown; also add images and GIFs
+Go through docs finding issues
+Write tests for those issues
+Fix those issues
+Add images and GIFs
+Fix weird display thing with next/prev pages in docs?
 Move to GitHub?
+Do todos shown in docs?
 Create GitHub issues?
 ----------------------
 Ready to Publish

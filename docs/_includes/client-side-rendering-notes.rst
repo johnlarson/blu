@@ -117,7 +117,7 @@
 
 
         def __page__():
-            return GoToPyPIButton
+            return GoToPythonDotOrgButton
 
         
         @client

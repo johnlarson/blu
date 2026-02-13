@@ -92,7 +92,7 @@ Client elements can take arguments:
 
 
     def __page__():
-        ColoredText('red', text='This should be red.')
+        return ColoredText('red', text='This should be red.')
 
     
     @client
@@ -117,7 +117,7 @@ You can also pass child nodes to client elements using square bracket notation a
 
 
     def __page__():
-        ColoredText('red')[
+        return ColoredText('red')[
             'This should be red.',
         ]
 
@@ -185,7 +185,8 @@ Use :func:`blu.use_state` to specify UI state and change that state in response 
 
 .. code-block:: python
 
-    from blu import use_state
+    from blu import client, use_state
+    from blu.html import button
 
     __client__ = True
 
@@ -199,7 +200,7 @@ Use :func:`blu.use_state` to specify UI state and change that state in response 
 
         return button(onClick=increment_click_count)[
             'Click Count: ',
-            count_count,
+            click_count,
         ]
 
 This will result in a button that tells you how many times it's been clicked:

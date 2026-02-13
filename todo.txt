@@ -1,5 +1,4 @@
-Go through docs finding issues
-Write tests for those issues
+Write tests for issues found going through docs
 Fix those issues
 Add images and GIFs
 Fix weird display thing with next/prev pages in docs?

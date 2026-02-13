@@ -51,7 +51,7 @@ To solve this, you create a *client element*. A client element is an custom elem
         return button(onClick=say_hello)
 
 
-    def say_hello():
+    def say_hello(e):
         print('Hello!')
 
 So if you visit the page in the example above,

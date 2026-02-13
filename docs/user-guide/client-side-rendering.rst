@@ -277,7 +277,7 @@ Sometimes, you'll want to perform some action immediately after rendering, witho
 
 .. code-block:: python
 
-    from blu import running_on_client, use_effect
+    from blu import client, is_client, use_effect
     from blu.html import p
 
     if is_client:
@@ -319,7 +319,7 @@ What's happening here:
 
     .. code-block:: python
 
-        from blu import running_on_client, use_effect
+        from blu import client, is_client, use_effect, use_state
         from blu.html import p
 
         if running_on_client:

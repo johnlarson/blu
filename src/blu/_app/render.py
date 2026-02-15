@@ -7,6 +7,7 @@ import pickle
 import shutil
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
+from blu._settings import settings
 from blu._utils.typing import Optional
 from xml.etree import ElementTree as ET
 
@@ -105,5 +106,5 @@ async def _get_config() -> dict[str, Jsonable]:
             "/_blu_internal/blu_pkg.zip": "./blu/*",
             "/_blu_internal/app_pkg.zip": "./app/*",
         },
-        # 'experimental_create_proxy': 'auto',
+        "packages": settings().CLIENT_REQUIREMENTS,
     }

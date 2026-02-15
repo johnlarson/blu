@@ -380,4 +380,5 @@ async def test_unusual_root_nodes(page: PageFixture):
 async def test_settings(page: PageFixture):
     p = await page("e2e_settings")
     await p.goto("/")
-    await sleep(300)
+    await expect(p.get_by_text("Ahoy there. How be you?")).to_be_visible()
+    await expect(p.get_by_text("👍")).to_be_visible()

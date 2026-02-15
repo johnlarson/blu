@@ -15,5 +15,5 @@ def MyClientElement():
 
     return div[
         p[arrr.translate("Hello there. How are you?")],
-        p[emoji.emojize(":heart_eyes:")],
+        p[emoji.emojize(":thumbs_up:")],
     ]

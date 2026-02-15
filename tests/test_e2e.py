@@ -375,3 +375,9 @@ async def test_unusual_root_nodes(page: PageFixture):
     await expect(p.get_by_text("Hello!")).to_be_visible()
     await p.goto("/unusual_root_nodes/tuple")
     await expect(p.get_by_text("ABC")).to_be_visible()
+
+
+async def test_settings(page: PageFixture):
+    p = await page("e2e_settings")
+    await p.goto("/")
+    await sleep(300)

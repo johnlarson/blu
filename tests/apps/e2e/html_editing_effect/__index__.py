@@ -11,7 +11,7 @@ def __page__():
 
 @client
 def RefTest():
-    div_ref = use_ref(None)
+    div_ref = use_ref()
 
     @use_effect
     def _():

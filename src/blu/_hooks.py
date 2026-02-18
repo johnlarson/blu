@@ -283,7 +283,7 @@ class Ref[T]:
                 current.destroy()
 
 
-def use_ref[T](init: T) -> Ref[T]:
+def use_ref[T](init: T = None) -> Ref[T]:
     """
     .. include:: /_includes/hook-note.rst
 

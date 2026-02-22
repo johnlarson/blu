@@ -320,33 +320,30 @@ What's happening here:
     .. code-block:: python
 
         from blu import client, is_client, use_effect, use_state
-        from blu.html import p
+        from blu.html import button
 
-        if running_on_client:
-            # The pyscript module is automatically made available in
-            # Blu client-side code. See https://docs.pyscript.net
-            # for details on this module.
-            from pyscript import window
-        
+        if is_client:
+            # The js module provides access to JavaScript APIs. See
+            # Blu's API reference for more details.
+            from js import alert
+
         __client__ = True
-        
+
 
         @client
-        def MyClientElement():
-
-            click_count, set_click_count = use_state(0)
+        def EffectWithCleanup():
+            render_count, set_render_count = use_state(1)
 
             @use_effect
-            def window_click_handlers():
-
-                def handle_click_anywhere(e):
-                    set_click_count(click_count + 1)
-                
-                window.addEventListener('click', handle_click_anywhere)
+            def _():
+                alert(f'SETUP {render_count}')
                 yield
-                window.removeEventListener('click', handle_click_anywhere)
-            
-            return p['You\'ve clicked on this page ', click_count, ' times.']
+                alert(f'TEARDOWN {render_count}')
+
+            def handle_button_click(e):
+                set_render_count(render_count + 1)
+
+            return button(onClick=handle_button_click)["Rerender"]
 
     .. todo:: GIF
 

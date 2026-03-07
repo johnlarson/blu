@@ -40,6 +40,8 @@ async def main():
     b64_bytes = b64_str.encode("ascii")
     pickled = base64.b64decode(b64_bytes)
     unpickled = pickle.loads(pickled)
+    _blu_js_utils.render_root(unpickled)  # type: ignore
+    return
     if not isinstance(
         unpickled,
         (HTMLElement, ClientElement, Key, tuple, NoneType),

@@ -6,6 +6,8 @@ import pickle
 from types import NoneType
 from blu._utils.typing import Generator
 
+from pyscript.js_modules import _blu_js_utils
+
 print("defaultdic:", defaultdict)
 
 

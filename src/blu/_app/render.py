@@ -99,6 +99,7 @@ async def _get_config() -> dict[str, Jsonable]:
             "main": {
                 "https://esm.sh/react-dom/client": "_blu_react_dom",
                 "https://esm.sh/react": "_blu_react",
+                "/_blu_internal/util.js": "_blu_js_utils",
             },
         },
         "debug": True,

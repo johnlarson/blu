@@ -69,6 +69,7 @@ async def _lifespan(
 
 PYTHON_MIME = "text/x-python"
 ZIP_MIME = "text/zip"
+JS_MIME = "text/javascript"
 
 
 async def _http(
@@ -86,6 +87,9 @@ async def _http(
         path = Path(__file__).parent / "client_main.py"
         await _serve_file(path, PYTHON_MIME, send)
         return
+    if scope["path"] == "/_blu_internal/util.js":
+        path = Path(__file__).parent.parent / "util.js"
+        await _serve_file(path, JS_MIME, send)
     try:
         await _serve_static(scope, send)
     except NotFound:

@@ -33,9 +33,21 @@ from blu.html import div
 
 from pyscript.js_modules import _blu_react_dom as react_dom
 from pyscript.js_modules import _blu_react as react
+from importlib import import_module
+
+
+PYTHON_TYPES = create_proxy(  # type: ignore
+    {
+        "ClientElement": ClientElement,
+        "Key": Key,
+        "tuple": tuple,
+        "HTMLElement": HTMLElement,
+    }
+)
 
 
 async def main():
+    _blu_js_utils.init(import_module)  # type: ignore
     b64_str: str = cast(str, document.querySelector('script[type="react-data"]').textContent)  # type: ignore
     b64_bytes = b64_str.encode("ascii")
     pickled = base64.b64decode(b64_bytes)

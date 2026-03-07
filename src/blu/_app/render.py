@@ -18,6 +18,7 @@ type Renamer = dict[tuple[Optional[str], Path], Optional[str]]
 
 REACT_LOCATION = "https://esm.sh/react"
 REACT_DOM_LOCATION = "https://esm.sh/react-dom"
+PYSCRIPT_URL = "https://pyscript.net/releases/2026.1.1/core.js"
 
 
 async def render_to_str(root: Node) -> str:
@@ -77,7 +78,7 @@ def _get_pyscript_include() -> ET.Element:
         "script",
         {
             "type": "module",
-            "src": "https://pyscript.net/releases/2026.1.1/core.js",
+            "src": PYSCRIPT_URL,
         },
     )
 

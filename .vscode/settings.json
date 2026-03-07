@@ -9,5 +9,6 @@
     // "reportSelfClsParameterName": false,
     // "reportGeneralTypeIssues": "information"
     // "reportGeneralTypeIssues": false
-  }
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:pipenv"
 }

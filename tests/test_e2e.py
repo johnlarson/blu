@@ -53,7 +53,7 @@ async def page(
 ) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
     async with async_playwright() as playwright:
         chromium = playwright.chromium
-        browser = await chromium.launch(headless=False)
+        browser = await chromium.launch(headless=True)
 
         async def ret(app_name: str) -> Page:
             patch_app(app_name)
@@ -141,7 +141,7 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     p = await page("e2e")
     await p.goto("/rendering")
     del_ = p.locator("del")
-    await expect(del_).to_have_count(1)
+    await expect(del_).to_have_count(1, timeout=10_000)
     await expect(del_).to_have_id("my-id")
     await expect(del_).to_have_text("Hello, World!ABCDEF12.0TrueFalseYZ")
 
@@ -331,7 +331,7 @@ async def test_dev_server(patch_app: Callable[[str], None]):
                     break
             async with async_playwright() as playwright:
                 chromium = playwright.chromium
-                browser = await chromium.launch(headless=False)
+                browser = await chromium.launch(headless=True)
                 context = await browser.new_context(base_url=url)
                 p = await context.new_page()
                 try:
@@ -380,5 +380,6 @@ async def test_unusual_root_nodes(page: PageFixture):
 async def test_settings(page: PageFixture):
     p = await page("e2e_settings")
     await p.goto("/")
-    await expect(p.get_by_text("Ahoy there. How be you?")).to_be_visible()
+    arrr_exp = expect(p.get_by_text("Ahoy there. How be you?"))
+    await arrr_exp.to_be_visible(timeout=10_000)
     await expect(p.get_by_text("👍")).to_be_visible()

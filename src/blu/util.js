@@ -81,15 +81,22 @@ function getArray(pyIterable) {
 }
 
 export function useState(init) {
-  const memoryManaged = useMemoryManagement(init);
-  return react.useState(init);
+  const notMemoryManaged = ['number', 'string', 'boolean'].includes(typeof init) ||
+                           [undefined, null].includes(init);
+  const wrapped = notMemoryManaged ? init : createProxy(init);
+  react.useEffect(() => () => {
+    if (!notMemoryManaged) {
+      ret.destroy();
+    }
+  });
+  return react.useState(wrapped);
 }
 
 export function useRefObj(pyRef) {
-
+  
 }
 
-function useMemoryManagement(toManage) {
+function useMemoryManagement(toManage, longLived = false) {
   const notMemoryManaged = ['number', 'string', 'boolean'].includes(typeof toManage) ||
                            [undefined, null].includes(toManage);
   const ret = notMemoryManaged ? toManage : createProxy(toManage);
@@ -102,5 +109,14 @@ function useMemoryManagement(toManage) {
 }
 
 export function useEffect(callback) {
-
+  react.useEffect(() => {
+    const result = callback();
+    if (isinstance(result, abc.Generator)) {
+      const generator = createProxy(result);
+      return () => {
+        generator.next();
+        generator.destroy();
+      };
+    }
+  })
 }

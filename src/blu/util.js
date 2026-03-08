@@ -81,11 +81,24 @@ function getArray(pyIterable) {
 }
 
 export function useState(init) {
+  const memoryManaged = useMemoryManagement(init);
+  return react.useState(init);
+}
+
+export function useRefObj(pyRef) {
 
 }
 
-export function useRef(init) {
-
+function useMemoryManagement(toManage) {
+  const notMemoryManaged = ['number', 'string', 'boolean'].includes(typeof toManage) ||
+                           [undefined, null].includes(toManage);
+  const ret = notMemoryManaged ? toManage : createProxy(toManage);
+  react.useEffect(() => () => {
+    if (!notMemoryManaged) {
+      ret.destroy();
+    }
+  });
+  return ret;
 }
 
 export function useEffect(callback) {

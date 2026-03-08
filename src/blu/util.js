@@ -93,19 +93,16 @@ export function useState(init) {
 }
 
 export function useRefObj(pyRef) {
-  
-}
-
-function useMemoryManagement(toManage, longLived = false) {
-  const notMemoryManaged = ['number', 'string', 'boolean'].includes(typeof toManage) ||
-                           [undefined, null].includes(toManage);
-  const ret = notMemoryManaged ? toManage : createProxy(toManage);
+  const refProxiedRef = react.useRef(false);
+  if (!refProxiedRef.current) {
+    pyRef = createProxy(pyRef);
+    refProxiedRef.current = true;
+  }
+  const refRef = useRef(pyRef);
   react.useEffect(() => () => {
-    if (!notMemoryManaged) {
-      ret.destroy();
-    }
-  });
-  return ret;
+    refRef.current.destroy();
+  }, []);
+  return react.useRef(pyRef);
 }
 
 export function useEffect(callback) {

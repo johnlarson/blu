@@ -1,3 +1,4 @@
+import react from 'https://esm.sh/react';
 import { createElement as $, Fragment } from 'https://esm.sh/react';
 import { createRoot } from 'https://esm.sh/react-dom/client';
 import PyScript from 'https://pyscript.net/releases/2026.1.1/core.js';
@@ -11,6 +12,7 @@ let createProxy;
 let blu;
 let builtins;
 let isinstance;
+let abc;
 
 export function init(innerPyImport) {
   const ffi = innerPyImport('pyscript.ffi');
@@ -21,6 +23,7 @@ export function init(innerPyImport) {
   blu = pyImport('blu');
   builtins = pyImport('builtins');
   isinstance = builtins.isinstance;
+  abc = pyImport('collections.abc')
 }
 
 export function renderRoot(pyRootIn) {
@@ -36,7 +39,7 @@ function getReactNode(pyNode) {
       renderer: pyNode._renderer,
       args: pyNode._args,
       kwargs: pyNode._kwargs,
-      py_children: pyNode._children,
+      pyChildren: pyNode._children,
     })
   } else if (isinstance(pyNode, blu.Key)) {
     return $(Fragment, { key: pyNode._key },
@@ -57,8 +60,20 @@ function getReactNode(pyNode) {
   }
 }
 
-function PythonElement({}) {
-
+function PythonElement({ renderer, args, kwargs, pyChildren }) {
+  react.useEffect(() => () => {
+    retProxy.destroy();
+  })
+  const result = renderer.callKwargs(...args, kwargs);
+  let pyNode;
+  if (isinstance(result, abc.Generator)) {
+    result.next();
+    pyNode = result.return(pyChildren).value;
+  } else {
+    pyNode = result;
+  }
+  retProxy = createProxy(pyNode);
+  return getReactNode(retProxy);
 }
 
 function getArray(pyNode) {

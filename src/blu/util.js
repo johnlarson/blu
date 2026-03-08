@@ -33,23 +33,23 @@ export function renderRoot(pyRootIn) {
 function getReactNode(pyNode) {
   if (isinstance(pyNode, blu.ClientElement)) {
     return $(PythonElement, {
-      renderer: create_proxy(pyNode._renderer),
-      args: create_proxy(pyNode._args),
-      kwargs: create_proxy(pyNode._kwargs),
-      py_children: create_proxy(pyNode._children),
+      renderer: pyNode._renderer,
+      args: pyNode._args,
+      kwargs: pyNode._kwargs,
+      py_children: pyNode._children,
     })
   } else if (isinstance(pyNode, blu.Key)) {
-    return $(MemoryManagedFragment, { key: pyNode._key },
+    return $(Fragment, { key: pyNode._key },
       ...getArray(pyNode._children),
     );
   } else if (isinstance(pyNode, builtins.tuple)) {
-    return $(MemoryManagedFragment, null, ...getArray(pyNode));
+    return $(Fragment, null, ...getArray(pyNode));
   } else if (typeof pyNode === 'string') {
     return pyNode;
   } else if (Symbol.iterator in pyNode) {
     return getArray(pyNode);
   } else if (isinstance(pyNode, blu.HTMLElement)) {
-    return $(Fragment, getObj())
+    return $(pyNode._tagname, null, ...getArray(pyNode._children));
   } else if (pyNode === undefined) {
     return undefined;
   } else {
@@ -58,14 +58,6 @@ function getReactNode(pyNode) {
 }
 
 function PythonElement({}) {
-
-}
-
-function MemoryManagedFragment(props) {
-
-}
-
-function MemoryManagedHTMLElement(props) {
 
 }
 

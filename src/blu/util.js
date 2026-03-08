@@ -76,8 +76,8 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
   return getReactNode(retProxy);
 }
 
-function getArray(pyNode) {
-
+function getArray(pyIterable) {
+  return Array.from(pyIterable).map(x => getReactNode(x));
 }
 
 export function useState(init) {

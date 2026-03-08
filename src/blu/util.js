@@ -102,7 +102,7 @@ export function useRefObj(pyRef) {
   react.useEffect(() => () => {
     refRef.current.destroy();
   }, []);
-  return react.useRef(pyRef);
+  return refRef.current;
 }
 
 export function useEffect(callback) {

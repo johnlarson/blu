@@ -11,7 +11,6 @@ console.log('PYSCRIPT INTERPRETER:', PyScript)
 let createProxy;
 let blu;
 let builtins;
-let isinstance;
 let abc;
 
 export function init(innerPyImport) {
@@ -22,7 +21,6 @@ export function init(innerPyImport) {
   }
   blu = pyImport('blu');
   builtins = pyImport('builtins');
-  isinstance = builtins.isinstance;
   abc = pyImport('collections.abc')
 }
 
@@ -34,24 +32,24 @@ export function renderRoot(pyRootIn) {
 }
 
 function getReactNode(pyNode) {
-  if (isinstance(pyNode, blu.ClientElement)) {
+  if (isOfType(pyNode, blu.ClientElement)) {
     return $(PythonElement, {
       renderer: pyNode._renderer,
       args: pyNode._args,
       kwargs: pyNode._kwargs,
       pyChildren: pyNode._children,
     })
-  } else if (isinstance(pyNode, blu.Key)) {
+  } else if (isOfType(pyNode, blu.Key)) {
     return $(Fragment, { key: pyNode._key },
       ...getArray(pyNode._children),
     );
-  } else if (isinstance(pyNode, builtins.tuple)) {
+  } else if (isOfType(pyNode, builtins.tuple)) {
     return $(Fragment, null, ...getArray(pyNode));
   } else if (typeof pyNode === 'string') {
     return pyNode;
-  } else if (Symbol.iterator in pyNode) {
+  } else if (isOfType(pyNode, abc.Iterable)) {
     return getArray(pyNode);
-  } else if (isinstance(pyNode, blu.HTMLElement)) {
+  } else if (isOfType(pyNode, blu.HTMLElement)) {
     // TODO: Figure out how to deal with props and ref
     const attrs = {};
     let hasRef = false;
@@ -138,4 +136,11 @@ export function useEffect(callback) {
       };
     }
   })
+}
+
+function isOfType(obj, pyClass) {
+  if (!pyClass.match(/^<class '[_A-Za-z0-9\.]+'>$/g)) {
+    throw Error('Second argument must be a Python class.')
+  }
+  return obj.__class__.toString() === pyClass.toString();
 }

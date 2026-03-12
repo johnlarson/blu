@@ -88,7 +88,11 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
 }
 
 function getArray(pyIterable) {
-  return Array.from(pyIterable).map(x => getReactNode(x));
+  const ret = [];
+  for (const item of pyIterable) {
+    ret.push(createProxy(item));
+  }
+  return ret;
 }
 
 export function useState(init) {
@@ -139,7 +143,7 @@ export function useEffect(callback) {
 }
 
 function isOfType(obj, pyClass) {
-  if (!pyClass.match(/^<class '[_A-Za-z0-9\.]+'>$/g)) {
+  if (!pyClass.toString().match(/^<class '[_A-Za-z0-9\.]+'>$/g)) {
     throw Error('Second argument must be a Python class.')
   }
   return obj.__class__.toString() === pyClass.toString();

@@ -1,7 +1,7 @@
 import react from 'https://esm.sh/react';
 import { createElement as $, Fragment } from 'https://esm.sh/react';
 import { createRoot } from 'https://esm.sh/react-dom/client';
-import PyScript from 'https://pyscript.net/releases/2026.1.1/core.js';
+import * as PyScript from 'https://pyscript.net/releases/2026.1.1/core.js';
 
 window.ps = PyScript;
 
@@ -52,7 +52,20 @@ function getReactNode(pyNode) {
   } else if (Symbol.iterator in pyNode) {
     return getArray(pyNode);
   } else if (isinstance(pyNode, blu.HTMLElement)) {
-    return $(pyNode._tagname, null, ...getArray(pyNode._children));
+    // TODO: Figure out how to deal with props and ref
+    const attrs = {};
+    let hasRef = false;
+    for (const [k, v] of pyNode._attrs.items()) {
+      if (k == 'ref') {
+        hasRef = true;
+        continue;
+      }
+      attrs[k] = v;
+    }
+    if (hasRef) {
+      attrs['ref'] = pyNode._attrs['ref']._ref_proxy;
+    }
+    return $(pyNode._tagname, attrs, ...getArray(pyNode._children));
   } else if (pyNode === undefined) {
     return undefined;
   } else {
@@ -72,7 +85,7 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
   } else {
     pyNode = result;
   }
-  retProxy = createProxy(pyNode);
+  let retProxy = createProxy(pyNode);
   return getReactNode(retProxy);
 }
 
@@ -97,12 +110,21 @@ export function useRefObj(pyRef) {
   if (!refProxiedRef.current) {
     pyRef = createProxy(pyRef);
     refProxiedRef.current = true;
+    pyRef._ref_proxy = refProxy();
   }
   const refRef = useRef(pyRef);
   react.useEffect(() => () => {
     refRef.current.destroy();
   }, []);
   return refRef.current;
+}
+
+function refProxy(pyRef) {
+  return {
+    set current(newValue) {
+      pyRef._value = newValue;
+    }
+  }
 }
 
 export function useEffect(callback) {

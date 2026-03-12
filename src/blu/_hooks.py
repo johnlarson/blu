@@ -203,6 +203,85 @@ class Ref[T]:
             ref = use_ref()
     """
 
+    _value: T
+    _ref_proxy: Any
+
+    def __getitem__(self, empty_slice: slice) -> T:
+        """
+        Get the value currently stored in the :class:`Ref <blu.Ref>`.
+
+        .. code-block:: python
+
+            from blu import client
+            from blu.html import button
+
+            __client__ = True
+
+
+            @client
+            def TwoButtons():
+                ref = use_ref('Hello')
+                ref[:]  # 'Hello'
+
+        :param empty_slice: Must be an empty slice, i.e. you must put a
+            single colon between the square brackets, without any
+            numbers.
+        :return: The value currently stored in ``self``.
+        """
+        if empty_slice.start or empty_slice.stop or empty_slice.step:
+            raise
+        return self._value
+
+    def __setitem__(self, empty_slice: slice, new_value: T):
+        """
+        Set the :class:`Ref <blu.Ref>` to point to a different value.
+
+        .. code-block:: python
+
+            from blu import client
+            from blu.tml import button
+
+            __client__ = True
+
+
+            @client
+            def TwoButtons():
+                ref = use_ref('Hello')
+                ref[:] = 'Goodbye'
+                ref[:]  # 'Goodbye'
+
+        :param empty_slice: Must be an empty slice, i.e. you must put a
+            single colon between the square brackets, without any
+            numbers.
+        :param new_value: The new value that should be stored in
+            ``self``.
+
+        Once this method has been called, the :class:`Ref <blu.Ref>`\\'s
+        stored value will be set to ``new_value``.
+        """
+        if empty_slice.start or empty_slice.stop or empty_slice.step:
+            raise
+        self._value = new_value
+
+
+class RefOld[T]:
+    """
+    The object returned by :func:`blu.use_ref`.
+
+    .. code-block:: python
+
+        from blu import client
+        from blu.tml import button
+
+        __client__ = True
+
+
+        @client
+        def TwoButtons():
+            # assigns variable ref to an instance of Ref.
+            ref = use_ref()
+    """
+
     _js_ref: Any
 
     def __getitem__(self, empty_slice: slice) -> T:

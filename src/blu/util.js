@@ -109,7 +109,7 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
   }, []);
   const result = renderer.callKwargs(...args, kwargs.toJs({ depth: 1 }));
   let pyNode;
-  if (isinstance(result, abc.Generator)) {
+  if (builtins.isinstance(result, abc.Generator)) {
     result.next();
     pyNode = result.return(pyChildren).value;
   } else {
@@ -144,6 +144,9 @@ function MemManagedHTMLElement({ _blu_tagname, children, ...attrs }) {
 }
 
 function getArray(pyIterable) {
+  if (pyIterable === undefined) {
+    return [];
+  }
   const ret = [];
   for (const item of pyIterable) {
     ret.push(getReactNode(item));

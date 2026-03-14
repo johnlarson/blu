@@ -1,5 +1,7 @@
 """A full stack React framework for Python."""
 
+from typing import Callable
+
 from blu._utils.client import is_client
 from blu._utils.typing import Protocol, Any
 from blu import html
@@ -57,6 +59,9 @@ __all__ = [
     "use_state",
     "use_ref",
 ]
+
+
+noop: Callable[[Any], None] = lambda x: x
 
 
 class Settings(Protocol):

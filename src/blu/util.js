@@ -8,24 +8,44 @@ window.ps = PyScript;
 console.log('Hello from client utils!');
 console.log('PYSCRIPT INTERPRETER:', PyScript)
 
-let createProxy;
+let create_proxy;
 let blu;
 let builtins;
 let abc;
 
 export function init(innerPyImport) {
   const ffi = innerPyImport('pyscript.ffi');
-  createProxy = ffi.create_proxy(ffi.create_proxy);
+  create_proxy = ffi.create_proxy(ffi.create_proxy);
   function pyImport(location) {
-    return createProxy(innerPyImport(location))
+    return create_proxy(innerPyImport(location))
   }
   blu = pyImport('blu');
   builtins = pyImport('builtins');
   abc = pyImport('collections.abc')
 }
 
+const idToProxy = new Map()
+const proxyToId = new Map()
+
+function getProxy(pyObj) {
+  const id = builtins.id(obj);
+  if (!idToProxy.has(id)) {
+    const proxy = create_proxy(obj)
+    idToProxy.set(id, proxy);
+    proxyToId.set(proxy, id);
+  }
+  return idToProxy.get(id);
+}
+
+function destroy(pyProxy) {
+  const id = proxyToId(pyProxy);
+  proxyToId.delete(pyProxy);
+  idToProxy.delete(id);
+  pyProxy.destroy();
+}
+
 export function renderRoot(pyRootIn) {
-  const pyRoot = createProxy(pyRootIn);
+  const pyRoot = getProxy(pyRootIn);
   const jsNode = getReactNode(pyRoot);
   const renderTarget = jsNode.type === 'html' ? document : document.body;
   createRoot(renderTarget).render(jsNode);
@@ -73,8 +93,8 @@ function getReactNode(pyNode) {
 
 function PythonElement({ renderer, args, kwargs, pyChildren }) {
   react.useEffect(() => () => {
-    retProxy.destroy();
-  })
+    destroy(retProxy);
+  });
   const result = renderer.callKwargs(...args, kwargs);
   let pyNode;
   if (isinstance(result, abc.Generator)) {
@@ -83,7 +103,7 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
   } else {
     pyNode = result;
   }
-  let retProxy = createProxy(pyNode);
+  let retProxy = getProxy(pyNode);
   return getReactNode(retProxy);
 }
 
@@ -98,10 +118,10 @@ function getArray(pyIterable) {
 export function useState(init) {
   const notMemoryManaged = ['number', 'string', 'boolean'].includes(typeof init) ||
                            [undefined, null].includes(init);
-  const wrapped = notMemoryManaged ? init : createProxy(init);
+  const wrapped = notMemoryManaged ? init : getProxy(init);
   react.useEffect(() => () => {
     if (!notMemoryManaged) {
-      ret.destroy();
+      destroy(ret);
     }
   });
   return react.useState(wrapped);
@@ -110,13 +130,13 @@ export function useState(init) {
 export function useRefObj(pyRef) {
   const refProxiedRef = react.useRef(false);
   if (!refProxiedRef.current) {
-    pyRef = createProxy(pyRef);
+    pyRef = getProxy(pyRef);
     refProxiedRef.current = true;
     pyRef._ref_proxy = refProxy();
   }
   const refRef = useRef(pyRef);
   react.useEffect(() => () => {
-    refRef.current.destroy();
+    destroy(refRef.current);
   }, []);
   return refRef.current;
 }
@@ -136,7 +156,7 @@ export function useEffect(callback) {
       const generator = createProxy(result);
       return () => {
         generator.next();
-        generator.destroy();
+        destroy(generator);
       };
     }
   })
@@ -150,4 +170,8 @@ function isOfType(obj, pyClass) {
     return false;
   }
   return obj.__class__.toString() === pyClass.toString();
+}
+
+function pyIs(obj1, obj2) {
+  return obj1.__repr__() === obj2.__repr__()
 }

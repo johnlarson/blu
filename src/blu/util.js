@@ -107,7 +107,7 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
     destroy(kwargs);
     destroy(pyChildren);
   }, []);
-  const result = renderer.callKwargs(...args, kwargs);
+  const result = renderer.callKwargs(...args, kwargs.toJs({ depth: 1 }));
   let pyNode;
   if (isinstance(result, abc.Generator)) {
     result.next();

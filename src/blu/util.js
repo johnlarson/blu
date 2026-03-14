@@ -1,4 +1,4 @@
-import react from 'https://esm.sh/react';
+import React from 'https://esm.sh/react';
 import { createElement as $, Fragment } from 'https://esm.sh/react';
 import { createRoot } from 'https://esm.sh/react-dom/client';
 import * as PyScript from 'https://pyscript.net/releases/2026.1.1/core.js';
@@ -29,9 +29,9 @@ const proxyToId = new Map()
 
 const PRIMITIVE_TYPES = ['undefined', 'boolean', 'number', 'bigint', 'string', 'symbol'];
 
-function getProxy(pyObj) {
-  if (pyObj === null || PRIMITIVE_TYPES.includes(typeof pyObj)) {
-    return pyObj;
+function getProxy(obj) {
+  if (obj === null || PRIMITIVE_TYPES.includes(typeof obj)) {
+    return obj;
   }
   const id = builtins.id(obj);
   if (!idToProxy.has(id)) {
@@ -101,7 +101,7 @@ function getReactNode(pyNode) {
 }
 
 function PythonElement({ renderer, args, kwargs, pyChildren }) {
-  react.useEffect(() => () => {
+  React.useEffect(() => () => {
     destroy(renderer);
     destroy(args);
     destroy(kwargs);
@@ -155,23 +155,23 @@ export function useState(init) {
   const notMemoryManaged = ['number', 'string', 'boolean'].includes(typeof init) ||
                            [undefined, null].includes(init);
   const wrapped = notMemoryManaged ? init : getProxy(init);
-  react.useEffect(() => () => {
+  React.useEffect(() => () => {
     if (!notMemoryManaged) {
       destroy(ret);
     }
   });
-  return react.useState(wrapped);
+  return React.useState(wrapped);
 }
 
 export function useRefObj(pyRef) {
-  const refProxiedRef = react.useRef(false);
+  const refProxiedRef = React.useRef(false);
   if (!refProxiedRef.current) {
     pyRef = getProxy(pyRef);
     refProxiedRef.current = true;
     pyRef._ref_proxy = refProxy();
   }
   const refRef = useRef(pyRef);
-  react.useEffect(() => () => {
+  React.useEffect(() => () => {
     destroy(refRef.current);
   }, []);
   return refRef.current;
@@ -186,7 +186,7 @@ function refProxy(pyRef) {
 }
 
 export function useEffect(callback) {
-  react.useEffect(() => {
+  React.useEffect(() => {
     const result = callback();
     if (isinstance(result, abc.Generator)) {
       const generator = createProxy(result);

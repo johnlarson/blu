@@ -27,7 +27,12 @@ export function init(innerPyImport) {
 const idToProxy = new Map()
 const proxyToId = new Map()
 
+const PRIMITIVE_TYPES = ['undefined', 'boolean', 'number', 'bigint', 'string', 'symbol'];
+
 function getProxy(pyObj) {
+  if (pyObj === null || PRIMITIVE_TYPES.includes(typeof pyObj)) {
+    return pyObj;
+  }
   const id = builtins.id(obj);
   if (!idToProxy.has(id)) {
     const proxy = create_proxy(obj)
@@ -38,14 +43,16 @@ function getProxy(pyObj) {
 }
 
 function destroy(pyProxy) {
+  if (pyProxy === null || PRIMITIVE_TYPES.includes(typeof pyObj)) {
+    return;
+  }
   const id = proxyToId(pyProxy);
   proxyToId.delete(pyProxy);
   idToProxy.delete(id);
   pyProxy.destroy();
 }
 
-export function renderRoot(pyRootIn) {
-  const pyRoot = getProxy(pyRootIn);
+export function renderRoot(pyRoot) {
   const jsNode = getReactNode(pyRoot);
   const renderTarget = jsNode.type === 'html' ? document : document.body;
   createRoot(renderTarget).render(jsNode);
@@ -54,21 +61,21 @@ export function renderRoot(pyRootIn) {
 function getReactNode(pyNode) {
   if (isOfType(pyNode, blu.ClientElement)) {
     return $(PythonElement, {
-      renderer: pyNode._renderer,
-      args: pyNode._args,
-      kwargs: pyNode._kwargs,
-      pyChildren: pyNode._children,
+      renderer: getProxy(pyNode._renderer),
+      args: getProxy(pyNode._args),
+      kwargs: getProxy(pyNode._kwargs),
+      pyChildren: getProxy(pyNode._children),
     })
   } else if (isOfType(pyNode, blu.Key)) {
-    return $(Fragment, { key: pyNode._key },
-      ...getArray(pyNode._children),
-    );
+    return $(MemManagedFragment, {
+      key: getProxy(pyNode._key), children: getProxy(pyNode._children)
+    });
   } else if (isOfType(pyNode, builtins.tuple)) {
-    return $(Fragment, null, ...getArray(pyNode));
+    return $(MemManagedFragment, { children: getProxy(pyNode._children) });
   } else if (typeof pyNode === 'string') {
     return pyNode;
   } else if (isOfType(pyNode, abc.Iterable)) {
-    return getArray(pyNode);
+    return $(MemManagedIterable, { children: getProxy(pyNode._children) });
   } else if (isOfType(pyNode, blu.HTMLElement)) {
     // TODO: Figure out how to deal with props and ref
     const attrs = {};
@@ -78,12 +85,14 @@ function getReactNode(pyNode) {
         hasRef = true;
         continue;
       }
-      attrs[k] = v;
+      attrs[k] = getProxy(v);
     }
     if (hasRef) {
-      attrs['ref'] = pyNode._attrs['ref']._ref_proxy;
+      attrs['ref'] = getProxy(pyNode._attrs['ref']._ref_proxy);
     }
-    return $(pyNode._tagname, attrs, ...getArray(pyNode._children));
+    return $(MemManagedHTMLElement, {
+      _blu_tagname: pyNode._tagname, children: getProxy(pyNode._children), ...attrs
+    });
   } else if (pyNode === undefined) {
     return undefined;
   } else {
@@ -93,8 +102,11 @@ function getReactNode(pyNode) {
 
 function PythonElement({ renderer, args, kwargs, pyChildren }) {
   react.useEffect(() => () => {
-    destroy(retProxy);
-  });
+    destroy(renderer);
+    destroy(args);
+    destroy(kwargs);
+    destroy(pyChildren);
+  }, []);
   const result = renderer.callKwargs(...args, kwargs);
   let pyNode;
   if (isinstance(result, abc.Generator)) {
@@ -103,8 +115,32 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
   } else {
     pyNode = result;
   }
-  let retProxy = getProxy(pyNode);
-  return getReactNode(retProxy);
+  return getReactNode(pyNode);
+}
+
+function MemManagedFragment({ key, children }) {
+  React.useEffect(() => () => {
+    destroy(key);
+    destroy(children);
+  }, []);
+  return $(React.Fragment, { key }, ...getArray(children));
+}
+
+function MemManagedIterable({ children }) {
+  React.useEffect(() => () => {
+    destroy(children);
+  }, []);
+  return getArray(children);
+}
+
+function MemManagedHTMLElement({ _blu_tagname, children, ...attrs }) {
+  React.useEffect(() => () => {
+    destroy(children);
+    for (const attr_value of Object.values(attrs)) {
+      destroy(attr_value);
+    }
+  }, []);
+  return $(_blu_tagname, attrs, ...getArray(children));
 }
 
 function getArray(pyIterable) {

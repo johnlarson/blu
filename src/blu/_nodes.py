@@ -516,7 +516,24 @@ def _index_to_children(index: Node | EllipsisType | tuple[Node, ...]) -> Childre
                 "`blu.react.CustomElement`, `typing.Sequence`, "
                 f"`str`, `int`, `float`, `None`. Got {child}"
             )
-    return children
+    return _convert_to_strings(children)
+
+
+def _convert_to_strings(children: list[Node]) -> list[Node]:
+    str_types = (float, bool)
+    ret: list[Node] = []
+    for item in children:
+        if is_client:
+            from pyodide.ffi import jsnull
+
+            if item == jsnull:
+                ret.append(str(item))
+                continue
+        if isinstance(item, str_types):
+            ret.append(str(item))
+        else:
+            ret.append(item)
+    return ret
 
 
 class Key:

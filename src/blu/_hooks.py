@@ -153,14 +153,7 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
         render, the first item in the tuple will be ``init``.
 
     """
-    state = useState(init)
-    value = next(state)
-    setter = next(state)
-    return value, setter
-    init_proxy = create_proxy(init)
-    value_proxy, js_setter = useState(init_proxy)
-    manager = use_setup(StateManager(init_proxy, value_proxy, js_setter))
-    return manager.value_proxy.unwrap(), manager.setter
+    return tuple(useState(init))
 
 
 class StateManager[T](HookManager):

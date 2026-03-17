@@ -261,6 +261,7 @@ class HTMLElement:
         # :return: A copy of `self`, but with `children` set to the
         # children passed into the index operator.
         # """
+        print("HTMLElement children:", children)
         return HTMLElement(
             self._tagname,
             props=self._attrs,
@@ -490,6 +491,11 @@ class CustomElement:
 
 
 def _index_to_children(index: Node | EllipsisType | tuple[Node, ...]) -> Children:
+    if is_client:
+        from pyodide.ffi import JsProxy
+
+        if isinstance(index, JsProxy):
+            index = index.unwrap()
     if index == ...:
         children = []
     elif isinstance(index, tuple):
@@ -501,6 +507,8 @@ def _index_to_children(index: Node | EllipsisType | tuple[Node, ...]) -> Childre
             child,
             (HTMLElement, Key, ClientElement, Sequence, str, Number, bool),
         ):
+            print(f"Wrong child:", child)
+            print(f"Wrong child type: {type(child.unwrap())}")
             raise TypeError(
                 "HTMLElement's children must be valid nodes, i.e. they "
                 "must be one of the following types: "
@@ -817,6 +825,7 @@ class ClientElement:
         """
         if not inspect.isgeneratorfunction(self._renderer):
             raise TypeError("This element does not accept any children.")
+        print("ClientElement children:", children)
         return ClientElement(
             self._renderer,
             self._args,

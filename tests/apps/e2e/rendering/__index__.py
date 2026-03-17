@@ -28,9 +28,13 @@ def Simple():
 
 @client
 def DoubleRender(a):
-    return Complex(a)[(yield)]
+    children = yield
+    print("DoubleRender children:", children)
+    return Complex(a)[children]
 
 
 @client
 def Complex(a):
-    return span[a, span[(yield)]]
+    children = yield
+    print("Complex children:", children)
+    return span[a, span[children]]

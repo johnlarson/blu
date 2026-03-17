@@ -12,6 +12,7 @@ let create_proxy;
 let blu;
 let builtins;
 let abc;
+let sys;
 
 export function init(innerPyImport) {
   const ffi = innerPyImport('pyscript.ffi');
@@ -21,7 +22,8 @@ export function init(innerPyImport) {
   }
   blu = pyImport('blu');
   builtins = pyImport('builtins');
-  abc = pyImport('collections.abc')
+  abc = pyImport('collections.abc');
+  sys = pyImport('sys');
 }
 
 const idToProxy = new Map()
@@ -71,11 +73,11 @@ function getReactNode(pyNode) {
       key: getProxy(pyNode._key), children: getProxy(pyNode._children)
     });
   } else if (isOfType(pyNode, builtins.tuple)) {
-    return $(MemManagedFragment, { children: getProxy(pyNode._children) });
+    return $(MemManagedFragment, { children: getProxy(pyNode) });
   } else if (typeof pyNode === 'string') {
     return pyNode;
-  } else if (isOfType(pyNode, abc.Iterable)) {
-    return $(MemManagedIterable, { children: getProxy(pyNode._children) });
+  } else if (builtins.hasattr(pyNode, '__iter__')) {
+    return $(MemManagedIterable, { children: getProxy(pyNode) });
   } else if (isOfType(pyNode, blu.HTMLElement)) {
     // TODO: Figure out how to deal with props and ref
     const attrs = {};
@@ -111,7 +113,20 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
   let pyNode;
   if (builtins.isinstance(result, abc.Generator)) {
     result.next();
-    pyNode = result.return(pyChildren).value;
+    try {
+      result.send(pyChildren);
+    } catch(e) {
+      if (e.name === 'PythonError') {
+        const pyExc = sys.last_exc;
+        if (isOfType(pyExc, builtins.StopIteration)) {
+          pyNode = pyExc.value;
+        } else {
+          throw e;
+        }
+      } else {
+        throw e;
+      }
+    }
   } else {
     pyNode = result;
   }

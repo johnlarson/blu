@@ -183,16 +183,17 @@ function getArray(pyIterable) {
 }
 
 export function useState(init) {
+  const initUsedRef = useRef(false);
   const wrapped = getProxy(init);
-  const initRef = React.useRef();
-  destroy(initRef.current);
-  initRef.current = wrapped;
   const valueRef = React.useRef(wrapped);
   React.useEffect(() => () => {
     destroy(valueRef.current);
-    destroy(initRef.current);
   });
   const [value, setValue] = React.useState(wrapped);
+  if (initUsedRef.current) {
+    destroy(wrapped);
+  }
+  initUsedRef.current = true;
   function setter(newValue) {
     destroy(valueRef.current);
     const newProxy = getProxy(newValue);

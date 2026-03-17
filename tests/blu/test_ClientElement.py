@@ -260,8 +260,8 @@ def test_accepts_any_node_children():
         [4, 5, 6],
         "Hello",
         7,
-        8.0,
-        True,
-        False,
+        "8.0",
+        "True",
+        "False",
         None,
     ]

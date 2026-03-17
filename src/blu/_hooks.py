@@ -6,7 +6,7 @@ from blu._utils import is_client
 if is_client or typing.TYPE_CHECKING:
     from pyscript.ffi import create_proxy, to_js
     from pyodide.ffi import JsDoubleProxy
-    from pyscript.js_modules._blu_js_utils import useEffect, useRef, useState
+    from pyscript.js_modules._blu_js_utils import useEffect, useRefObj, useState
 
 
 def use_effect(callback: Callable[[], None | Generator[None]]):
@@ -48,70 +48,7 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     called immediately after the element is initially rendered to the
     DOM.
     """
-    manager = EffectManager(callback)
-    useEffect(manager.js_callback)
-
-
-class HookManager:
-    proxy: Any
-    watch_list: Any
-
-    def __init__(self):
-        self.proxy = create_proxy(self)
-        self.self_effect = create_proxy(self.self_effect)
-        self.self_cleanup = create_proxy(self.self_cleanup)
-        self.watch_list = to_js([])
-
-    def self_effect(self):
-        return self.self_cleanup
-
-    def self_cleanup(self):
-        self.self_effect.destroy()
-        self.self_cleanup.destroy()
-        self.proxy.destroy()
-
-
-def use_setup(manager: HookManager, long_lasting: bool = False):
-    proxy = create_proxy(manager)
-    use_self_cleanup(proxy, long_lasting)
-    return proxy
-
-
-def use_self_cleanup(proxy: Any, long_lasting: bool = False):
-    if long_lasting:
-        useEffect(proxy.self_effect, proxy.watch_list)
-    else:
-        useEffect(proxy.self_effect)
-
-
-class EffectManager(HookManager):
-    callback: Callable[[], None | Generator[None] | None] = lambda: None
-    generator: Generator[None] | None = None
-
-    def __init__(self, callback: Callable[[], None | Generator[None] | None]):
-        super().__init__()
-        self.callback = create_proxy(callback)
-        self.js_callback = create_proxy(self.js_callback)
-
-    def js_callback(self):
-        result = self.callback()
-        if isinstance(result, Generator):
-            next(result)
-        self.generator = result
-        return self.js_cleanup
-
-    def js_cleanup(self):
-        if self.generator is not None:
-            try:
-                next(self.generator)
-            except StopIteration:
-                pass
-
-    def self_cleanup(self):
-        self.callback.destroy()
-        self.generator.destroy()
-        self.js_callback.destroy()
-        super().self_cleanup()
+    useEffect(callback)
 
 
 def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
@@ -154,32 +91,6 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
 
     """
     return tuple(useState(init))
-
-
-class StateManager[T](HookManager):
-    value_proxy: Any
-    js_setter: Callable[[T], None]
-
-    def __init__(
-        self,
-        init_proxy: Any,
-        value_proxy: Any,
-        js_setter: Callable[[T], None],
-    ):
-        super().__init__()
-        if value_proxy.unwrap() is not init_proxy.unwrap():
-            init_proxy.destroy()
-        self.value_proxy = value_proxy
-        self.js_setter = js_setter
-        self.setter = create_proxy(self.setter)
-
-    def setter(self, new_value: T):
-        self.js_setter(create_proxy(new_value))
-
-    def self_cleanup(self):
-        self.value_proxy.destroy()
-        self.setter.destroy()
-        super().self_cleanup()
 
 
 class Ref[T]:
@@ -404,17 +315,3 @@ def use_ref[T](init: T = None) -> Ref[T]:
     ref: Ref[T] = Ref()
     ref[:] = init
     return useRefObj(ref)
-
-
-class RefManager[T](HookManager):
-    ref: Ref[T] | None = None
-
-    def __init__(self, ref: Any):
-        super().__init__()
-        self.ref = ref
-        # self.ref = create_proxy(ref)
-
-    def self_cleanup(self):
-        self.ref._cleanup()
-        self.ref.destroy()
-        super().self_cleanup()

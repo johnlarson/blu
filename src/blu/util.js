@@ -227,16 +227,22 @@ function refProxy(pyRef) {
 }
 
 export function useEffect(callback) {
+  const callbackProxy = getProxy(callback);
   React.useEffect(() => {
-    const result = callback();
+    const result = callbackProxy();
     if (isinstance(result, abc.Generator)) {
-      const generator = createProxy(result);
+      const generator = getProxy(result);
       return () => {
         generator.next();
         destroy(generator);
+        destroy(callbackProxy);
       };
+    } else {
+      return () => {
+        destroy(callbackProxy);
+      }
     }
-  })
+  });
 }
 
 function isOfType(obj, pyClass) {

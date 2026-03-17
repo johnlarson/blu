@@ -53,7 +53,7 @@ async def page(
 ) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
     async with async_playwright() as playwright:
         chromium = playwright.chromium
-        browser = await chromium.launch(headless=True)
+        browser = await chromium.launch(headless=False)
 
         async def ret(app_name: str) -> Page:
             patch_app(app_name)
@@ -189,6 +189,7 @@ async def test_use_effect(page: PageFixture):
     p = await page("e2e")
     events_div = p.locator("#events")
     await p.goto("/use_effect")
+    await sleep(3600)
     await expect(events_div).to_have_text("", timeout=10_000)
     await p.click("button")
     await expect(events_div).to_have_text("SETUP")

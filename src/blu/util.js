@@ -26,8 +26,8 @@ export function init(innerPyImport) {
   sys = pyImport('sys');
 }
 
-const idToProxy = new Map()
-const proxyToId = new Map()
+const idToProxyInfo = new Map();
+const proxyToId = new Map();
 
 const PRIMITIVE_TYPES = ['undefined', 'boolean', 'number', 'bigint', 'string', 'symbol'];
 
@@ -36,12 +36,17 @@ function getProxy(obj) {
     return obj;
   }
   const id = builtins.id(obj);
-  if (!idToProxy.has(id)) {
+  if (!idToProxyInfo.has(id)) {
     const proxy = create_proxy(obj)
-    idToProxy.set(id, proxy);
+    idToProxyInfo.set(id, {
+      proxy,
+      count: 0
+    });
     proxyToId.set(proxy, id);
   }
-  return idToProxy.get(id);
+  const proxyInfo = idToProxyInfo.get(id);
+  proxyInfo.count++;
+  return proxyInfo.proxy;
 }
 
 function destroy(pyProxy) {
@@ -49,9 +54,17 @@ function destroy(pyProxy) {
     return;
   }
   const id = proxyToId(pyProxy);
-  proxyToId.delete(pyProxy);
-  idToProxy.delete(id);
-  pyProxy.destroy();
+  const proxyInfo = idToProxyInfo(id);
+  const { proxy, count } = proxyInfo;
+  if (count < 1) {
+    throw new Error(`Too few existing copies (${count}) when destroying ${proxy}`);
+  }
+  proxyInfo.count--;
+  if (proxyInfo.count === 0) {
+    proxyToId.delete(proxy);
+    idToProxyInfo.delete(id);
+    proxy.destroy();
+  }
 }
 
 export function renderRoot(pyRoot) {
@@ -170,15 +183,23 @@ function getArray(pyIterable) {
 }
 
 export function useState(init) {
-  const notMemoryManaged = ['number', 'string', 'boolean'].includes(typeof init) ||
-                           [undefined, null].includes(init);
-  const wrapped = notMemoryManaged ? init : getProxy(init);
+  const wrapped = getProxy(init);
+  const initRef = React.useRef();
+  destroy(initRef.current);
+  initRef.current = wrapped;
+  const valueRef = React.useRef(wrapped);
   React.useEffect(() => () => {
-    if (!notMemoryManaged) {
-      destroy(ret);
-    }
+    destroy(valueRef.current);
+    destroy(initRef.current);
   });
-  return React.useState(wrapped);
+  const [value, setValue] = React.useState(wrapped);
+  function setter(newValue) {
+    destroy(valueRef.current);
+    const newProxy = getProxy(newValue);
+    valueRef.current = newProxy;
+    setValue(newProxy);
+  }
+  return [value, setter];
 }
 
 export function useRefObj(pyRef) {

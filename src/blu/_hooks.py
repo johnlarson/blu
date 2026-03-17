@@ -6,7 +6,7 @@ from blu._utils import is_client
 if is_client or typing.TYPE_CHECKING:
     from pyscript.ffi import create_proxy, to_js
     from pyodide.ffi import JsDoubleProxy
-    from pyscript.js_modules._blu_react import useEffect, useRef, useState
+    from pyscript.js_modules._blu_js_utils import useEffect, useRef, useState
 
 
 def use_effect(callback: Callable[[], None | Generator[None]]):
@@ -153,6 +153,10 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
         render, the first item in the tuple will be ``init``.
 
     """
+    state = useState(init)
+    value = next(state)
+    setter = next(state)
+    return value, setter
     init_proxy = create_proxy(init)
     value_proxy, js_setter = useState(init_proxy)
     manager = use_setup(StateManager(init_proxy, value_proxy, js_setter))

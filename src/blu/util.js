@@ -205,12 +205,13 @@ export function useState(init) {
 
 export function useRefObj(pyRef) {
   const refProxiedRef = React.useRef(false);
-  if (!refProxiedRef.current) {
-    pyRef = getProxy(pyRef);
-    refProxiedRef.current = true;
-    pyRef._ref_proxy = refProxy();
-  }
+  const pyRef = getProxy(pyRef);
+  pyRef._ref_proxy = refProxy();
   const refRef = useRef(pyRef);
+  if (refProxiedRef.current) {
+    destroy(pyRef);
+  }
+  refProxiedRef.current = true;
   React.useEffect(() => () => {
     destroy(refRef.current);
   }, []);

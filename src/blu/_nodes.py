@@ -508,7 +508,6 @@ def _index_to_children(index: Node | EllipsisType | tuple[Node, ...]) -> Childre
             (HTMLElement, Key, ClientElement, Sequence, str, Number, bool),
         ):
             print(f"Wrong child:", child)
-            print(f"Wrong child type: {type(child.unwrap())}")
             raise TypeError(
                 "HTMLElement's children must be valid nodes, i.e. they "
                 "must be one of the following types: "

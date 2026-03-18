@@ -183,7 +183,7 @@ function getArray(pyIterable) {
 }
 
 export function useState(init) {
-  const initUsedRef = useRef(false);
+  const initUsedRef = React.useRef(false);
   const wrapped = getProxy(init);
   const valueRef = React.useRef(wrapped);
   React.useEffect(() => () => {
@@ -205,9 +205,9 @@ export function useState(init) {
 
 export function useRefObj(pyRef) {
   const refProxiedRef = React.useRef(false);
-  const pyRef = getProxy(pyRef);
+  pyRef = getProxy(pyRef);
   pyRef._ref_proxy = refProxy();
-  const refRef = useRef(pyRef);
+  const refRef = React.useRef(pyRef);
   if (refProxiedRef.current) {
     destroy(pyRef);
   }
@@ -230,8 +230,9 @@ export function useEffect(callback) {
   const callbackProxy = getProxy(callback);
   React.useEffect(() => {
     const result = callbackProxy();
-    if (isinstance(result, abc.Generator)) {
+    if (builtins.isinstance(result, abc.Generator)) {
       const generator = getProxy(result);
+      generator.next();
       return () => {
         generator.next();
         destroy(generator);

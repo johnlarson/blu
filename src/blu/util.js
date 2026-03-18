@@ -206,7 +206,7 @@ export function useState(init) {
 export function useRefObj(pyRef) {
   const refProxiedRef = React.useRef(false);
   pyRef = getProxy(pyRef);
-  pyRef._ref_proxy = refProxy();
+  pyRef._ref_proxy = refProxy(pyRef);
   const refRef = React.useRef(pyRef);
   if (refProxiedRef.current) {
     destroy(pyRef);

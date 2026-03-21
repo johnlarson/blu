@@ -1,6 +1,7 @@
 from collections.abc import AsyncGenerator, Callable, Generator, Iterable
 import importlib
 import inspect
+from logging import getLogger
 from numbers import Number
 from pathlib import Path
 import re
@@ -9,6 +10,8 @@ from blu._utils.typing import Any, Mapping, Protocol, Sequence, cast
 from blu._utils.client import is_client
 
 from blu._exceptions import WrongEnvironmentError
+
+log = getLogger("blu")
 
 # """
 # JSON-serializable primitive value.
@@ -122,7 +125,7 @@ class HTMLElement:
         div(id='my-id')['Hello!'].props == {'id': 'my-id'}
     """
 
-    _children: list[Node]
+    _children: Node
     """
     The element's children.
 
@@ -133,7 +136,7 @@ class HTMLElement:
         div[span['Hello'], 'Hi.'].children == [span['Hello'], 'Hi.']
     """
 
-    def __init__(self, tagname: str, props: Props, children: Children):
+    def __init__(self, tagname: str, props: Props, children: Node):
         self._tagname = tagname
         self._attrs = props
         self._children = children
@@ -209,7 +212,7 @@ class HTMLElement:
             children=self._children,
         )
 
-    def __getitem__(self, children: Node | tuple[Node, ...]) -> "HTMLElement":
+    def __getitem__(self, children: Node) -> "HTMLElement":
         """
         Create a copy of ``self`` whose child nodes are set to the items
         passed in.
@@ -265,7 +268,7 @@ class HTMLElement:
         return HTMLElement(
             self._tagname,
             props=self._attrs,
-            children=_index_to_children(children),
+            children=_validate_children(children),
         )
 
     def _rename_props(self, props: Props) -> Props:
@@ -326,7 +329,7 @@ class CustomElement:
         MyComponent(my_prop=5)['Hello World!'].props == {'my_prop': 5}
     """
 
-    children: list[Node]
+    children: Node
     """
     The React element's `children` prop.
 
@@ -345,7 +348,7 @@ class CustomElement:
         path: Path | str,
         name: str,
         props: Props,
-        children: Children,
+        children: Node,
     ):
         self.path = Path(path)
         self.name = name
@@ -486,11 +489,11 @@ class CustomElement:
             path=self.path,
             name=self.name,
             props=self.props,
-            children=_index_to_children(index),
+            children=_validate_children(index),
         )
 
 
-def _index_to_children(index: Node | EllipsisType | tuple[Node, ...]) -> Children:
+def _validate_children(index: Node) -> Node:
     if is_client:
         print("is_client")
         from pyodide.ffi import JsProxy
@@ -498,45 +501,42 @@ def _index_to_children(index: Node | EllipsisType | tuple[Node, ...]) -> Childre
         print("index type:", type(index))
         if isinstance(index, JsProxy):
             print("Proxy type:", index.typeof)
-            index = index.unwrap()
-    if index == ...:
-        children = []
-    elif isinstance(index, tuple):
-        children = list(cast(tuple[Node], index))
+            index = cast(Node, index.unwrap())
+    # if isinstance(index, tuple):
+    #     children = list(cast(tuple[Node], index))
+    # else:
+    #     children = [index]
+    # for child in children:
+    #     if child is not None and not isinstance(
+    #         child,
+    #         (HTMLElement, Key, ClientElement, Sequence, str, Number, bool),
+    #     ):
+    #         print(f"Wrong child:", child)
+    #         print("Wrong child type:", type(child))
+    #         raise TypeError(
+    #             "HTMLElement's children must be valid nodes, i.e. they "
+    #             "must be one of the following types: "
+    #             "`blu.react.HTMLElement`, "
+    #             "`blu.react.CustomElement`, `typing.Sequence`, "
+    #             f"`str`, `int`, `float`, `None`. Got {child}"
+    #         )
+    if isinstance(index, tuple):
+        return tuple(_convert_to_string(x) for x in index)
     else:
-        children = [index]
-    for child in children:
-        if child is not None and not isinstance(
-            child,
-            (HTMLElement, Key, ClientElement, Sequence, str, Number, bool),
-        ):
-            print(f"Wrong child:", child)
-            print("Wrong child type:", type(child))
-            raise TypeError(
-                "HTMLElement's children must be valid nodes, i.e. they "
-                "must be one of the following types: "
-                "`blu.react.HTMLElement`, "
-                "`blu.react.CustomElement`, `typing.Sequence`, "
-                f"`str`, `int`, `float`, `None`. Got {child}"
-            )
-    return _convert_to_strings(children)
+        return _convert_to_string(index)
 
 
-def _convert_to_strings(children: list[Node]) -> list[Node]:
+def _convert_to_string(item: Node) -> Node:
     str_types = (float, bool)
-    ret: list[Node] = []
-    for item in children:
-        if is_client:
-            from pyodide.ffi import jsnull
+    if is_client:
+        from pyodide.ffi import jsnull
 
-            if item == jsnull:
-                ret.append(str(item))
-                continue
-        if isinstance(item, str_types):
-            ret.append(str(item))
-        else:
-            ret.append(item)
-    return ret
+        if item == jsnull:
+            return str(item)
+    if isinstance(item, str_types):
+        return str(item)
+    else:
+        return item
 
 
 class Key:
@@ -594,13 +594,13 @@ class Key:
     """
 
     _key: Any
-    _children: list[Node]
+    _children: Node
 
     def __init__(self, key: Any):
         self._key = key
         self._children = []
 
-    def __getitem__(self, children: Node | tuple[Node]) -> "Key":
+    def __getitem__(self, children: Node) -> "Key":
         """
         Create a copy of ``self`` with the given children.
 
@@ -689,7 +689,7 @@ class ClientElement:
 
     _args: tuple[Any, ...]
     _kwargs: dict[str, Any]
-    _children: list["Node"]
+    _children: Node
     _renderer: ClientRenderer
     _key: Any
     _has_key: bool
@@ -699,14 +699,14 @@ class ClientElement:
         renderer: ClientRenderer,
         args: tuple[Any, ...],
         kwargs: dict[str, Any],
-        children: Sequence[Node],
+        children: Node,
         key: Any,
         has_key: bool,
     ):
         self._renderer = renderer
         self._args = args
         self._kwargs = kwargs
-        self._children = list(children)
+        self._children = children
         self._key = key
         self._has_key = has_key
 
@@ -807,10 +807,7 @@ class ClientElement:
             has_key="key" in kwargs,
         )
 
-    def __getitem__(
-        self,
-        children: Node | tuple[Node, ...],
-    ) -> "ClientElement":
+    def __getitem__(self, children: Node) -> "ClientElement":
         """
         Create a copy of ``self`` that will render with the given
         children displayed where the render function uses the ``yield``
@@ -845,12 +842,12 @@ class ClientElement:
         """
         if not inspect.isgeneratorfunction(self._renderer):
             raise TypeError("This element does not accept any children.")
-        print("ClientElement children:", children)
+        log.error(f"ClientElement children: {children}")
         return ClientElement(
             self._renderer,
             self._args,
             self._kwargs,
-            _index_to_children(children),
+            _validate_children(children),
             key=self._key,
             has_key=self._has_key,
         )
@@ -895,7 +892,7 @@ def _import_client_module(
         all_kwargs = kwargs
     with_args = base(*args, **all_kwargs)
     if children:
-        return with_args[tuple(children)]
+        return with_args[children]
     else:
         return with_args
 

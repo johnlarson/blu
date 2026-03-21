@@ -385,8 +385,8 @@ async def test_settings(page: PageFixture):
     await expect(p.get_by_text("👍")).to_be_visible()
 
 
-async def test_children_rendering_docs(page: PageFixture):
+async def test_multilayer_tuple_children(page: PageFixture):
     p = await page("e2e")
-    await p.goto("/children_rendering_docs")
-    await sleep(3500)
+    await p.goto("/yield_in_tuple")
+    await sleep(3600)
     await expect(p.get_by_text("This should be red.")).to_be_visible()

@@ -152,7 +152,7 @@ function MemManagedFragment({ key, children }) {
     destroy(key);
     destroy(children);
   }, []);
-  return $(React.Fragment, { key }, ...getArray(children));
+  return $(React.Fragment, { key }, getReactNode(children));
 }
 
 function MemManagedIterable({ children }) {
@@ -169,7 +169,7 @@ function MemManagedHTMLElement({ _blu_tagname, children, ...attrs }) {
       destroy(attr_value);
     }
   }, []);
-  return $(_blu_tagname, attrs, ...getArray(children));
+  return $(_blu_tagname, attrs, getReactNode(children));
 }
 
 function getArray(pyIterable) {

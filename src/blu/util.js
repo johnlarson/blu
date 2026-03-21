@@ -13,6 +13,7 @@ let blu;
 let builtins;
 let abc;
 let sys;
+let renderClientElement;
 
 export function init(innerPyImport) {
   const ffi = innerPyImport('pyscript.ffi');
@@ -24,6 +25,7 @@ export function init(innerPyImport) {
   builtins = pyImport('builtins');
   abc = pyImport('collections.abc');
   sys = pyImport('sys');
+  renderClientElement = pyImport('blu._nodes')._render_client_element
 }
 
 const idToProxyInfo = new Map();
@@ -67,6 +69,16 @@ function destroy(pyProxy) {
   }
 }
 
+function unwrap(thing) {
+  if ([undefined, null].includes(thing)) {
+    return thing;
+  }
+  while (thing.type === 'pyodide.ffi.JsProxy') {
+    thing = thing.unwrap();
+  }
+  return thing;
+}
+
 export function renderRoot(pyRoot) {
   const jsNode = getReactNode(pyRoot);
   const renderTarget = jsNode.type === 'html' ? document : document.body;
@@ -76,21 +88,20 @@ export function renderRoot(pyRoot) {
 function getReactNode(pyNode) {
   if (isOfType(pyNode, blu.ClientElement)) {
     return $(PythonElement, {
-      renderer: getProxy(pyNode._renderer),
-      args: getProxy(pyNode._args),
-      kwargs: getProxy(pyNode._kwargs),
-      pyChildren: getProxy(pyNode._children),
-    })
+        renderer: getProxy(pyNode._renderer),
+        args: getProxy(pyNode._args),
+        kwargs: getProxy(pyNode._kwargs),
+      },
+      ...getProxies(pyNode._children),
+    )
   } else if (isOfType(pyNode, blu.Key)) {
-    return $(MemManagedFragment, {
-      key: getProxy(pyNode._key), children: getProxy(pyNode._children)
-    });
+    return $(MemManagedFragment, { key: getProxy(pyNode._key) }, ...getProxies(pyNode._children));
   } else if (isOfType(pyNode, builtins.tuple)) {
-    return $(MemManagedFragment, { children: getProxy(pyNode) });
+    return $(MemManagedFragment, null, ...getProxies(pyNode));
   } else if (typeof pyNode === 'string') {
     return pyNode;
   } else if (builtins.hasattr(pyNode, '__iter__')) {
-    return $(MemManagedIterable, { children: getProxy(pyNode) });
+    return $(MemManagedIterable, null, ...getProxies(pyNode));
   } else if (isOfType(pyNode, blu.HTMLElement)) {
     // TODO: Figure out how to deal with props and ref
     const attrs = {};
@@ -105,9 +116,9 @@ function getReactNode(pyNode) {
     if (hasRef) {
       attrs['ref'] = getProxy(pyNode._attrs['ref']._ref_proxy);
     }
-    return $(MemManagedHTMLElement, {
-      _blu_tagname: pyNode._tagname, children: getProxy(pyNode._children), ...attrs
-    });
+    return $(MemManagedHTMLElement, { _blu_tagname: pyNode._tagname, ...attrs },
+      ...getProxies(pyNode._children),
+    );
   } else if (pyNode === undefined) {
     return undefined;
   } else {
@@ -115,19 +126,32 @@ function getReactNode(pyNode) {
   }
 }
 
-function PythonElement({ renderer, args, kwargs, pyChildren }) {
+function getProxies(items) {
+  const ret = [];
+  for (const item of items) {
+    ret.push(getProxy(item));
+  }
+  return ret
+}
+
+function PythonElement(proxies) {
   React.useEffect(() => () => {
-    destroy(renderer);
-    destroy(args);
-    destroy(kwargs);
-    destroy(pyChildren);
+    destroy(proxies.renderer);
+    destroy(proxies.args);
+    destroy(proxies.kwargs);
+    destroy(proxies.pyChildren);
   }, []);
+  // const pyNode = renderClientElement(props)
+  const { renderer, args, kwargs, children } = unwrapProxyProps(proxies);
+  if (children instanceof Array) {
+    children = builtins.tuple(children);
+  }
   const result = renderer.callKwargs(...args, kwargs.toJs({ depth: 1 }));
   let pyNode;
   if (builtins.isinstance(result, abc.Generator)) {
     result.next();
     try {
-      result.send(pyChildren);
+      result.send(children);
       // result.send([])
     } catch(e) {
       if (e.name === 'PythonError') {
@@ -147,7 +171,16 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
   return getReactNode(pyNode);
 }
 
+function unwrapProxyProps(proxies) {
+  const ret = {}
+  for (const [k, v] of Object.entries(proxies)) {
+    ret[k] = unwrap(v);
+  }
+  return ret
+}
+
 function MemManagedFragment({ key, children }) {
+  children = unwrap(children);
   React.useEffect(() => () => {
     destroy(key);
     destroy(children);
@@ -156,6 +189,7 @@ function MemManagedFragment({ key, children }) {
 }
 
 function MemManagedIterable({ children }) {
+  children = unwrap(children);
   React.useEffect(() => () => {
     destroy(children);
   }, []);
@@ -163,6 +197,7 @@ function MemManagedIterable({ children }) {
 }
 
 function MemManagedHTMLElement({ _blu_tagname, children, ...attrs }) {
+  children = unwrap(children);
   React.useEffect(() => () => {
     destroy(children);
     for (const attr_value of Object.values(attrs)) {
@@ -173,9 +208,10 @@ function MemManagedHTMLElement({ _blu_tagname, children, ...attrs }) {
 }
 
 function getArray(pyIterable) {
-  if (pyIterable === undefined) {
-    return [];
-  }
+  pyIterable = unwrap(pyIterable);
+  // if (pyIterable === undefined) {
+  //   return [];
+  // }
   const ret = [];
   for (const item of pyIterable) {
     ret.push(getReactNode(item));

@@ -125,7 +125,7 @@ class HTMLElement:
         div(id='my-id')['Hello!'].props == {'id': 'my-id'}
     """
 
-    _children: Node
+    _children: list[Node]
     """
     The element's children.
 
@@ -136,7 +136,7 @@ class HTMLElement:
         div[span['Hello'], 'Hi.'].children == [span['Hello'], 'Hi.']
     """
 
-    def __init__(self, tagname: str, props: Props, children: Node):
+    def __init__(self, tagname: str, props: Props, children: list[Node]):
         self._tagname = tagname
         self._attrs = props
         self._children = children
@@ -212,7 +212,7 @@ class HTMLElement:
             children=self._children,
         )
 
-    def __getitem__(self, children: Node) -> "HTMLElement":
+    def __getitem__(self, children: Node | tuple[Node, ...]) -> "HTMLElement":
         """
         Create a copy of ``self`` whose child nodes are set to the items
         passed in.
@@ -268,232 +268,14 @@ class HTMLElement:
         return HTMLElement(
             self._tagname,
             props=self._attrs,
-            children=_validate_children(children),
+            children=_get_children(children),
         )
 
     def _rename_props(self, props: Props) -> Props:
         return {py_to_html_name(k): v for k, v in props.items()}
 
 
-class CustomElement:
-    """
-    Server-side representation of a React element whose type is a React
-    function component. Created using :func:`blu.import_client`.
-
-    .. code-block:: python
-
-        from blu import import_client
-
-        MyComponent = import_client('/path/to/module', 'MyComponent')
-    """
-
-    module: Path
-    """
-    The path portion of the URL of the module containing the element's
-    component type.
-
-    .. code-block:: python
-
-        from blu import import_client
-
-        MyComponent = import_client('/path/to/module', 'MyComponent')
-        MyComponent.path == '/path/to/module'
-
-    """
-
-    name: str
-    """
-    The export name of the component.
-
-    .. code-block:: python
-
-        from blu import import_client
-
-        NamedImport = import_client('/path/to/module', 'MyComponent')
-        NamedImport.name == 'MyComponent'
-
-        DefaultImport = import_client('/path/to/module')
-        DefaultImport.name == 'default'
-    """
-
-    props: Props
-    """
-    The React element's props, other than `children`.
-
-    .. code-block:: python
-
-        from blu import import_client
-
-        MyComponent = import_client('/MyComponent')
-        
-        MyComponent(my_prop=5)['Hello World!'].props == {'my_prop': 5}
-    """
-
-    children: Node
-    """
-    The React element's `children` prop.
-
-    .. code-block:: python
-
-        from blu import import_client
-        from blu.html import div, span
-
-        MyComponent = import_client('/MyComponent')
-        with_children = MyComponent[span['Hello'], div, 'Hi.']
-        with_children.children == [span['Hello'], div, 'Hi.']
-    """
-
-    def __init__(
-        self,
-        path: Path | str,
-        name: str,
-        props: Props,
-        children: Node,
-    ):
-        self.path = Path(path)
-        self.name = name
-        self.props = props
-        self.children = children
-
-    def __call__(self, **kwargs: PropValue) -> "CustomElement":
-        """
-        Create a copy of :data:`self` with the props specified by
-        ``kwargs``.
-
-        .. code-block:: python
-
-            from blu import import_client
-
-            MyComponent = import_client('/MyComponent')
-
-            MyComponent(my_prop='value')
-
-        :param kwargs: The new props.
-        :return: A copy of :data:`self`, with :data:`props` replaced by
-            ``kwargs``.
-
-        .. note:: Calling a :class:`CustomElement` does not change the
-            original :class:`CustomElement`; it just returns a copy with
-            the given props.
-
-            .. code-block:: python
-
-                from blu import import_client
-
-                MyComponent = import_client('/MyComponent')
-
-                MyComponent  # <MyComponent />
-
-                # <MyComponent my_prop={'value'} />
-                MyComponent(my_prop='value')
-
-                MyComponent  # Still <MyComponent />
-
-        .. note:: When calling a :class:`CustomElement`, the copy
-            returned does not keep any of the original's non-children
-            props except those explicitly specified in the call:
-
-            .. code-block:: python
-
-                from blu import import_client
-
-                MyComponent = import_client('/MyComponent')
-
-                # <MyComponent a={1} b={2} c={3} />
-                first = MyComponent(a=1, b=2, c=3)
-
-                # <MyComponent c={3} d={4} e={5} />
-                second = first(c=3, d=4, e=5)
-
-        .. note:: When calling a :class:`CustomElement`, the copy's
-            :data:`children` are unchanged from the original's:
-
-            .. code-block:: python
-
-                from blu import import_client
-
-                MyComponent = import_client('/MyComponent')
-
-                # <MyComponent a={1}>Hello!</MyComponent>
-                first = MyComponent(a=1)['Hello!']
-
-                # <MyComponent b={2}>Hello!</MyComponent>
-                second = first(b=2)
-
-        .. note:: ``children`` is not a valid prop name in Blu. To set
-            React children, use the index operator (:data:`[]`).
-        """
-        return CustomElement(
-            path=self.path,
-            name=self.name,
-            props=kwargs,
-            children=self.children,
-        )
-
-    def __getitem__(
-        self,
-        children: Node | tuple[Node, ...],
-    ) -> "CustomElement":
-        """
-        Create a copy of :data:`self` with the :data:`children`
-        specified by :data:`index`.
-
-        .. code-block:: python
-
-            from blu import import_client
-            from blu.html import span
-
-            MyComponent = import_client('/MyComponent')
-
-            MyComponent[
-              span['Hello World!'],
-            ]
-
-
-        :param index: A :type:`blu.Node`, a :py:class:`tuple` of
-            :type:`blu.Node`\\ s, or :py:data:`... <ellipsis>`.
-        :return:
-            - If ``index`` is a :type:`blu.Node`: A copy of ``self``
-              with :attr:`children <blu.CustomElement.children>` set to
-              ``[index]``.
-            - If ``index`` is a :py:class:`tuple` of
-              :type:`blu.Node`\\ s: A copy of ``self`` with
-              :attr:`children <blu.CustomElement.children>` set to
-              ``list(index)``.
-            - If ``index`` is :py:data:`... <ellipsis>`: A copy of
-              ``self`` with
-              :attr:`children <blu.CustomElement.children>` set to
-              ``[]``.
-
-        .. note::
-
-            Using the index operator (:data:`[]`) on a
-            :class:`CustomComponent` does not mutate the original
-            :class:`CustomComponent`; instead, it returns a copy of the
-            :class:`CustomComponent` with different children:
-
-            .. code-block:: python
-
-                from blu import import_client
-
-                MyComponent = import_client('/MyComponent')
-
-                MyComponent  # <MyComponent />
-
-                # <MyComponent>Hello!</MyComponent>
-                MyComponent['Hello!']
-
-                MyComponent  # Still <MyComponent />
-        """
-        return CustomElement(
-            path=self.path,
-            name=self.name,
-            props=self.props,
-            children=_validate_children(index),
-        )
-
-
-def _validate_children(index: Node) -> Node:
+def _get_children(index: Node | tuple[Node, ...]) -> list[Node]:
     if is_client:
         print("is_client")
         from pyodide.ffi import JsProxy
@@ -502,10 +284,10 @@ def _validate_children(index: Node) -> Node:
         if isinstance(index, JsProxy):
             print("Proxy type:", index.typeof)
             index = cast(Node, index.unwrap())
-    # if isinstance(index, tuple):
-    #     children = list(cast(tuple[Node], index))
-    # else:
-    #     children = [index]
+    if isinstance(index, tuple):
+        children = list(cast(tuple[Node], index))
+    else:
+        children = [index]
     # for child in children:
     #     if child is not None and not isinstance(
     #         child,
@@ -520,10 +302,7 @@ def _validate_children(index: Node) -> Node:
     #             "`blu.react.CustomElement`, `typing.Sequence`, "
     #             f"`str`, `int`, `float`, `None`. Got {child}"
     #         )
-    if isinstance(index, tuple):
-        return tuple(_convert_to_string(x) for x in index)
-    else:
-        return _convert_to_string(index)
+    return [_convert_to_string(x) for x in children]
 
 
 def _convert_to_string(item: Node) -> Node:
@@ -594,13 +373,13 @@ class Key:
     """
 
     _key: Any
-    _children: Node
+    _children: list[Node]
 
     def __init__(self, key: Any):
         self._key = key
         self._children = []
 
-    def __getitem__(self, children: Node) -> "Key":
+    def __getitem__(self, children: Node | tuple[Node, ...]) -> "Key":
         """
         Create a copy of ``self`` with the given children.
 
@@ -626,10 +405,7 @@ class Key:
             children are ``[children]``.
         """
         copy = Key(self._key)
-        if isinstance(children, tuple):
-            copy._children = list(children)
-        else:
-            copy._children = [children]
+        copy._children = _get_children(children)
         return copy
 
 
@@ -689,7 +465,7 @@ class ClientElement:
 
     _args: tuple[Any, ...]
     _kwargs: dict[str, Any]
-    _children: Node
+    _children: list[Node]
     _renderer: ClientRenderer
     _key: Any
     _has_key: bool
@@ -699,7 +475,7 @@ class ClientElement:
         renderer: ClientRenderer,
         args: tuple[Any, ...],
         kwargs: dict[str, Any],
-        children: Node,
+        children: list[Node],
         key: Any,
         has_key: bool,
     ):
@@ -847,7 +623,7 @@ class ClientElement:
             self._renderer,
             self._args,
             self._kwargs,
-            _validate_children(children),
+            _get_children(children),
             key=self._key,
             has_key=self._has_key,
         )
@@ -872,6 +648,26 @@ class ClientElement:
                 self._has_key,
             ),
         )
+
+
+def _render_client_element(props_js: Any):
+    assert is_client
+    from pyodide.ffi import JsDoubleProxy
+
+    props_wrapped = props_js.as_py_json()
+    props = {
+        k: v.unwrap() if isinstance(v, JsDoubleProxy) else v
+        for k, v in props_wrapped.items()
+    }
+    result = props["renderer"](*props["args"], **props["kwargs"])
+    if isinstance(result, Generator):
+        next(result)
+        try:
+            result.send(props["pyChildren"])
+        except StopIteration as e:
+            return e.value
+    else:
+        return result
 
 
 def _import_client_module(

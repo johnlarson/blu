@@ -53,7 +53,7 @@ async def page(
 ) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
     async with async_playwright() as playwright:
         chromium = playwright.chromium
-        browser = await chromium.launch(headless=False)
+        browser = await chromium.launch(headless=True)
 
         async def ret(app_name: str) -> Page:
             patch_app(app_name)
@@ -388,5 +388,4 @@ async def test_settings(page: PageFixture):
 async def test_multilayer_tuple_children(page: PageFixture):
     p = await page("e2e")
     await p.goto("/yield_in_tuple")
-    await sleep(3600)
     await expect(p.get_by_text("This should be red.")).to_be_visible()

@@ -53,7 +53,7 @@ async def page(
 ) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
     async with async_playwright() as playwright:
         chromium = playwright.chromium
-        browser = await chromium.launch(headless=True)
+        browser = await chromium.launch(headless=False)
 
         async def ret(app_name: str) -> Page:
             patch_app(app_name)
@@ -383,3 +383,10 @@ async def test_settings(page: PageFixture):
     arrr_exp = expect(p.get_by_text("Ahoy there. How be you?"))
     await arrr_exp.to_be_visible(timeout=10_000)
     await expect(p.get_by_text("👍")).to_be_visible()
+
+
+async def test_children_rendering_docs(page: PageFixture):
+    p = await page("e2e")
+    await p.goto("/children_rendering_docs")
+    await sleep(3500)
+    await expect(p.get_by_text("This should be red.")).to_be_visible()

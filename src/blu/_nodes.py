@@ -492,9 +492,12 @@ class CustomElement:
 
 def _index_to_children(index: Node | EllipsisType | tuple[Node, ...]) -> Children:
     if is_client:
+        print("is_client")
         from pyodide.ffi import JsProxy
 
+        print("index type:", type(index))
         if isinstance(index, JsProxy):
+            print("Proxy type:", index.typeof)
             index = index.unwrap()
     if index == ...:
         children = []
@@ -508,6 +511,7 @@ def _index_to_children(index: Node | EllipsisType | tuple[Node, ...]) -> Childre
             (HTMLElement, Key, ClientElement, Sequence, str, Number, bool),
         ):
             print(f"Wrong child:", child)
+            print("Wrong child type:", type(child))
             raise TypeError(
                 "HTMLElement's children must be valid nodes, i.e. they "
                 "must be one of the following types: "

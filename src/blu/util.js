@@ -128,6 +128,7 @@ function PythonElement({ renderer, args, kwargs, pyChildren }) {
     result.next();
     try {
       result.send(pyChildren);
+      // result.send([])
     } catch(e) {
       if (e.name === 'PythonError') {
         const pyExc = sys.last_exc;

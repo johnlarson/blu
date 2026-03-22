@@ -1,6 +1,6 @@
 from blu import server
 
-from app.shared import A
+from app.server_functions.shared import A
 
 
 @server

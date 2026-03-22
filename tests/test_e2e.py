@@ -389,3 +389,9 @@ async def test_multilayer_tuple_children(page: PageFixture):
     p = await page("e2e")
     await p.goto("/yield_in_tuple")
     await expect(p.get_by_text("This should be red.")).to_be_visible()
+
+
+async def test_server_function(page: PageFixture):
+    p = await page("e2e")
+    await p.goto("/server_functions")
+    await expect(p.get_by_text("Hello!")).to_be_visible()

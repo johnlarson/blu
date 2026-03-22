@@ -140,17 +140,17 @@ function PythonElement(proxies) {
     destroy(proxies.kwargs);
     destroy(proxies.pyChildren);
   }, []);
-  // const pyNode = renderClientElement(props)
-  const { renderer, args, kwargs, children } = unwrapProxyProps(proxies);
-  if (children instanceof Array) {
-    children = builtins.tuple(children);
-  }
+  const { renderer, args, kwargs, pyChildren } = unwrapProxyProps(proxies);
   const result = renderer.callKwargs(...args, kwargs.toJs({ depth: 1 }));
   let pyNode;
   if (builtins.isinstance(result, abc.Generator)) {
     result.next();
     try {
-      result.send(children);
+      if (pyChildren.length === 1) {
+        result.send(pyChildren[0]);
+      } else {
+        result.send(pyChildren);
+      }
       // result.send([])
     } catch(e) {
       if (e.name === 'PythonError') {

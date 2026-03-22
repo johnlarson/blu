@@ -2,6 +2,7 @@ print("Hello, World!")
 
 import base64
 from collections import defaultdict
+import logging
 import pickle
 from types import NoneType
 from blu._utils.typing import Generator
@@ -34,6 +35,9 @@ from blu.html import div
 from pyscript.js_modules import _blu_react_dom as react_dom
 from pyscript.js_modules import _blu_react as react
 from importlib import import_module
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 PYTHON_TYPES = create_proxy(  # type: ignore

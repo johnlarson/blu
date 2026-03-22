@@ -617,6 +617,8 @@ class ClientElement:
             i.e. doesn't contain a ``yield`` statement.
         """
         if not inspect.isgeneratorfunction(self._renderer):
+            log.info("INFO")
+            log.debug(f"Non-generator function: {self._renderer}")
             raise TypeError("This element does not accept any children.")
         log.error(f"ClientElement children: {children}")
         return ClientElement(

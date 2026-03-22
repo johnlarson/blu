@@ -11,6 +11,8 @@ Run ``blu`` from your project root (the directory containing the ``app/`` direct
 
 The deveopment server will automatically find an available port to run on, and once it has started, the ``blu`` process will give you output like the following, showing the URL where your app is running:
 
-.. todo:: Get the output for this.
+.. code-block:: none
+
+  INFO:     Uvicorn running on http://127.0.0.1:50227 (Press CTRL+C to quit)
 
 Don't run the development server in production. See :ref:`Deploying Your App` for details on how to deploy an app to a production environment.

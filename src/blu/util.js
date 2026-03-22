@@ -179,18 +179,15 @@ function unwrapProxyProps(proxies) {
 }
 
 function MemManagedFragment({ key, children }) {
+  const childrenArray = getChildrenArray(children);
   React.useEffect(() => () => {
     destroy(key);
   }, []);
-  return $(React.Fragment, { key }, ...children);
+  return $(React.Fragment, { key }, ...childrenArray);
 }
 
-function MemManagedIterable({ children }) {
-  childrenArray = children instanceof Array ? children : [children]
-  React.useEffect(() => () => {
-    destroyChildren(children);
-  }, []);
-  return children;
+function getChildrenArray(children) {
+  return children instanceof Array ? children : [children];
 }
 
 function unwrapChildren(children) {
@@ -212,12 +209,13 @@ function destroyChildren(children) {
 }
 
 function MemManagedHTMLElement({ _blu_tagname, children, ...attrs }) {
+  const childrenArray = getChildrenArray(children);
   React.useEffect(() => () => {
     for (const attr_value of Object.values(attrs)) {
       destroy(attr_value);
     }
   }, []);
-  return $(_blu_tagname, attrs, ...childrenReactArray(children));
+  return $(_blu_tagname, attrs, ...childrenArray);
 }
 
 function childrenReactArray(children) {

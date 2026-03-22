@@ -437,4 +437,30 @@ Sometimes you'll need to access server-side resources after a page has loaded, u
 .. note::
     A :func:`@server <blu.server>` function must be defined at the top level of a module.
 
+    .. code-block:: python
+        :caption: Wrong!
+
+        class A:
+
+            @server
+            def func():
+                return 1
+
     
+    .. code-block:: python
+        :caption: Wrong!
+
+        def func_factory():
+
+            @server
+            def func():
+                return 1
+            
+            return func
+        
+    .. code-block:: python
+        :caption: Right.
+
+        @server
+        def func():
+            return 1

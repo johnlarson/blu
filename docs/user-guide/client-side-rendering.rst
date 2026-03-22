@@ -23,7 +23,12 @@ You may have noticed that when you try to set an event handler on an html elemen
 
 visiting the page will result in a 500 error and a message like this in the log:
 
-.. todo:: Add message.
+.. code-block:: none
+
+    blu._exceptions.WrongEnvironmentError: Could not add
+    attribute "onClick" to button element. Event-handling
+    attributes like "onClick" can only be set in client-side
+    rendering; this code was run server-side.
 
 What's going on here is that, under the hood, Blu pickes all of the HTML elements returned from *__page__()* and sends them to the client to be rendered. This means every attribute of every element has to be pickleable.
 

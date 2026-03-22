@@ -1,5 +1,5 @@
-Create GitHub issues?
 Implement server functions?
+Create GitHub issues?
 ----------------------
 Ready to Publish
 ----------------------

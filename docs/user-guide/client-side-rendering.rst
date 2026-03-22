@@ -352,4 +352,89 @@ What's happening here:
 
     .. figure:: /_img/effect_cleanup.gif
 
+Accessing Server-Side Resources from the Client
+-----------------------------------------------
 
+Sometimes you'll need to access server-side resources after a page has loaded, usually in response to user input. You can do using the :func:`@blu.server` decorator, which exposes a server-side function to be called client-side.
+
+.. code-block:: python
+    :caption: app/hello_module.py
+
+    from blu import server
+
+
+    @server
+    def hello():
+        print('Hello!')
+
+
+.. code-block:: python
+    :caption: app/client.py
+
+    from blu import client
+    from blu.html import div
+
+    from app.hello_module import hello
+
+    __client__ = True
+
+
+    @client
+    def SayHello():
+        return div[hello()]
+
+
+.. code-block:: html
+
+    <div>Hello!</div>
+
+.. danger::
+
+    Don't use this in production. The only exception to this rule is when:
+
+    1. The server function doesn't change any persistent state (no writing files, updating databases, etc.), *AND*
+    2. The server function does not return any sensitive data.
+
+    The :func:`@server <blu.server>` function security strategy is still being planned and has not been implemented.
+
+.. note::
+    When calling a :func:`@server <blu.server>` function clientside, all arguments must be JSON-serializable, and the return value must be `picklable <https://docs.python.org/3/library/pickle.html>`_.
+
+    .. code-block:: python
+        :caption: Wrong! (non-JSON-serializable argument)
+
+        @client
+        def ClientElement():
+            return div[my_server_function(object())]
+
+    .. code-block:: python
+        :caption: Wrong! (non-picklable return value)
+
+        @server
+        def my_server_function():
+            def my_callable():
+                return 1
+            return my_callable
+
+    .. code-block:: python
+        :caption: Right.
+
+        class A:
+            def __init__(self, value):
+                self.value = value
+
+
+        @server
+        def my_server_function(json_input):
+            return A(json_input)
+
+        
+        @client
+        def ClientElement():
+            return my_server_function({'Hello': 'World'})
+
+
+.. note::
+    A :func:`@server <blu.server>` function must be defined at the top level of a module.
+
+    

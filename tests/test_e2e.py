@@ -140,7 +140,6 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""
     p = await page("e2e")
     await p.goto("/rendering")
-    await sleep(3600)
     del_ = p.locator("del")
     await expect(del_).to_have_count(1, timeout=10_000)
     await expect(del_).to_have_id("my-id")

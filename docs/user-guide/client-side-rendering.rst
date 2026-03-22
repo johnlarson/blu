@@ -210,7 +210,7 @@ Use :func:`blu.use_state` to specify UI state and change that state in response 
 
 This will result in a button that tells you how many times it's been clicked:
 
-.. todo:: GIF
+.. figure:: /_img/responding_to_user_interaction.gif
 
 
 What's going on here is:
@@ -252,7 +252,7 @@ Most of the time, you will be able to get the interactive behavior you want by c
             input(ref=input_ref),
         ]
 
-.. todo:: GIF
+.. figure:: /_img/directly_manipulating_rendered_elements.gif
 
 What's happening here is:
 
@@ -303,7 +303,7 @@ Sometimes, you'll want to perform some action immediately after rendering, witho
         
         return p['(element content)']
 
-.. todo:: GIF
+.. figure:: /_img/perform_an_action_immediately_after_rendering.gif
 
 What's happening here:
 
@@ -350,6 +350,6 @@ What's happening here:
 
             return button(onClick=handle_button_click)["Rerender"]
 
-    .. todo:: GIF
+    .. figure:: /_img/effect_cleanup.gif
 
 

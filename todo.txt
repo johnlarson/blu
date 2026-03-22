@@ -1,5 +1,3 @@
-Move to GitHub?
-Do todos shown in docs?
 Create GitHub issues?
 Implement server functions?
 ----------------------

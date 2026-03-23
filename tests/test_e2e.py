@@ -360,6 +360,7 @@ async def test_dev_server(patch_app: Callable[[str], None]):
 
 
 async def test_unusual_root_nodes(page: PageFixture):
+    """Any blu.Node can be returned by a __page__ handler."""
     p = await page("e2e")
     await p.goto("/unusual_root_nodes/float")
     await expect(p.get_by_text("1.23485")).to_be_visible()
@@ -378,6 +379,9 @@ async def test_unusual_root_nodes(page: PageFixture):
 
 
 async def test_settings(page: PageFixture):
+    """
+    Settings in app/__settings__.py work as described in documenation.
+    """
     p = await page("e2e_settings")
     await p.goto("/")
     arrr_exp = expect(p.get_by_text("Ahoy there."))
@@ -386,12 +390,17 @@ async def test_settings(page: PageFixture):
 
 
 async def test_multilayer_tuple_children(page: PageFixture):
+    """
+    HTMLElement correctly renders when a tuple of tuples is passed in as
+    children.
+    """
     p = await page("e2e")
     await p.goto("/yield_in_tuple")
     await expect(p.get_by_text("This should be red.")).to_be_visible()
 
 
 async def test_server_function(page: PageFixture):
+    """Server functions work as described in documentation."""
     p = await page("e2e")
     await p.goto("/server_functions")
     await expect(p.get_by_text("Hello!")).to_be_visible()

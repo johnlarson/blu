@@ -16,6 +16,7 @@ from blu._nodes import (
     create_html_element as create_rare_html_element,
 )
 from blu._hooks import Ref, use_effect, use_ref, use_state
+from blu._server_functions import server
 
 
 class ServerOnlyClientInterface:
@@ -55,6 +56,7 @@ __all__ = [
     "create_rare_html_element",
     "html",
     "is_client",
+    "server",
     "use_effect",
     "use_state",
     "use_ref",

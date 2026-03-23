@@ -102,26 +102,4 @@ def server[
         def func():
             return 1
     """
-
-    # if is_client:
-    #     from pyscript import fetch
-    #     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> Awaitable[R]:
-    #         url = (
-    #             f'/_blu_interna/server_functions/{fn.__module__}/{fn.__name__}'
-    #         )
-    #         response = await fetch(
-    #             url,
-    #             method='POST',
-    #             body=await json.dumps({
-    #                 'args': args,
-    #                 'kwargs': kwargs,
-    #             }),
-    #             headers={
-    #                 'Content-Type': 'application/json',
-    #             },
-    #         )
-    # elif isinstance(fn, Awaitable):
-    #     return fn
-    # else:
-    #     return asyncify(fn)
     ...

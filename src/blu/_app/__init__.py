@@ -19,6 +19,7 @@ from pathlib import Path
 import aiofiles
 from blu._app.router import NotFound, router_from_root_package
 from blu._http import QueryParams, Request, Response
+from blu._server_functions import handle_server_function_request
 from blu._utils import asgi
 from .render import render_to_str
 from blu import _utils
@@ -90,6 +91,10 @@ async def _http(
     if scope["path"] == "/_blu_internal/util.js":
         path = Path(__file__).parent.parent / "util.js"
         await _serve_file(path, JS_MIME, send)
+        return
+    if scope["path"] == "/_blu_internal/server_function" and scope["method"] == "POST":
+        await handle_server_function_request(receive, send)
+        return
     try:
         await _serve_static(scope, send)
     except NotFound:
@@ -403,11 +408,61 @@ def _app_pkg_zip(zips_root: Path):
     src_path = Path(app_pkg_locations[0])
     dest_path = zips_root / "app.zip"
     with ZipFile(dest_path, "w") as dest_f:
+        added_py: set[str] = set()
         for path in src_path.rglob("*"):
-            if path.is_file():
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            rel_posix = path.relative_to(src_path).as_posix()
+            if path.suffix == ".py":
                 if _is_client_module(path):
-                    dest_f.write(str(path), arcname=path.relative_to(src_path))
+                    dest_f.write(path, arcname=rel_posix)
+                    added_py.add(rel_posix)
+        for path in src_path.rglob("*.py"):
+            if "__pycache__" in path.parts:
+                continue
+            rel_posix = path.relative_to(src_path).as_posix()
+            if rel_posix in added_py:
+                continue
+            stub_src = _client_stub_source_for_server_module(path)
+            if stub_src is not None:
+                dest_f.writestr(rel_posix, stub_src.encode("utf-8"))
     print("DONE ZIPPING")
+
+
+def _decorator_is_server(dec: ast.expr) -> bool:
+    if isinstance(dec, ast.Name) and dec.id == "server":
+        return True
+    if isinstance(dec, ast.Call):
+        inner = dec.func
+        if isinstance(inner, ast.Name) and inner.id == "server":
+            return True
+        if isinstance(inner, ast.Attribute) and inner.attr == "server":
+            return True
+    if isinstance(dec, ast.Attribute) and dec.attr == "server":
+        return True
+    return False
+
+
+def _client_stub_source_for_server_module(path: Path) -> str | None:
+    try:
+        source = path.read_text()
+    except OSError:
+        return None
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return None
+    chunks: list[str] = []
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if not any(_decorator_is_server(d) for d in node.decorator_list):
+                continue
+            async_kw = "async " if isinstance(node, ast.AsyncFunctionDef) else ""
+            args_src = ast.unparse(node.args)
+            chunks.append(f"@server\n{async_kw}def {node.name}({args_src}):\n    ...")
+    if not chunks:
+        return None
+    return "from blu import server\n\n" + "\n\n".join(chunks) + "\n"
 
 
 def _is_client_module(path: Path) -> bool:

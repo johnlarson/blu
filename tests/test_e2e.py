@@ -112,7 +112,10 @@ def server() -> Generator[Callable[[], Awaitable[str]]]:
         yield ret
     finally:
         if server_task is not None:
-            server_task.cancel()
+            try:
+                server_task.cancel()
+            except RuntimeError:
+                pass
 
 
 type PageFixture = Callable[[str], Awaitable[Page]]

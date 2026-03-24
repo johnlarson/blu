@@ -1,8 +1,8 @@
 def test_server_functions_no_expose_server_only_modules():
     """
-    Marking a function as a server function does not cause the file to
-    be accessible to the outside world; it still needs
-    "__client__ = True" in order for it to be available client-side.
-
-    TODO: implement this
+    Modules that are not marked ``__client__ = True`` are not shipped to the
+    client as full source. If they only expose :func:`blu.server` callables at
+    module scope, a minimal stub (``@server`` plus signature and ``...`` body)
+    is included in ``app_pkg.zip`` under the same import path instead.
     """
+    ...

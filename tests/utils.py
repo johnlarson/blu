@@ -1,5 +1,6 @@
 import asyncio
 import importlib
+from unittest import mock
 from blu._settings import settings
 from blu._app import _get_app_def, _get_router
 from blu._nodes import ClientElement, HTMLElement, Key, Node
@@ -19,6 +20,9 @@ import uvicorn
 from blu._utils import asgi, get_available_port
 from blu._utils import json
 from blu import is_client
+import blu
+from blu import _utils
+from blu._utils import client as client_utils
 
 if not is_client:
     import shutil
@@ -426,3 +430,17 @@ def patch_app(module_name: str):
     _get_app_def.cache_clear()
     _get_router.cache_clear()
     settings.cache_clear()
+
+
+@contextmanager
+def reload_is_client(system: str):
+    with mock.patch("platform.system", return_value=system):
+        _reload_is_client()
+        yield
+    _reload_is_client()
+
+
+def _reload_is_client():
+    importlib.reload(client_utils)
+    importlib.reload(_utils)
+    importlib.reload(blu)

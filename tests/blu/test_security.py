@@ -5,26 +5,33 @@ from zipfile import ZipFile
 from tests.utils import ClientFixture
 
 
-def test_server_functions_no_expose_server_only_modules(patch_app, tmp_path: Path):
+async def test_server_functions_no_expose_server_only_modules(
+    client: ClientFixture, tmp_path: Path
+):
     """
     Modules that are not marked ``__client__ = True`` are not shipped to the
     client as full source. If they only expose :func:`blu.server` callables at
     module scope, a minimal stub (``@server`` plus signature and ``...`` body)
     is included in ``app_pkg.zip`` under the same import path instead.
     """
-    patch_app("e2e")
-    from blu._app import _app_pkg_zip
-
-    _app_pkg_zip(tmp_path)
-    with ZipFile(tmp_path / "app.zip") as zf:
-        data = zf.read("server_functions/hello_module.py").decode()
-
-        assert "def hello(" in data
-        assert "@server" in data
-        assert "..." in data
-        assert "A(" not in data
-        assert "from app.server_functions.shared" not in data
-        assert "return " not in data
+    c = await client("e2e")
+    response = await c.get("/_blu_internal/app_pkg.zip")
+    with TemporaryDirectory() as temp_dir_str:
+        temp_dir = Path(temp_dir_str)
+        zip_path = temp_dir / "app_pkg.zip"
+        with open(zip_path, "wb") as zip_f_write:
+            async for chunk in response.content.iter_chunked(1024):
+                zip_f_write.write(chunk)
+        with ZipFile(zip_path, "r") as zip_f_read:
+            zip_f_read.extractall(temp_dir)
+        with open(temp_dir / "server_functions/hello_module.py", "r") as f:
+            data = f.read()
+    assert "def hello(" in data
+    assert "@server" in data
+    assert "..." in data
+    assert "A(" not in data
+    assert "from app.server_functions.shared" not in data
+    assert "return " not in data
 
 
 async def test_no_access_non_client_files(client: ClientFixture):

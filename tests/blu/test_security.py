@@ -1,8 +1,9 @@
+from asyncio import sleep
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
-from tests.utils import ClientFixture
+from tests.utils import ClientFixture, PageFixture
 
 
 async def test_server_functions_no_expose_server_only_modules(
@@ -52,10 +53,30 @@ async def test_no_access_non_client_files(client: ClientFixture, tmp_path: Path)
     assert not fail_path.exists()
 
 
-def test_server_function_csrf():
+async def test_server_function_csrf(page: PageFixture):
     """
     Server functions can only be called from a page served by the
-    associated Blu application, and cannot have any method other than
-    POST.
+    associated Blu application, will not be called from requests that
+    have any method other than POST.
     """
-    ...
+    p = await page("server_function_csrf")
+    await p.goto("/")
+    await sleep(3600)
+    await p.evaluate(
+        f"""
+        async () => (
+            await fetch(
+                '{p.base_url}/_blu_internal/server_function',
+                {{
+                    method: 'POST',
+                    body: JSON.stringify({{
+                        module: 'app.server_functions',
+                        name: 'change_file_contents',
+                        args: [],
+                        kwargs: {{}},
+                    }}),
+                }},
+            )
+        )
+    """
+    )

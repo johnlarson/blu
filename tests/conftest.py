@@ -19,7 +19,7 @@ from blu._settings import settings
 from blu._utils import get_available_port
 
 
-HEADLESS = True
+HEADLESS = False
 
 
 @pytest.fixture
@@ -35,7 +35,9 @@ async def page(
             patch_app(app_name)
             base_url = await server()
             context = await browser.new_context(base_url=base_url)
-            return await context.new_page()
+            page = await context.new_page()
+            page.base_url = base_url  # type: ignore
+            return page
 
         try:
             yield ret

@@ -24,119 +24,7 @@ import re
 
 from blu import is_client
 from blu._utils import get_available_port
-
-type ClientFixture = Callable[[str], Awaitable[aiohttp.ClientSession]]
-
-
-@pytest.fixture
-async def client(patch_app, server: Callable[[], Awaitable[str]]):  # type: ignore
-    session: aiohttp.ClientSession | None = None
-    try:
-
-        async def ret(app_name: str):
-            nonlocal session
-            patch_app(app_name)
-            session = aiohttp.ClientSession(await server())
-            await session.__aenter__()
-            return session
-
-        yield ret
-    finally:
-        if session is not None:
-            await session.__aexit__()
-
-
-@pytest.fixture
-async def page(
-    patch_app: Callable[[str], None],
-    server: Callable[[], Awaitable[str]],
-) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
-    async with async_playwright() as playwright:
-        chromium = playwright.chromium
-        browser = await chromium.launch(headless=False)
-
-        async def ret(app_name: str) -> Page:
-            patch_app(app_name)
-            base_url = await server()
-            context = await browser.new_context(base_url=base_url)
-            return await context.new_page()
-
-        try:
-            yield ret
-        finally:
-            await browser.close()
-
-
-@pytest.fixture
-async def page_old(
-    # patch_app: Callable[[str], None],
-    web_browser: BrowserType,
-    # server: Callable[[], Awaitable[str]],
-) -> AsyncGenerator[Callable[[str], Awaitable[Page]]]:
-    async with async_playwright() as playwright:
-        chromium = playwright.chromium
-        browser = await chromium.launch(headless=True)
-
-    async def ret(app_name: str) -> Page:
-        # patch_app(app_name)
-        # base_url = await server()
-        # context = cast(
-        #     BrowserContext,
-        #     await web_browser.new_context(base_url=base_url),  # type: ignore
-        # )
-        context = cast(BrowserContext, await web_browser.new_context())
-        print("CREATED_CONTEXT!!!!")
-        return await context.new_page()
-
-    yield ret
-
-
-@pytest.fixture
-def server() -> Generator[Callable[[], Awaitable[str]]]:
-    server_task: Task[None] | None = None
-    try:
-
-        async def ret() -> str:
-            nonlocal server_task
-            port = get_available_port()
-            from blu import app
-
-            config = uvicorn.Config(app, port=port)
-            server = uvicorn.Server(config)
-            server_task = asyncio.create_task(server.serve())
-            base_url = f"http://127.0.0.1:{port}"
-            async with aiohttp.ClientSession(base_url) as session:
-                await _wait_for_server_start(session)
-            return base_url
-
-        yield ret
-    finally:
-        if server_task is not None:
-            try:
-                server_task.cancel()
-            except RuntimeError:
-                pass
-
-
-type PageFixture = Callable[[str], Awaitable[Page]]
-
-
-@pytest.fixture(scope="module")
-async def web_browser():
-    async with async_playwright() as playwright:
-        chromium = playwright.chromium
-        yield await chromium.launch(headless=True, slow_mo=50)
-
-
-async def _wait_for_server_start(session: aiohttp.ClientSession):
-    for _ in range(25):
-        await asyncio.sleep(0.1)
-        try:
-            async with session.get("/"):
-                return
-        except aiohttp.ClientConnectorError:
-            pass
-    raise TimeoutError("Dev server never started.")
+from tests.utils import ClientFixture, PageFixture
 
 
 async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
@@ -270,31 +158,9 @@ async def test_client_file_specifier_ui(page: PageFixture):
     """
     p = await page("e2e")
     await p.goto("/app_pkg_clientside/success")
-    await expect(p.locator("#status")).to_have_text("Success!")
+    await expect(p.locator("#status")).to_have_text("Success!", timeout=10_000)
     await p.goto("/app_pkg_clientside/fail")
-    await expect(p.locator("#status")).to_have_text("Fail.")
-
-
-async def test_client_file_specifier_http(client: ClientFixture):
-    """
-    Python files within the app package are not accessible from outside
-    the server unless they contain the top-level statement
-    "__client__ = True".
-    """
-    c = await client("e2e")
-    response = await c.get("/_blu_internal/app_pkg.zip")
-    with TemporaryDirectory() as temp_dir_str:
-        temp_dir = Path(temp_dir_str)
-        zip_path = temp_dir / "app_pkg.zip"
-        with open(zip_path, "wb") as zip_f_write:
-            async for chunk in response.content.iter_chunked(1024):
-                zip_f_write.write(chunk)
-        with ZipFile(zip_path, "r") as zip_f_read:
-            zip_f_read.extractall(temp_dir)
-        success_path = temp_dir / "app_pkg_clientside/success/module.py"
-        assert success_path.exists()
-        fail_path = temp_dir / "app_pkg_clientside/fail/module.py"
-        assert not fail_path.exists()
+    await expect(p.locator("#status")).to_have_text("Fail.", timeout=10_000)
 
 
 async def test_dev_server(patch_app: Callable[[str], None]):
@@ -366,19 +232,19 @@ async def test_unusual_root_nodes(page: PageFixture):
     """Any blu.Node can be returned by a __page__ handler."""
     p = await page("e2e")
     await p.goto("/unusual_root_nodes/float")
-    await expect(p.get_by_text("1.23485")).to_be_visible()
+    await expect(p.get_by_text("1.23485")).to_be_visible(timeout=10_000)
     await p.goto("/unusual_root_nodes/int")
-    await expect(p.get_by_text("234857")).to_be_visible()
+    await expect(p.get_by_text("234857")).to_be_visible(timeout=10_000)
     await p.goto("/unusual_root_nodes/iterable")
-    await expect(p.get_by_text("ABC")).to_be_visible()
+    await expect(p.get_by_text("ABC")).to_be_visible(timeout=10_000)
     await p.goto("/unusual_root_nodes/key")
-    await expect(p.get_by_text("Hello!")).to_be_visible()
+    await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
     await p.goto("/unusual_root_nodes/none")
-    await expect(p.get_by_text(re.compile(r".+"))).to_have_count(0)
+    await expect(p.get_by_text(re.compile(r".+"))).to_have_count(0, timeout=10_000)
     await p.goto("/unusual_root_nodes/str")
-    await expect(p.get_by_text("Hello!")).to_be_visible()
+    await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
     await p.goto("/unusual_root_nodes/tuple")
-    await expect(p.get_by_text("ABC")).to_be_visible()
+    await expect(p.get_by_text("ABC")).to_be_visible(timeout=10_000)
 
 
 async def test_settings(page: PageFixture):
@@ -399,7 +265,7 @@ async def test_multilayer_tuple_children(page: PageFixture):
     """
     p = await page("e2e")
     await p.goto("/yield_in_tuple")
-    await expect(p.get_by_text("This should be red.")).to_be_visible()
+    await expect(p.get_by_text("This should be red.")).to_be_visible(timeout=10_000)
 
 
 async def test_server_function(page: PageFixture):

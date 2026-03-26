@@ -1,5 +1,8 @@
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from zipfile import ZipFile
+
+from tests.utils import ClientFixture
 
 
 def test_server_functions_no_expose_server_only_modules(patch_app, tmp_path: Path):
@@ -22,3 +25,25 @@ def test_server_functions_no_expose_server_only_modules(patch_app, tmp_path: Pat
         assert "A(" not in data
         assert "from app.server_functions.shared" not in data
         assert "return " not in data
+
+
+async def test_no_access_non_client_files(client: ClientFixture):
+    """
+    Python files within the app package are not accessible from outside
+    the server unless they contain the top-level statement
+    "__client__ = True".
+    """
+    c = await client("e2e")
+    response = await c.get("/_blu_internal/app_pkg.zip")
+    with TemporaryDirectory() as temp_dir_str:
+        temp_dir = Path(temp_dir_str)
+        zip_path = temp_dir / "app_pkg.zip"
+        with open(zip_path, "wb") as zip_f_write:
+            async for chunk in response.content.iter_chunked(1024):
+                zip_f_write.write(chunk)
+        with ZipFile(zip_path, "r") as zip_f_read:
+            zip_f_read.extractall(temp_dir)
+        success_path = temp_dir / "app_pkg_clientside/success/module.py"
+        assert success_path.exists()
+        fail_path = temp_dir / "app_pkg_clientside/fail/module.py"
+        assert not fail_path.exists()

@@ -1,6 +1,9 @@
 import asyncio
+from collections.abc import Awaitable, Callable
 import importlib
 from unittest import mock
+
+import aiohttp
 from blu._settings import settings
 from blu._app import _get_app_def, _get_router
 from blu._nodes import ClientElement, HTMLElement, Key, Node
@@ -32,6 +35,10 @@ if not is_client:
 tests = Path(__file__).parent
 projects = tests / "projects"
 test_projects = projects
+
+type ClientFixture = Callable[[str], Awaitable[aiohttp.ClientSession]]
+
+type PageFixture = Callable[[str], Awaitable[Page]]
 
 
 @contextmanager

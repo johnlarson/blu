@@ -50,3 +50,12 @@ async def test_no_access_non_client_files(client: ClientFixture, tmp_path: Path)
     assert success_path.exists()
     fail_path = tmp_path / "app_pkg_clientside/fail/module.py"
     assert not fail_path.exists()
+
+
+def test_server_function_csrf():
+    """
+    Server functions can only be called from a page served by the
+    associated Blu application, and cannot have any method other than
+    POST.
+    """
+    ...

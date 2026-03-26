@@ -87,3 +87,6 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
         assert "TypeError: Failed to fetch" in str(e)
     else:
         assert False  # If didn't raise error, fail.
+    from app.server_functions import value
+
+    assert value[0] == "UNTOUCHED"

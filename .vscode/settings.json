@@ -10,5 +10,5 @@
     // "reportGeneralTypeIssues": "information"
     // "reportGeneralTypeIssues": false
   },
-  "python-envs.defaultEnvManager": "ms-python.python:pipenv"
+  "python-envs.defaultEnvManager": "ms-python.python:venv"
 }

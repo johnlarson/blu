@@ -3,6 +3,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
+from pytest_httpserver import HTTPServer
+
 from tests.utils import ClientFixture, PageFixture
 
 
@@ -53,30 +55,35 @@ async def test_no_access_non_client_files(client: ClientFixture, tmp_path: Path)
     assert not fail_path.exists()
 
 
-async def test_server_function_csrf(page: PageFixture):
+async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     """
     Server functions can only be called from a page served by the
     associated Blu application, will not be called from requests that
     have any method other than POST.
     """
+    httpserver.expect_request("/").respond_with_data("Other Site")
     p = await page("server_function_csrf")
-    await p.goto("/")
-    await sleep(3600)
-    await p.evaluate(
-        f"""
-        async () => (
-            await fetch(
-                '{p.base_url}/_blu_internal/server_function',
-                {{
-                    method: 'POST',
-                    body: JSON.stringify({{
-                        module: 'app.server_functions',
-                        name: 'change_file_contents',
-                        args: [],
-                        kwargs: {{}},
-                    }}),
-                }},
+    await p.goto(httpserver.url_for("/"))
+    try:
+        await p.evaluate(
+            f"""
+            async () => (
+                await fetch(
+                    '{p.base_url}/_blu_internal/server_function',
+                    {{
+                        method: 'POST',
+                        body: JSON.stringify({{
+                            module: 'app.server_functions',
+                            name: 'change_file_contents',
+                            args: [],
+                            kwargs: {{}},
+                        }}),
+                    }},
+                )
             )
+        """
         )
-    """
-    )
+    except Exception as e:
+        assert "TypeError: Failed to fetch" in str(e)
+    else:
+        assert False  # If didn't raise error, fail.

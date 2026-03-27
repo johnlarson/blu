@@ -1,6 +1,7 @@
 import ast
 from functools import cache
 from importlib import import_module
+from re import L
 import shutil
 from tempfile import TemporaryDirectory
 from types import ModuleType
@@ -93,10 +94,20 @@ async def _http(
         await _serve_file(path, JS_MIME, send)
         return
     if scope["path"] == "/_blu_internal/server_function":
-        if scope["method"] == "POST":
-            await handle_server_function_request(receive, send)
-        else:
+        if scope["method"] != "POST":
             await _serve_405(send)
+            return
+        headers = _get_asgi_headers(scope)
+        if headers.get("Host", None) is None:
+            await _serve_400(send)
+            return
+        if headers.get("Origin", None) is None:
+            await _serve_400(send)
+            return
+        if not _host_origin_match(headers["Host"], headers["Origin"]):
+            await _serve_400(send)
+            return
+        await handle_server_function_request(receive, send)
         return
     try:
         await _serve_static(scope, send)
@@ -127,6 +138,20 @@ async def _http(
     )
 
 
+def _host_origin_match(host: str, origin: str) -> bool:
+    if origin.startswith("https://"):
+        exp_host = origin.replace("https://", "")
+    elif origin.startswith("http://"):
+        exp_host = origin.replace("http://", "")
+    else:
+        return False
+    return host == exp_host
+
+
+def _get_asgi_headers(scope: asgi.HTTPConnectionScope) -> dict[str, str]:
+    return {k.decode("utf-8"): v.decode("utf-8") for k, v in scope["headers"]}
+
+
 async def _serve_404(message: str, send: asgi.Sender):
     await send(
         {
@@ -147,6 +172,21 @@ async def _serve_405(send: asgi.Sender):
         {
             "type": "http.response.start",
             "status": 405,
+        }
+    )
+    await send(
+        {
+            "type": "http.response.body",
+            "body": b"",
+        }
+    )
+
+
+async def _serve_400(send: asgi.Sender):
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 400,
         }
     )
     await send(

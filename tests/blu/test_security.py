@@ -92,8 +92,22 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     else:
         assert False  # If didn't raise error, fail.
 
-    # TODO add tests for incorrect HTTP methods (not POST)
-    # Make sure you specifically check safe methods.'
+    async def assert_405(method: str):
+        try:
+            await fetch_fn(method)
+        except Exception as e:
+            a = 1
+        else:
+            assert False
+
+    await p.goto("/")
+    await assert_405("GET")
+    await assert_405("HEAD")
+    await assert_405("OPTIONS")
+    await assert_405("PUT")
+    await assert_405("PATCH")
+    await assert_405("DELETE")
+    await assert_405("MADEUPMETHOD")
 
     # TODO specifically test to ensure the server function call is
     # blocked when origin header doesn't match "Host" header.

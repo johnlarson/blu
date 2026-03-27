@@ -98,13 +98,13 @@ async def _http(
             await _serve_405(send)
             return
         headers = _get_asgi_headers(scope)
-        if headers.get("Host", None) is None:
+        if headers.get("host", None) is None:
             await _serve_400(send)
             return
-        if headers.get("Origin", None) is None:
+        if headers.get("origin", None) is None:
             await _serve_400(send)
             return
-        if not _host_origin_match(headers["Host"], headers["Origin"]):
+        if not _host_origin_match(headers["host"], headers["origin"]):
             await _serve_400(send)
             return
         await handle_server_function_request(receive, send)

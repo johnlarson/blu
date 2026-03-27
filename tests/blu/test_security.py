@@ -154,21 +154,31 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
         assert response.status == 400
         assert await response.text() == ""
 
-    # WORK IN PROGRESS: No Host, only Origin
+    # No Host, only Origin
     reader, writer = await asyncio.open_connection(host, port)
     writer.write(b"POST /_blu_internal/server_function HTTP/1.1\r\n")
-    writer.write(b"ORIGIN: " + p.base_url.encode("utf-8") + b"\r\n")
+    writer.write(b"Origin: " + p.base_url.encode("utf-8") + b"\r\n")
     writer.write(b"\r\n")
     await writer.drain()
-    await reader.read(1024)
+    response = await reader.read(1024)
+    assert response.startswith(b"HTTP/1.1 400")
     writer.close()
     await writer.wait_closed()
 
-    # TODO: No Host or Origin
+    # No Host or Origin
+    reader, writer = await asyncio.open_connection(host, port)
+    writer.write(b"POST /_blu_internal/server_function HTTP/1.1\r\n")
+    writer.write(b"Host: " + host_and_port.encode("utf-8") + b"\r\n")
+    writer.write(b"\r\n")
+    await writer.drain()
+    response = await reader.read(1024)
+    assert response.startswith(b"HTTP/1.1 400")
+    writer.close()
+    await writer.wait_closed()
 
-    from app import server_functions
+    from app.server_functions import value
 
-    assert server_functions.value[0] == "UNTOUCHED"
+    assert value[0] == "UNTOUCHED"
 
     async with aiohttp.ClientSession(p.base_url) as session:
         # Matching Host and Origin
@@ -184,5 +194,4 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
         )
         assert response.status == 200
 
-    importlib.reload(server_functions)
-    assert server_functions.value[0] == "CHANGED"
+    assert value[0] == "CHANGED"

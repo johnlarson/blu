@@ -1,5 +1,6 @@
 from asyncio import sleep
 import asyncio
+import importlib
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, cast
@@ -125,19 +126,6 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     # blocked when origin header doesn't match "Host" header.
 
     async with aiohttp.ClientSession(p.base_url) as session:
-        # Matching Host and Origin
-        response = await session.post(
-            f"{p.base_url}/_blu_internal/server_function",
-            headers={"Origin": p.base_url},
-            json={
-                "module": "app.server_functions",
-                "name": "change_file_contents",
-                "args": [],
-                "kwargs": {},
-            },
-        )
-        assert response.status == 200
-        assert await response.text() == "Hello!"
 
         # Non-matching Host and Origin
         response = await session.post(
@@ -178,6 +166,23 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
 
     # TODO: No Host or Origin
 
-    from app.server_functions import value
+    from app import server_functions
 
-    assert value[0] == "UNTOUCHED"
+    assert server_functions.value[0] == "UNTOUCHED"
+
+    async with aiohttp.ClientSession(p.base_url) as session:
+        # Matching Host and Origin
+        response = await session.post(
+            f"{p.base_url}/_blu_internal/server_function",
+            headers={"Origin": p.base_url},
+            json={
+                "module": "app.server_functions",
+                "name": "change_file_contents",
+                "args": [],
+                "kwargs": {},
+            },
+        )
+        assert response.status == 200
+
+    importlib.reload(server_functions)
+    assert server_functions.value[0] == "CHANGED"

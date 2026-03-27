@@ -154,7 +154,7 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
         assert response.status == 400
         assert await response.text() == ""
 
-    # TODO: No Host, only Origin
+    # WORK IN PROGRESS: No Host, only Origin
     reader, writer = await asyncio.open_connection(host, port)
     writer.write(b"POST /_blu_internal/server_function HTTP/1.1\r\n")
     writer.write(b"ORIGIN: " + p.base_url.encode("utf-8") + b"\r\n")

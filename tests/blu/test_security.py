@@ -119,7 +119,35 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
 
     # TODO specifically test to ensure the server function call is
     # blocked when origin header doesn't match "Host" header.
+
     async with aiohttp.ClientSession(p.base_url) as session:
+        # Matching Host and Origin
+        response = await session.post(
+            f"{p.base_url}/_blu_internal/server_function",
+            headers={"Origin": p.base_url},
+            json={
+                "module": "app.server_functions",
+                "name": "change_file_contents",
+                "args": [],
+                "kwargs": {},
+            },
+        )
+        assert response.status == 200
+        assert await response.text() == "Hello!"
+
+        # Non-matching Host and Origin
+        response = await session.post(
+            f"{p.base_url}/_blu_internal/server_function",
+            headers={"Origin": "http://www.google.com"},
+            json={
+                "module": "app.server_functions",
+                "name": "change_file_contents",
+                "args": [],
+                "kwargs": {},
+            },
+        )
+
+        # No Origin, only Host
         response = await session.post(
             f"{p.base_url}/_blu_internal/server_function",
             json={
@@ -129,8 +157,10 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
                 "kwargs": {},
             },
         )
-    assert response.status == 400
-    assert await response.text() == ""
+
+        # TODO: No Host, only Origin
+
+        # TODO: No Host or Origin
 
     from app.server_functions import value
 

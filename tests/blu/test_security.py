@@ -90,3 +90,9 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     from app.server_functions import value
 
     assert value[0] == "UNTOUCHED"
+
+    # TODO add tests for incorrect HTTP methods (not POST)
+    # Make sure you specifically check safe methods.
+
+    # TODO specifically test to ensure the server function call is
+    # blocked when origin header doesn't match "Host" header.

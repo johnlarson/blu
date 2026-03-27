@@ -166,17 +166,17 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
         assert response.status == 400
         assert await response.text() == ""
 
-        # TODO: No Host, only Origin
-        reader, writer = await asyncio.open_connection(host, port)
-        writer.write(b"POST /_blu_internal/server_function HTTP/1.1\r\n")
-        writer.write(b"ORIGIN: " + p.base_url.encode("utf-8") + b"\r\n")
-        writer.write(b"\r\n")
-        await writer.drain()
-        await reader.read(1024)
-        writer.close()
-        await writer.wait_closed()
+    # TODO: No Host, only Origin
+    reader, writer = await asyncio.open_connection(host, port)
+    writer.write(b"POST /_blu_internal/server_function HTTP/1.1\r\n")
+    writer.write(b"ORIGIN: " + p.base_url.encode("utf-8") + b"\r\n")
+    writer.write(b"\r\n")
+    await writer.drain()
+    await reader.read(1024)
+    writer.close()
+    await writer.wait_closed()
 
-        # TODO: No Host or Origin
+    # TODO: No Host or Origin
 
     from app.server_functions import value
 

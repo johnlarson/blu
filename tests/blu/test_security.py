@@ -64,35 +64,40 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     httpserver.expect_request("/").respond_with_data("Other Site")
     p = await page("server_function_csrf")
     await p.goto(httpserver.url_for("/"))
-    try:
+
+    async def fetch_fn(method: str):
         await p.evaluate(
             f"""
-            async () => (
-                await fetch(
-                    '{p.base_url}/_blu_internal/server_function',
-                    {{
-                        method: 'POST',
-                        body: JSON.stringify({{
-                            module: 'app.server_functions',
-                            name: 'change_file_contents',
-                            args: [],
-                            kwargs: {{}},
-                        }}),
-                    }},
+                async () => (
+                    await fetch(
+                        '{p.base_url}/_blu_internal/server_function',
+                        {{
+                            method: '{method}',
+                            body: JSON.stringify({{
+                                module: 'app.server_functions',
+                                name: 'change_file_contents',
+                                args: [],
+                                kwargs: {{}},
+                            }}),
+                        }},
+                    )
                 )
-            )
-        """
+            """
         )
+
+    try:
+        await fetch_fn("POST")
     except Exception as e:
         assert "TypeError: Failed to fetch" in str(e)
     else:
         assert False  # If didn't raise error, fail.
-    from app.server_functions import value
-
-    assert value[0] == "UNTOUCHED"
 
     # TODO add tests for incorrect HTTP methods (not POST)
-    # Make sure you specifically check safe methods.
+    # Make sure you specifically check safe methods.'
 
     # TODO specifically test to ensure the server function call is
     # blocked when origin header doesn't match "Host" header.
+
+    from app.server_functions import value
+
+    assert value[0] == "UNTOUCHED"

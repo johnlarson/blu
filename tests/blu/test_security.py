@@ -1,7 +1,8 @@
 from asyncio import sleep
+import asyncio
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from typing import Any, cast
 from zipfile import ZipFile
 
 import aiohttp
@@ -66,6 +67,9 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     """
     httpserver.expect_request("/").respond_with_data("Other Site")
     p = await page("server_function_csrf")
+    host_and_port = cast(str, p.base_url).replace("http://", "")
+    host, port_str = host_and_port.split(":")
+    port = int(port_str)
     await p.goto(httpserver.url_for("/"))
 
     async def fetch_fn(method: str, body: bool = True) -> tuple[int, str]:
@@ -146,6 +150,8 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
                 "kwargs": {},
             },
         )
+        assert response.status == 400
+        assert await response.text() == ""
 
         # No Origin, only Host
         response = await session.post(
@@ -157,8 +163,18 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
                 "kwargs": {},
             },
         )
+        assert response.status == 400
+        assert await response.text() == ""
 
         # TODO: No Host, only Origin
+        reader, writer = await asyncio.open_connection(host, port)
+        writer.write(b"POST /_blu_internal/server_function HTTP/1.1\r\n")
+        writer.write(b"ORIGIN: " + p.base_url.encode("utf-8") + b"\r\n")
+        writer.write(b"\r\n")
+        await writer.drain()
+        await reader.read(1024)
+        writer.close()
+        await writer.wait_closed()
 
         # TODO: No Host or Origin
 

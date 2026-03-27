@@ -92,8 +92,11 @@ async def _http(
         path = Path(__file__).parent.parent / "util.js"
         await _serve_file(path, JS_MIME, send)
         return
-    if scope["path"] == "/_blu_internal/server_function" and scope["method"] == "POST":
-        await handle_server_function_request(receive, send)
+    if scope["path"] == "/_blu_internal/server_function":
+        if scope["method"] == "POST":
+            await handle_server_function_request(receive, send)
+        else:
+            await _serve_405(send)
         return
     try:
         await _serve_static(scope, send)
@@ -135,6 +138,21 @@ async def _serve_404(message: str, send: asgi.Sender):
         {
             "type": "http.response.body",
             "body": message.encode(),
+        }
+    )
+
+
+async def _serve_405(send: asgi.Sender):
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 405,
+        }
+    )
+    await send(
+        {
+            "type": "http.response.body",
+            "body": b"",
         }
     )
 

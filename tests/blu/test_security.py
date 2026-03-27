@@ -1,9 +1,12 @@
 from asyncio import sleep
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Any
 from zipfile import ZipFile
 
+import aiohttp
 from pytest_httpserver import HTTPServer
+import requests
 
 from tests.utils import ClientFixture, PageFixture
 
@@ -65,23 +68,31 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     p = await page("server_function_csrf")
     await p.goto(httpserver.url_for("/"))
 
-    async def fetch_fn(method: str):
-        await p.evaluate(
+    async def fetch_fn(method: str, body: bool = True) -> tuple[int, str]:
+        req_body = (
             f"""
-                async () => (
-                    await fetch(
+            body: JSON.stringify({{
+                module: 'app.server_functions',
+                name: 'change_file_contents',
+                args: [],
+                kwargs: {{}},
+            }})
+        """
+            if body
+            else ""
+        )
+        return await p.evaluate(
+            f"""
+                async () => {{
+                    const response = await fetch(
                         '{p.base_url}/_blu_internal/server_function',
                         {{
                             method: '{method}',
-                            body: JSON.stringify({{
-                                module: 'app.server_functions',
-                                name: 'change_file_contents',
-                                args: [],
-                                kwargs: {{}},
-                            }}),
+                            {req_body}
                         }},
-                    )
-                )
+                    );
+                    return [response.status, await response.text()];
+                }}
             """
         )
 
@@ -92,17 +103,14 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     else:
         assert False  # If didn't raise error, fail.
 
-    async def assert_405(method: str):
-        try:
-            await fetch_fn(method)
-        except Exception as e:
-            a = 1
-        else:
-            assert False
+    async def assert_405(method: str, body: bool = True):
+        status, body = await fetch_fn(method, body=body)
+        assert status == 405
+        assert body == ""
 
     await p.goto("/")
-    await assert_405("GET")
-    await assert_405("HEAD")
+    await assert_405("GET", body=False)
+    await assert_405("HEAD", body=False)
     await assert_405("OPTIONS")
     await assert_405("PUT")
     await assert_405("PATCH")
@@ -111,6 +119,18 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
 
     # TODO specifically test to ensure the server function call is
     # blocked when origin header doesn't match "Host" header.
+    async with aiohttp.ClientSession(p.base_url) as session:
+        response = await session.post(
+            f"{p.base_url}/_blu_internal/server_function",
+            json={
+                "module": "app.server_functions",
+                "name": "change_file_contents",
+                "args": [],
+                "kwargs": {},
+            },
+        )
+    assert response.status == 400
+    assert await response.text() == ""
 
     from app.server_functions import value
 

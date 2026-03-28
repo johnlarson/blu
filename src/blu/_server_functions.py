@@ -27,8 +27,8 @@ def collect_blu_server_import_bindings(
     From a module's top-level statements, collect local names that refer to the
     ``blu`` package and to :func:`blu.server`.
 
-    Only absolute imports are considered (``level == 0``). ``from blu… import
-    server`` (and ``server`` re-exported from ``blu.*`` submodules) binds the
+    Only absolute imports are considered (``level == 0``). ``from blu import
+    server`` or ``from blu.<submodule> import server`` binds the
     decorator name; ``import blu`` / ``import blu as …`` binds the package
     for ``@blu.server`` / ``@alias.server``.
     """
@@ -43,7 +43,7 @@ def collect_blu_server_import_bindings(
             if stmt.level != 0:
                 continue
             mod = stmt.module
-            if mod is None or mod != "blu":
+            if mod is None or (mod != "blu" and not mod.startswith("blu.")):
                 continue
             for alias in stmt.names:
                 if alias.name == "*":

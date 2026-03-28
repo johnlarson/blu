@@ -93,7 +93,6 @@ def _app_py_path_to_module_name(app_root: Path, path: Path) -> str:
     elif parts[-1].endswith(".py"):
         pkg_parts = (*parts[:-1], parts[-1][:-3])
     else:
-        # TODO ask why
         return ""
     if not pkg_parts:
         return "app"

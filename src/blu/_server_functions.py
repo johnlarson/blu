@@ -288,7 +288,7 @@ async def handle_server_function_request(
         await _send_server_function_json(
             send,
             400,
-            {"ok": False, "error": f"invalid request: {e}"},
+            {"ok": False, "error": f"invalid request"},
         )
         return
 

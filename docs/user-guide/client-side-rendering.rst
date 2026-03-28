@@ -388,15 +388,6 @@ Sometimes you'll need to access server-side resources after a page has loaded, u
 
     <div>Hello!</div>
 
-.. danger::
-
-    Don't use this in production. The only exception to this rule is when:
-
-    1. The server function doesn't change any persistent state (no writing files, updating databases, etc.), *AND*
-    2. The server function does not return any sensitive data.
-
-    The :func:`@server <blu.server>` function security strategy is still being planned and has not been implemented.
-
 .. note::
     When calling a :func:`@server <blu.server>` function clientside, all arguments must be JSON-serializable, and the return value must be `picklable <https://docs.python.org/3/library/pickle.html>`_.
 

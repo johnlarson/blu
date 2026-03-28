@@ -70,19 +70,6 @@ def server[
     **P, R
 ](callable: Callable[P, R | Awaitable[R]],) -> Callable[P, Awaitable[R]]:
     """
-    .. danger::
-
-        Don't use this in production. The only exception to this rule is
-        when:
-
-        1. The server function doesn't change any persistent state (no
-        writing files, updating databases, etc.), *AND*
-
-        2. The server function does not return any sensitive data.
-
-        The :func:`@server <blu.server>` function security strategy is
-        still being planned and has not been implemented.
-
     Create a server function that can be called from the client.
 
     .. code-block:: python

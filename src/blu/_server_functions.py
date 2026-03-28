@@ -181,15 +181,15 @@ async def handle_server_function_request(
         await _send_server_function_json(
             send,
             404,
-            {"ok": False, "error": str(e)},
+            {"ok": False, "error": "Not Found"},
         )
         return
 
     if not _is_registered_server_function(fn):
         await _send_server_function_json(
             send,
-            403,
-            {"ok": False, "error": "not a registered server function"},
+            404,
+            {"ok": False, "error": "Not Found"},
         )
         return
 
@@ -202,7 +202,7 @@ async def handle_server_function_request(
         await _send_server_function_json(
             send,
             500,
-            {"ok": False, "error": str(e)},
+            {"ok": False, "error": ""},
         )
         return
 

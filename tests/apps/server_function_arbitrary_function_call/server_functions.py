@@ -4,14 +4,14 @@ callable_called = [False]
 
 
 @server
-def callable():
+def callable(value: str) -> str:
     callable_called[0] = True
-    return "Callable"
+    return value
 
 
 non_callable_called = [False]
 
 
-def should_not_be_callable():
+def should_not_be_callable() -> str:
     non_callable_called[0] = True
-    return "Should not be callable"
+    return "Should not have been called"

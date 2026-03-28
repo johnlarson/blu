@@ -1,4 +1,4 @@
-called = [False]
+server_only_function_called = [False]
 
 
 def server_only_function():

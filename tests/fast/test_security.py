@@ -197,9 +197,78 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     assert value[0] == "CHANGED"
 
 
-def test_server_function_no_call_arbitrary_function():
+async def test_server_function_no_call_arbitrary_function(
+    client: ClientFixture,
+):
     """
     If a function is not marked as a server function, it cannot be
     called client-side.
     """
-    ...
+    c = await client("server_function_arbitrary_function_call")
+
+    from app.server_functions import callable_called, non_callable_called
+    from app.server_only_module import server_only_function_called
+
+    origin = str(c._base_url_origin)
+
+    # Sanity check -- this should succeed.
+    r = await c.post(
+        "/_blu_internal/server_function",
+        headers={"Origin": origin},
+        json={
+            "module": "app.server_functions",
+            "name": "callable",
+            "args": [350],
+            "kwargs": {},
+        },
+    )
+    assert r.status == 200
+    assert callable_called == [True]
+
+    # Non-server function in same module as server function
+    r = await c.post(
+        "/_blu_internal/server_function",
+        headers={"Origin": origin},
+        json={
+            "module": "app.server_functions",
+            "name": "should_not_be_callable",
+            "args": [],
+            "kwargs": {},
+        },
+    )
+    assert r.status == 404
+    data = await r.json()
+    assert data["error"] == "Not Found"
+    assert non_callable_called == [False]
+
+    # Non-server function in module with no server functions
+    r = await c.post(
+        "/_blu_internal/server_function",
+        headers={"Origin": origin},
+        json={
+            "module": "app.server_only_module",
+            "name": "server_only_function",
+            "args": [],
+            "kwargs": {},
+        },
+    )
+    assert r.status == 404
+    data = await r.json()
+    assert data["error"] == "Not Found"
+    assert server_only_function_called == [False]
+
+    # Standard library function
+    r = await c.post(
+        "/_blu_internal/server_function",
+        headers={"Origin": origin},
+        json={
+            "module": "platform",
+            "name": "system",
+            "args": [],
+            "kwargs": {},
+        },
+    )
+    assert r.status == 404
+    data = await r.json()
+    assert data["error"] == "Not Found"
+    assert server_only_function_called == [False]

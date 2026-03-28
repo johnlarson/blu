@@ -156,6 +156,7 @@
             .. code-block:: html
 
 .. _note-on-hooks:
+
 Note on Hooks
 -------------
 

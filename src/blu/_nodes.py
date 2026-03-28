@@ -236,34 +236,6 @@ class HTMLElement:
               :type:`blu.Node`\\ s: A copy of :data:`self` whose
               children are set to ``list(children)``.
         """
-
-        # For example, to generate a div with two spans in it:
-
-        # ```
-        # from reactssr import html
-
-        # html.div[
-        #     html.span,
-        #     html.span,
-        # ]  # renders as <div><span></span><span></span></div>
-        # ```
-
-        # You can use `...` as a placeholder for when you know there will
-        # be children, but have not yet implemented that part of the view:
-
-        # ```
-        # from reactssr import html
-
-        # html.div[
-        #     ...
-        # ]  # renders as <div></div>
-        # ```
-
-        # :param index: The child nodes for the new `ReactElement`.
-
-        # :return: A copy of `self`, but with `children` set to the
-        # children passed into the index operator.
-        # """
         print("HTMLElement children:", children)
         return HTMLElement(
             self._tagname,

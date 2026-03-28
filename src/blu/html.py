@@ -83,4 +83,9 @@ def __getattr__(import_name: str) -> _HTMLElement:
     """
     from blu._nodes import py_to_html_name
 
+    if import_name == "__mro__":
+        raise AttributeError(
+            "module 'blu.html' has no attribute '__mro'",
+        )
+
     return _HTMLElement(py_to_html_name(import_name), {}, [])

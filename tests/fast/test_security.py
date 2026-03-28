@@ -4,6 +4,7 @@ import importlib
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, cast
+from unittest.mock import patch
 from zipfile import ZipFile
 
 import aiohttp
@@ -272,3 +273,43 @@ async def test_server_function_no_call_arbitrary_function(
     data = await r.json()
     assert data["error"] == "Not Found"
     assert server_only_function_called == [False]
+
+
+async def test_server_functions_cannot_be_called_outside_app_package(
+    client: ClientFixture,
+):
+    """
+    Even if it is decorated with the @blu.server decorator, a function
+    cannot be called from the client if it is not in the app package.
+    """
+    c = await client("server_functions_outside_app")
+    origin = str(c._base_url_origin)
+
+    # Sanity check; this should succeed.
+    with patch("app.valid.valid") as valid_mock:
+        await c.post(
+            "/_blu_internal/server_function",
+            headers={"Origin": origin},
+            json={
+                "module": "app.valid",
+                "name": "valid",
+                "args": [],
+                "kwargs": {},
+            },
+        )
+        valid_mock.assert_called_once()
+
+    # This should fail.
+    with patch("tests.resources.server_fn_outside_app.invalid") as invalid_mock:
+        r = await c.post(
+            "/_blu_internal/server_function",
+            headers={"Origin": origin},
+            json={
+                "module": "tests.resources.invalid",
+                "name": "invalid",
+                "args": [],
+                "kwargs": {},
+            },
+        )
+        assert r.status == 404
+        invalid_mock.assert_not_called()

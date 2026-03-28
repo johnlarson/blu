@@ -195,3 +195,11 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
         assert response.status == 200
 
     assert value[0] == "CHANGED"
+
+
+def test_server_function_no_call_arbitrary_function():
+    """
+    If a function is not marked as a server function, it cannot be
+    called client-side.
+    """
+    ...

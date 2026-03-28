@@ -3,7 +3,6 @@ import asyncio
 import base64
 import functools
 import importlib
-import importlib.util
 import inspect
 import json
 import pickle
@@ -72,32 +71,114 @@ def decorator_is_server(
     return False
 
 
-def _read_module_source_without_importing_target(module_name: str) -> str | None:
-    """
-    Read the source file for ``module_name`` using :func:`importlib.util.find_spec`
-    so we resolve the same path :func:`importlib.import_module` would use (including
-    when ``app`` is a namespace package with several search locations), without
-    executing that module's body.
-    """
-    spec = importlib.util.find_spec(module_name)
-    if spec is None:
-        return None
-    origin = spec.origin
-    if origin not in (None, "namespace") and getattr(spec, "has_location", True):
-        path = Path(origin)
-        if path.suffix == ".py":
-            try:
-                return path.read_text(encoding="utf-8")
-            except OSError:
-                return None
-    subs = getattr(spec, "submodule_search_locations", None)
-    if subs:
-        loc = Path(next(iter(subs)))
+_server_function_registry: dict[tuple[str, str], Callable[..., Any]] | None = None
+
+
+def _rpc_key_well_formed(module_name: str, fn_name: str) -> bool:
+    if not fn_name.isidentifier():
+        return False
+    if not module_name.startswith("app.") or module_name == "app":
+        return False
+    rest = module_name[4:]
+    if not rest:
+        return False
+    return all(p.isidentifier() for p in rest.split("."))
+
+
+def _app_py_path_to_module_name(app_root: Path, path: Path) -> str:
+    rel = path.relative_to(app_root)
+    parts = rel.parts
+    if parts[-1] == "__init__.py":
+        pkg_parts = parts[:-1]
+    elif parts[-1].endswith(".py"):
+        pkg_parts = (*parts[:-1], parts[-1][:-3])
+    else:
+        # TODO ask why
+        return ""
+    if not pkg_parts:
+        return "app"
+    return "app." + ".".join(pkg_parts)
+
+
+def _collect_app_module_paths() -> dict[str, Path]:
+    import app
+
+    spec = app.__spec__
+    if spec is None or not spec.submodule_search_locations:
+        return {}
+    seen: dict[str, Path] = {}
+    for root_str in spec.submodule_search_locations:
+        root = Path(root_str)
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*.py"):
+            if "__pycache__" in path.parts:
+                continue
+            mod_name = _app_py_path_to_module_name(root, path)
+            if mod_name and mod_name not in seen:
+                seen[mod_name] = path
+    return seen
+
+
+def _discover_server_function_names_from_source(source: str) -> list[str]:
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+    blu_pkg, server_dec = collect_blu_server_import_bindings(tree.body)
+    names: list[str] = []
+    for node in tree.body:
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if any(
+            decorator_is_server(d, blu_pkg, server_dec) for d in node.decorator_list
+        ):
+            names.append(node.name)
+    return names
+
+
+def _build_server_function_registry() -> dict[tuple[str, str], Callable[..., Any]]:
+    reg: dict[tuple[str, str], Callable[..., Any]] = {}
+    for module_name, file_path in _collect_app_module_paths().items():
         try:
-            return (loc / "__init__.py").read_text(encoding="utf-8")
+            source = file_path.read_text(encoding="utf-8")
         except OSError:
-            return None
-    return None
+            continue
+        fn_names = _discover_server_function_names_from_source(source)
+        if not fn_names:
+            continue
+        try:
+            mod = importlib.import_module(module_name)
+        except ImportError:
+            continue
+        for name in fn_names:
+            fn = getattr(mod, name, None)
+            if fn is not None and _is_registered_server_function(fn):
+                reg[(module_name, name)] = fn
+    return reg
+
+
+def refresh_server_function_registry() -> None:
+    global _server_function_registry
+    _server_function_registry = _build_server_function_registry()
+
+
+def _ensure_server_function_registry() -> None:
+    global _server_function_registry
+    if _server_function_registry is None:
+        refresh_server_function_registry()
+
+
+def lookup_server_function(module_name: str, fn_name: str) -> Callable[..., Any] | None:
+    """
+    Return the registered server callable for ``(module_name, fn_name)`` if any.
+    Lazily builds the registry when lifespan has not run (e.g. minimal ASGI hosts).
+    """
+    _ensure_server_function_registry()
+    assert _server_function_registry is not None
+    if not _rpc_key_well_formed(module_name, fn_name):
+        return None
+    return _server_function_registry.get((module_name, fn_name))
 
 
 def _source_defines_top_level_server_function(source: str, fn_name: str) -> bool:
@@ -115,24 +196,6 @@ def _source_defines_top_level_server_function(source: str, fn_name: str) -> bool
             decorator_is_server(d, blu_pkg, server_dec) for d in node.decorator_list
         )
     return False
-
-
-def _allowed_server_rpc_target(module_name: str, fn_name: str) -> bool:
-    """
-    True if ``module_name`` / ``fn_name`` is a top-level ``@server`` function
-    according to the module's source, without importing that target module.
-    """
-    if not fn_name.isidentifier():
-        return False
-    if not module_name.startswith("app.") or module_name == "app":
-        return False
-    rest = module_name[4:]
-    if not rest or not all(p.isidentifier() for p in rest.split(".")):
-        return False
-    source = _read_module_source_without_importing_target(module_name)
-    if source is None:
-        return False
-    return _source_defines_top_level_server_function(source, fn_name)
 
 
 async def _invoke_server_function_remote(
@@ -292,26 +355,8 @@ async def handle_server_function_request(
         )
         return
 
-    if not _allowed_server_rpc_target(module_name, fn_name):
-        await _send_server_function_json(
-            send,
-            404,
-            {"ok": False, "error": "Not Found"},
-        )
-        return
-
-    try:
-        mod = importlib.import_module(module_name)
-        fn = getattr(mod, fn_name)
-    except (ImportError, AttributeError):
-        await _send_server_function_json(
-            send,
-            404,
-            {"ok": False, "error": "Not Found"},
-        )
-        return
-
-    if not _is_registered_server_function(fn):
+    fn = lookup_server_function(module_name, fn_name)
+    if fn is None:
         await _send_server_function_json(
             send,
             404,

@@ -448,6 +448,11 @@ def reload_is_client(system: str):
 
 
 def _reload_is_client():
+    import blu._app
+    import blu._server_functions
+
     importlib.reload(client_utils)
     importlib.reload(_utils)
+    importlib.reload(blu._server_functions)
+    importlib.reload(blu._app)
     importlib.reload(blu)

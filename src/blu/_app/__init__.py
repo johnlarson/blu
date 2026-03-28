@@ -1,7 +1,6 @@
 import ast
 from functools import cache
 from importlib import import_module
-from re import L
 import shutil
 from tempfile import TemporaryDirectory
 from types import ModuleType
@@ -23,7 +22,6 @@ from blu._http import QueryParams, Request, Response
 from blu._server_functions import (
     collect_blu_server_import_bindings,
     decorator_is_server,
-    handle_server_function_request,
 )
 from blu._utils import asgi
 from .render import render_to_str
@@ -67,6 +65,9 @@ async def _lifespan(
 ):
     event = await receive()
     assert event["type"] == "lifespan.startup"
+    from blu._server_functions import refresh_server_function_registry
+
+    refresh_server_function_registry()
     await send({"type": "lifespan.startup.complete"})
     event = await receive()
     assert event["type"] == "lifespan.shutdown"
@@ -111,6 +112,8 @@ async def _http(
         if not _host_origin_match(headers["host"], headers["origin"]):
             await _serve_400(send)
             return
+        from blu._server_functions import handle_server_function_request
+
         await handle_server_function_request(receive, send)
         return
     try:

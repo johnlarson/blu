@@ -275,3 +275,7 @@ async def test_server_function(page: PageFixture):
     p = await page("e2e")
     await p.goto("/server_functions")
     await expect(p.get_by_text("Hello!")).to_be_visible()
+
+
+async def test_async_effect(page: PageFixture):
+    """use_effect accepts async callbacks."""

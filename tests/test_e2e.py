@@ -26,6 +26,8 @@ from blu import is_client
 from blu._utils import get_available_port
 from tests.utils import ClientFixture, PageFixture
 
+pytestmark = pytest.mark.slow
+
 
 async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""

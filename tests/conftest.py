@@ -19,7 +19,7 @@ from blu._settings import settings
 from blu._utils import get_available_port
 
 
-HEADLESS = False
+HEADLESS = True
 
 
 @pytest.fixture

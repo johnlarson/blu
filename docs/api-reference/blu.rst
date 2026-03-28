@@ -1,8 +1,8 @@
 ``blu``
 =======
- 
+
 .. automodule:: blu
-    :exclude-members: HTMLElement, ClientElement, Key, Ref
+    :exclude-members: HTMLElement, ClientElement, Key, Ref, ClientRenderer, Node
 
     .. autoclass:: ClientElement()
         :special-members: __call__, __getitem__

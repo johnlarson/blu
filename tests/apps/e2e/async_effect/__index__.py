@@ -30,4 +30,7 @@ def MyClientElement():
     def handle_click(e):
         set_render_num(render_num + 1)
 
-    return div[button(onClick=handle_click), div(id="events")[",".join(events[:])]]
+    return div[
+        button(id="rerender", onClick=handle_click),
+        div(id="events")[",".join(events[:])],
+    ]

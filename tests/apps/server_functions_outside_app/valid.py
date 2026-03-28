@@ -1,6 +1,9 @@
 from blu import server
 
 
+valid_called = [False]
+
+
 @server
 def valid():
-    pass
+    valid_called[0] = True

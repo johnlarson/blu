@@ -286,30 +286,32 @@ async def test_server_functions_cannot_be_called_outside_app_package(
     origin = str(c._base_url_origin)
 
     # Sanity check; this should succeed.
-    with patch("app.valid.valid") as valid_mock:
-        await c.post(
-            "/_blu_internal/server_function",
-            headers={"Origin": origin},
-            json={
-                "module": "app.valid",
-                "name": "valid",
-                "args": [],
-                "kwargs": {},
-            },
-        )
-        valid_mock.assert_called_once()
+    await c.post(
+        "/_blu_internal/server_function",
+        headers={"Origin": origin},
+        json={
+            "module": "app.valid",
+            "name": "valid",
+            "args": [],
+            "kwargs": {},
+        },
+    )
+    from app.valid import valid_called
+
+    assert valid_called == [True]
 
     # This should fail.
-    with patch("tests.resources.server_fn_outside_app.invalid") as invalid_mock:
-        r = await c.post(
-            "/_blu_internal/server_function",
-            headers={"Origin": origin},
-            json={
-                "module": "tests.resources.invalid",
-                "name": "invalid",
-                "args": [],
-                "kwargs": {},
-            },
-        )
-        assert r.status == 404
-        invalid_mock.assert_not_called()
+    r = await c.post(
+        "/_blu_internal/server_function",
+        headers={"Origin": origin},
+        json={
+            "module": "tests.resources.invalid",
+            "name": "invalid",
+            "args": [],
+            "kwargs": {},
+        },
+    )
+    assert r.status == 404
+    from tests.resources.server_fn_outside_app import invalid_called
+
+    assert invalid_called == [False]

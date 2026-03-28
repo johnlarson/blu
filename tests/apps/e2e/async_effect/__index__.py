@@ -1,20 +1,16 @@
-import asyncio
-
-from blu import client, use_effect, use_ref
-from blu._nodes import ClientElement
+from blu import client, use_effect
 from blu.html import div
 
-from app.server_functions.hello_module import hello
 
 __client__ = True
 
 
 def __page__():
-    return ClientElement
+    return MyClientElement
 
 
 @client
-def ClientElement():
+def MyClientElement():
     from js import alert
 
     @use_effect

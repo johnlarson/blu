@@ -20,7 +20,11 @@ from pathlib import Path
 import aiofiles
 from blu._app.router import NotFound, router_from_root_package
 from blu._http import QueryParams, Request, Response
-from blu._server_functions import handle_server_function_request
+from blu._server_functions import (
+    collect_blu_server_import_bindings,
+    decorator_is_server,
+    handle_server_function_request,
+)
 from blu._utils import asgi
 from .render import render_to_str
 from blu import _utils
@@ -487,20 +491,6 @@ def _app_pkg_zip(zips_root: Path):
     print("DONE ZIPPING")
 
 
-def _decorator_is_server(dec: ast.expr) -> bool:
-    if isinstance(dec, ast.Name) and dec.id == "server":
-        return True
-    if isinstance(dec, ast.Call):
-        inner = dec.func
-        if isinstance(inner, ast.Name) and inner.id == "server":
-            return True
-        if isinstance(inner, ast.Attribute) and inner.attr == "server":
-            return True
-    if isinstance(dec, ast.Attribute) and dec.attr == "server":
-        return True
-    return False
-
-
 def _client_stub_source_for_server_module(path: Path) -> str | None:
     try:
         source = path.read_text()
@@ -510,10 +500,13 @@ def _client_stub_source_for_server_module(path: Path) -> str | None:
         tree = ast.parse(source)
     except SyntaxError:
         return None
+    blu_pkg, server_dec = collect_blu_server_import_bindings(tree.body)
     chunks: list[str] = []
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            if not any(_decorator_is_server(d) for d in node.decorator_list):
+            if not any(
+                decorator_is_server(d, blu_pkg, server_dec) for d in node.decorator_list
+            ):
                 continue
             async_kw = "async " if isinstance(node, ast.AsyncFunctionDef) else ""
             args_src = ast.unparse(node.args)

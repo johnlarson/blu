@@ -57,3 +57,52 @@ async def test_client_side():
                 (1, 2),
                 {},
             )
+
+
+def test_ast_server_decorator_requires_blu_binding():
+    from blu._server_functions import _source_defines_top_level_server_function
+
+    wrong = """
+from not_blu import server
+
+@server
+def hello(x):
+    pass
+"""
+    assert not _source_defines_top_level_server_function(wrong, "hello")
+
+    ok_from = """
+from blu import server
+
+@server
+def hello(x):
+    pass
+"""
+    assert _source_defines_top_level_server_function(ok_from, "hello")
+
+    ok_pkg = """
+import blu
+
+@blu.server
+def hello(x):
+    pass
+"""
+    assert _source_defines_top_level_server_function(ok_pkg, "hello")
+
+    ok_alias = """
+import blu as b
+
+@b.server
+def hello(x):
+    pass
+"""
+    assert _source_defines_top_level_server_function(ok_alias, "hello")
+
+    ok_submodule = """
+from blu._server_functions import server
+
+@server
+def hello(x):
+    pass
+"""
+    assert _source_defines_top_level_server_function(ok_submodule, "hello")

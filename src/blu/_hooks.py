@@ -1,4 +1,4 @@
-from collections.abc import AsyncGenerator, Callable, Generator
+from collections.abc import AsyncGenerator, Callable, Coroutine, Generator
 from typing import Any
 import typing
 from blu._utils import is_client
@@ -9,7 +9,15 @@ if is_client or typing.TYPE_CHECKING:
     from pyscript.js_modules._blu_js_utils import useEffect, useRefObj, useState
 
 
-def use_effect(callback: Callable[[], None | Generator[None]]):
+def use_effect(
+    callback: Callable[
+        [],
+        None
+        | Generator[None]
+        | Coroutine[None, None, None]
+        | AsyncGenerator[None, None],
+    ],
+):
     """
     .. include:: /_includes/hook-note.rst
 
@@ -36,17 +44,23 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
 
             return div['Hello!']
 
-    :param callback: A non-generator function or a generator function
-        with a single ``yield`` statement.
+    :param callback: A plain function, an ``async def`` function, a
+        generator function with a single ``yield``, or an ``async def``
+        generator function with a single ``yield``.
 
-    If ``callback`` is generator function, it will be run right up until
-    the ``yield`` statement immediately after the element is initially
-    rendered to the DOM. The rest of the function will be run
+    If ``callback`` is a (sync) generator function, it will be run right
+    up until the ``yield`` statement immediately after the element is
+    initially rendered to the DOM. The rest of the function will be run
     immediately before the element is removed from the DOM.
 
-    If ``callback`` is not a generator function, ``callback`` will be
-    called immediately after the element is initially rendered to the
-    DOM.
+    If ``callback`` is an async generator function, the same pattern
+    applies: code up to the first ``yield`` runs after render; the
+    remainder runs on teardown.
+
+    If ``callback`` is a plain function, it is called synchronously
+    after render. If it is an ``async def`` function (not a generator),
+    the coroutine is scheduled and runs on the asyncio event loop; it
+    has no separate teardown hook beyond hook cleanup.
     """
     useEffect(callback)
 

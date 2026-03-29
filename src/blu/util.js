@@ -276,11 +276,96 @@ function refProxy(pyRef) {
   }
 }
 
+function isStopAsyncIterationError(e) {
+  if (e.name === 'PythonError') {
+    const pyExc = sys.last_exc;
+    return isOfType(pyExc, builtins.StopAsyncIteration);
+  }
+  return false;
+}
+
 export function useEffect(callback) {
   const callbackProxy = getProxy(callback);
   React.useEffect(() => {
     const result = callbackProxy();
-    if (builtins.isinstance(result, abc.Generator)) {
+    if (builtins.isinstance(result, abc.AsyncGenerator)) {
+      const agen = getProxy(result);
+      let afterYield = false;
+      let cleanedUp = false;
+      (async () => {
+        try {
+          await agen.__anext__();
+          if (cleanedUp) {
+            try {
+              await agen.aclose();
+            } catch (e2) {
+              if (!isStopAsyncIterationError(e2)) {
+                /* GeneratorExit / aclose cleanup */
+              }
+            }
+            return;
+          }
+          afterYield = true;
+        } catch (e) {
+          if (cleanedUp) {
+            return;
+          }
+          if (isStopAsyncIterationError(e)) {
+            return;
+          }
+          throw e;
+        }
+      })();
+      return () => {
+        cleanedUp = true;
+        (async () => {
+          try {
+            if (afterYield) {
+              try {
+                await agen.__anext__();
+              } catch (e) {
+                if (!isStopAsyncIterationError(e)) {
+                  throw e;
+                }
+              }
+            } else {
+              try {
+                await agen.aclose();
+              } catch (e) {
+                if (!isStopAsyncIterationError(e)) {
+                  throw e;
+                }
+              }
+            }
+          } finally {
+            destroy(agen);
+            destroy(callbackProxy);
+          }
+        })();
+      };
+    } else if (builtins.isinstance(result, abc.Coroutine)) {
+      const coro = getProxy(result);
+      let cancelled = false;
+      (async () => {
+        try {
+          await coro;
+        } catch (e) {
+          if (!cancelled) {
+            throw e;
+          }
+        }
+      })();
+      return () => {
+        cancelled = true;
+        try {
+          coro.close();
+        } catch (e) {
+          /* ignore close errors during unmount */
+        }
+        destroy(coro);
+        destroy(callbackProxy);
+      };
+    } else if (builtins.isinstance(result, abc.Generator)) {
       const generator = getProxy(result);
       generator.next();
       return () => {
@@ -291,7 +376,7 @@ export function useEffect(callback) {
     } else {
       return () => {
         destroy(callbackProxy);
-      }
+      };
     }
   });
 }

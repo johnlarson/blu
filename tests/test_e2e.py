@@ -281,11 +281,13 @@ async def test_async_effect(page: PageFixture):
     """use_effect accepts async callbacks."""
     p = await page("e2e")
     await p.goto("/async_effect")
+    await sleep(3600)
     await expect(p.locator("#events")).to_have_text("SETUP,SETUP ONLY")
     await p.locator("#rerender").click()
     await expect(p.locator("#events")).to_have_text(
         "SETUP,SETUP ONLY,TEARDOWN,SETUP,SETUP ONLY",
     )
+    await p.locator("#rerender").click()
     await expect(p.locator("#events")).to_have_text(
         "SETUP,SETUP ONLY,TEARDOWN,SETUP,SETUP ONLY,TEARDOWN,SETUP,SETUP ONLY",
     )

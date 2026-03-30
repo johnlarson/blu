@@ -14,6 +14,9 @@ let builtins;
 let abc;
 let sys;
 let renderClientElement;
+let useEffectInvoke;
+let operator;
+let useEffectCleanupAsyncGen;
 
 export function init(innerPyImport) {
   const ffi = innerPyImport('pyscript.ffi');
@@ -25,7 +28,11 @@ export function init(innerPyImport) {
   builtins = pyImport('builtins');
   abc = pyImport('collections.abc');
   sys = pyImport('sys');
-  renderClientElement = pyImport('blu._nodes')._render_client_element
+  operator = pyImport('operator');
+  renderClientElement = pyImport('blu._nodes')._render_client_element;
+  const hooksMod = pyImport('blu._hooks');
+  useEffectInvoke = getProxy(hooksMod._use_effect_invoke);
+  useEffectCleanupAsyncGen = getProxy(hooksMod._use_effect_cleanup_async_gen);
 }
 
 const idToProxyInfo = new Map();
@@ -279,8 +286,31 @@ function refProxy(pyRef) {
 export function useEffect(callback) {
   const callbackProxy = getProxy(callback);
   React.useEffect(() => {
-    const result = callbackProxy();
-    if (builtins.isinstance(result, abc.Generator)) {
+    const packed = useEffectInvoke(callbackProxy);
+    const tag = operator.getitem(packed, 0).toString();
+    const result = operator.getitem(packed, 1);
+    if (tag === 'async_generator') {
+      const agen = getProxy(result);
+      return () => {
+        const onDone = create_proxy(() => {
+          destroy(agen);
+          onDone.destroy();
+        });
+        useEffectCleanupAsyncGen(agen, onDone);
+        destroy(callbackProxy);
+      };
+    } else if (tag === 'coroutine') {
+      const coro = getProxy(result);
+      return () => {
+        try {
+          coro.close();
+        } catch (e) {
+          /* ignore close errors during unmount */
+        }
+        destroy(coro);
+        destroy(callbackProxy);
+      };
+    } else if (tag === 'generator') {
       const generator = getProxy(result);
       generator.next();
       return () => {
@@ -291,7 +321,7 @@ export function useEffect(callback) {
     } else {
       return () => {
         destroy(callbackProxy);
-      }
+      };
     }
   });
 }

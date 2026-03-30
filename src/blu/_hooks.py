@@ -141,9 +141,8 @@ def use_effect(
 
             return div['Hello!']
 
-    :param callback: A plain function, an ``async def`` function, a
-        generator function with a single ``yield``, or an ``async def``
-        generator function with a single ``yield``.
+    :param callback: A non-generator function or a generator function
+        with a single ``yield`` statement.
 
     If ``callback`` is a generator function or async generator function,
     it will be run right up until the ``yield`` statement immediately

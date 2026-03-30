@@ -150,10 +150,6 @@ def use_effect(
     function will be run immediately before the element is removed from
     the DOM.
 
-    If ``callback`` is an async generator function, the same pattern
-    applies: code up to the first ``yield`` runs after render; the
-    remainder runs on teardown.
-
     Otherwise, ``callback`` will be called immediately after the element
     is initially rendered to the DOM.
     """

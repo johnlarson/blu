@@ -14,6 +14,9 @@ let builtins;
 let abc;
 let sys;
 let renderClientElement;
+let useEffectInvoke;
+let operator;
+let useEffectCleanupAsyncGen;
 
 export function init(innerPyImport) {
   const ffi = innerPyImport('pyscript.ffi');
@@ -25,7 +28,11 @@ export function init(innerPyImport) {
   builtins = pyImport('builtins');
   abc = pyImport('collections.abc');
   sys = pyImport('sys');
-  renderClientElement = pyImport('blu._nodes')._render_client_element
+  operator = pyImport('operator');
+  renderClientElement = pyImport('blu._nodes')._render_client_element;
+  const hooksMod = pyImport('blu._hooks');
+  useEffectInvoke = getProxy(hooksMod._use_effect_invoke);
+  useEffectCleanupAsyncGen = getProxy(hooksMod._use_effect_cleanup_async_gen);
 }
 
 const idToProxyInfo = new Map();
@@ -276,87 +283,25 @@ function refProxy(pyRef) {
   }
 }
 
-function isStopAsyncIterationError(e) {
-  if (e.name === 'PythonError') {
-    const pyExc = sys.last_exc;
-    return isOfType(pyExc, builtins.StopAsyncIteration);
-  }
-  return false;
-}
-
 export function useEffect(callback) {
   const callbackProxy = getProxy(callback);
   React.useEffect(() => {
-    const result = callbackProxy();
-    if (builtins.isinstance(result, abc.AsyncGenerator)) {
+    const packed = useEffectInvoke(callbackProxy);
+    const tag = operator.getitem(packed, 0).toString();
+    const result = operator.getitem(packed, 1);
+    if (tag === 'async_generator') {
       const agen = getProxy(result);
-      let afterYield = false;
-      let cleanedUp = false;
-      (async () => {
-        try {
-          await agen.__anext__();
-          if (cleanedUp) {
-            try {
-              await agen.aclose();
-            } catch (e2) {
-              if (!isStopAsyncIterationError(e2)) {
-                /* GeneratorExit / aclose cleanup */
-              }
-            }
-            return;
-          }
-          afterYield = true;
-        } catch (e) {
-          if (cleanedUp) {
-            return;
-          }
-          if (isStopAsyncIterationError(e)) {
-            return;
-          }
-          throw e;
-        }
-      })();
       return () => {
-        cleanedUp = true;
-        (async () => {
-          try {
-            if (afterYield) {
-              try {
-                await agen.__anext__();
-              } catch (e) {
-                if (!isStopAsyncIterationError(e)) {
-                  throw e;
-                }
-              }
-            } else {
-              try {
-                await agen.aclose();
-              } catch (e) {
-                if (!isStopAsyncIterationError(e)) {
-                  throw e;
-                }
-              }
-            }
-          } finally {
-            destroy(agen);
-            destroy(callbackProxy);
-          }
-        })();
+        const onDone = create_proxy(() => {
+          destroy(agen);
+          onDone.destroy();
+        });
+        useEffectCleanupAsyncGen(agen, onDone);
+        destroy(callbackProxy);
       };
-    } else if (builtins.isinstance(result, abc.Coroutine)) {
+    } else if (tag === 'coroutine') {
       const coro = getProxy(result);
-      let cancelled = false;
-      (async () => {
-        try {
-          await coro;
-        } catch (e) {
-          if (!cancelled) {
-            throw e;
-          }
-        }
-      })();
       return () => {
-        cancelled = true;
         try {
           coro.close();
         } catch (e) {
@@ -365,7 +310,7 @@ export function useEffect(callback) {
         destroy(coro);
         destroy(callbackProxy);
       };
-    } else if (builtins.isinstance(result, abc.Generator)) {
+    } else if (tag === 'generator') {
       const generator = getProxy(result);
       generator.next();
       return () => {

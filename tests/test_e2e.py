@@ -280,8 +280,11 @@ async def test_server_function(page: PageFixture):
 async def test_async_effect(page: PageFixture):
     """use_effect accepts async callbacks."""
     p = await page("e2e")
-    await p.goto("/async_effect")
-    await sleep(3600)
+    await p.goto("/async_effect", wait_until="networkidle")
+    await expect(p).to_have_title(
+        re.compile(r"blu-async-effect:SETUP,SETUP ONLY"),
+        timeout=10_000,
+    )
     await expect(p.locator("#events")).to_have_text("SETUP,SETUP ONLY")
     await p.locator("#rerender").click()
     await expect(p.locator("#events")).to_have_text(

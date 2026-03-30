@@ -8,6 +8,103 @@ if is_client or typing.TYPE_CHECKING:
     from pyodide.ffi import JsDoubleProxy
     from pyscript.js_modules._blu_js_utils import useEffect, useRefObj, useState
 
+# Integers for JS `useEffect` (avoid classifying return values in JS, where
+# coroutines can be finalized before `isinstance` runs).
+_use_effect_ag_phase: dict[int, str] = {}
+
+# String tags for JS (reliable compare; PyProxy int coercion was flaky).
+_USE_EFFECT_TAG_ASYNC_GENERATOR = "async_generator"
+_USE_EFFECT_TAG_COROUTINE = "coroutine"
+_USE_EFFECT_TAG_GENERATOR = "generator"
+_USE_EFFECT_TAG_PLAIN = "plain"
+
+
+def _unwrap_js_proxy(obj: Any) -> Any:
+    """Resolve Pyodide ``JsProxy`` so ``id`` matches the underlying Python object."""
+    if not is_client:
+        return obj
+    try:
+        from pyodide.ffi import JsProxy
+    except ImportError:
+        return obj
+    while isinstance(obj, JsProxy):
+        obj = obj.unwrap()
+    return obj
+
+
+def _use_effect_invoke(callback: Callable[[], Any]) -> tuple[str, Any]:
+    """Call ``callback()`` and classify the return value for ``util.js`` ``useEffect``."""
+    from collections.abc import AsyncGenerator as AsyncGenABC
+    from collections.abc import Coroutine as CoroutineABC
+    from collections.abc import Generator as GenABC
+
+    result = callback()
+    if isinstance(result, AsyncGenABC):
+        _use_effect_start_async_gen(result)
+        return (_USE_EFFECT_TAG_ASYNC_GENERATOR, result)
+    if isinstance(result, CoroutineABC):
+        _use_effect_start_coro(result)
+        return (_USE_EFFECT_TAG_COROUTINE, result)
+    if isinstance(result, GenABC):
+        return (_USE_EFFECT_TAG_GENERATOR, result)
+    return (_USE_EFFECT_TAG_PLAIN, result)
+
+
+def _use_effect_start_async_gen(agen: AsyncGenerator[Any, None]) -> None:
+    """Schedule running an async generator up to its first ``yield``."""
+    import asyncio
+
+    agen = _unwrap_js_proxy(agen)
+    aid = id(agen)
+    _use_effect_ag_phase[aid] = "pending"
+
+    async def setup() -> None:
+        await anext(agen)
+        _use_effect_ag_phase[aid] = "after_yield"
+
+    asyncio.create_task(setup())
+
+
+def _use_effect_cleanup_async_gen(
+    agen: AsyncGenerator[Any, None],
+    on_done: Callable[[], None] | None = None,
+) -> None:
+    """Schedule teardown or ``aclose`` for an effect async generator.
+
+    ``on_done`` runs after async work finishes (e.g. to release JS proxies). The
+    client must not destroy ``agen`` until then, or the cleanup task may see a
+    dead generator.
+    """
+    import asyncio
+
+    agen = _unwrap_js_proxy(agen)
+
+    async def work() -> None:
+        try:
+            aid = id(agen)
+            phase = _use_effect_ag_phase.pop(aid, "pending")
+            if phase == "after_yield":
+                try:
+                    await anext(agen)
+                except StopAsyncIteration:
+                    pass
+            else:
+                try:
+                    await agen.aclose()
+                except Exception:
+                    pass
+        finally:
+            if on_done is not None:
+                on_done()
+
+    asyncio.create_task(work())
+
+
+def _use_effect_start_coro(coro: Coroutine[Any, Any, Any]) -> None:
+    import asyncio
+
+    asyncio.create_task(coro)
+
 
 def use_effect(
     callback: Callable[

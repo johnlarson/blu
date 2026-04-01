@@ -2,6 +2,10 @@
 
 {% block document %}
   {{ super() }}
+{% endblock %}
+  {% block footer %}
+  <div class="custom-footer">
+  <div class="custom-footer-spacer"></div>
   <ul class="footer-nav">
     {%- if prev %}
       <li class="prev">
@@ -14,4 +18,6 @@
       </li>
     {%- endif %}
   </ul>
-{% endblock %}
+  </div>
+  {{ super() }}
+  {% endblock %}

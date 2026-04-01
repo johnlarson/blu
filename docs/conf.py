@@ -45,8 +45,6 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }
 
-# intersphinx_disabled_reftypes = ['*']
-
 html_css_files = ["styles.css"]
 
 todo_include_todos = True
@@ -60,7 +58,4 @@ autodoc_default_options = {
     "imported-members": True,
     "undoc-members": True,
     "show-inheritance": True,
-    # 'class-doc-from': 'both',
 }
-
-# autodoc_typehints = 'both'

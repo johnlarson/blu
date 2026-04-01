@@ -5,10 +5,5 @@
   "python.analysis.fixAll": [
     "source.unusedImports"
   ],
-  "python.analysis.diagnosticSeverityOverrides": {
-    // "reportSelfClsParameterName": false,
-    // "reportGeneralTypeIssues": "information"
-    // "reportGeneralTypeIssues": false
-  },
   "python-envs.defaultEnvManager": "ms-python.python:venv"
 }

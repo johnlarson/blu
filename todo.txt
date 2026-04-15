@@ -1,8 +1,8 @@
-Implement server functions?
-Create GitHub issues?
+cleanup
 ----------------------
 Ready to Publish
 ----------------------
+Create GitHub issues?
 Add note about not being ready for use? (README and Docs)
 Version it
 Put on PyPI

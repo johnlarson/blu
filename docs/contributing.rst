@@ -6,13 +6,11 @@ Setup
 
 1. Fork the `repository <https://github.com/johnlarson/blu>`_ on GitHub.
 
-2. Ensure `Python 3.13 <https://www.python.org/downloads/>`_ is installed.
+2. Ensure `Python <https://www.python.org/downloads/>`_ (v3.14 or higher) is installed.
 
-3. Ensure `Pipenv <https://pipenv.pypa.io>`_ is installed.
+3. Ensure `uv <https://docs.astral.sh/uv/>`_ is installed.
 
-4. cd into the repository root and run ``pipenv install``.
-
-5. Run tests with ``pipenv run pytest``. If the tests pass, you have successfully set up your development environment and are ready to make a change to the codebase.
+4. Run tests with ``uv run pytest``. If the tests pass, you have successfully set up your development environment and are ready to make a change to the codebase.
 
 
 Making Changes

@@ -2,7 +2,7 @@ get e2e tests to pass on the first try
 Add note about not being ready for use? (README and Docs)
 License
 Move to-dos
-Version it (Git, pyproject.toml)
+Version it (pyproject.toml, Git)
 ----------------------
 Ready to Publish
 ----------------------
@@ -13,18 +13,14 @@ Make git repo public
 Figure out how to get it tested
 Work on it, get feedback
 ----------------------
-After Alpha Testing
+After Testing
 ----------------------
-Change note from "Alpha Testing" to "Open Beta Testing" (README and Docs)
+Remove note about not being ready from README and Docs
 Social media account(s)
 workshop
 get word out
 get feedback
 respond to feedback and issues
-----------------------
-After Beta Testing
-----------------------
-Remove note about beta testing from README and Docs
 add other stuff
 ----------------------
 When Ready to commit to API

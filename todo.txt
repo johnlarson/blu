@@ -1,5 +1,9 @@
+look closer at test utils
 cleanup
-get e2e tests to pass the first time
+2 QueryParams classes?
+2 WrongEnvironmentError classes?
+2 sets of HTTP classes?
+get e2e tests to pass on the first try
 ----------------------
 Ready to Publish
 ----------------------

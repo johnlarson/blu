@@ -6,7 +6,7 @@ import logging
 import pickle
 from typing import Any, TypedDict, cast
 
-from js import console, document  # type: ignore
+from js import document  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
 from pyscript.js_modules import _blu_react as react
 from pyscript.js_modules import _blu_js_utils

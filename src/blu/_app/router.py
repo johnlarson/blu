@@ -27,7 +27,6 @@ class Router:
     dynamic_segments: dict[str, "Router"]
 
     def __init__(self, dir: Path, package_name: str):
-        print("DIR:", str(dir))
         self.index_page = None
         self.default_page = None
         self.static_segments = {}

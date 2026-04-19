@@ -391,14 +391,12 @@ def _python_zip_dir():
 
 
 def _blu_pkg_zip(zips_root: Path):
-    print("BLU ZIP")
     src_dir = Path(__file__).parent.parent
     base_name = str(zips_root / "blu")
     shutil.make_archive(base_name, "zip", src_dir, src_dir)
 
 
 def _app_pkg_zip(zips_root: Path):
-    print("START APP ZIP")
     import app
 
     assert app.__spec__ is not None
@@ -425,7 +423,6 @@ def _app_pkg_zip(zips_root: Path):
             stub_src = _client_stub_source_for_server_module(path)
             if stub_src is not None:
                 dest_f.writestr(rel_posix, stub_src.encode("utf-8"))
-    print("DONE ZIPPING")
 
 
 def _client_stub_source_for_server_module(path: Path) -> str | None:

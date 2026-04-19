@@ -234,7 +234,6 @@ class HTMLElement:
               :type:`blu.Node`\\ s: A copy of :data:`self` whose
               children are set to ``list(children)``.
         """
-        print("HTMLElement children:", children)
         return HTMLElement(
             self._tagname,
             props=self._attrs,
@@ -247,12 +246,9 @@ class HTMLElement:
 
 def _get_children(index: Node | tuple[Node, ...]) -> list[Node]:
     if is_client:
-        print("is_client")
         from pyodide.ffi import JsProxy
 
-        print("index type:", type(index))
         if isinstance(index, JsProxy):
-            print("Proxy type:", index.typeof)
             index = cast(Node, index.unwrap())
     if isinstance(index, tuple):
         children = list(cast(tuple[Node], index))
@@ -617,8 +613,6 @@ def _import_client_module(
     key: Any,
     has_key: bool,
 ):
-    print("MODULE:", module)
-    print("NAME:", name)
     base = getattr(importlib.import_module(module), name)
     if has_key:
         all_kwargs = {**kwargs, "key": key}

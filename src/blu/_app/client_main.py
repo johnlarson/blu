@@ -1,5 +1,3 @@
-print("Hello, World!")
-
 import base64
 from collections.abc import AsyncGenerator, Generator, Iterable
 import importlib
@@ -38,12 +36,7 @@ async def main():
 
 
 def get_node(data: Any):
-    print("DATA:", data)
     if isinstance(data, ClientElement):
-        print("R:", data._renderer)
-        print("ARGS:", data._args)
-        print("KWARGS:", data._kwargs)
-        print("CHILDREN:", data._children)
         return react.createElement(
             PythonElement,
             to_js(
@@ -96,7 +89,6 @@ def get_dict(my_dict: dict):
 
 
 def get_array(array: Any):
-    print("ARRAY:", array)
     return to_js([get_node(x) for x in array])
 
 
@@ -109,9 +101,7 @@ class PythonElementProps(TypedDict):
 
 @create_proxy
 def PythonElement(props: PythonElementProps, extra: Any = None):
-    print("A")
     result = props.renderer(*props.args, **props.kwargs.as_object_map())
-    print("B")
     if isinstance(result, Generator):
         next(result)
         try:
@@ -127,7 +117,6 @@ def PythonElement(props: PythonElementProps, extra: Any = None):
 
 
 def py_to_js_node(py_node: Node):
-    print("PY NODE:", py_node)
     if isinstance(py_node, ClientElement):
         return react.createElement(
             PythonElement,
@@ -154,7 +143,6 @@ def py_to_js_node(py_node: Node):
 
 
 def parse_py_element(data: dict[str, Any]):
-    print("CLIENT ELEMENT:", data)
     return ClientElement(
         get_renderer(data),
         get_array(data["args"]),

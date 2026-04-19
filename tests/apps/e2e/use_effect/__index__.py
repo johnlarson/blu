@@ -12,7 +12,6 @@ def __page__():
 def EffectTest():
 
     render_id, rerender = use_state(0)
-    print("TYPE:", type(render_id))
 
     events_ref = use_ref([])
 
@@ -23,7 +22,6 @@ def EffectTest():
         events_ref[:] = [*events_ref[:], "TEARDOWN"]
 
     def handle_button_click(e):
-        print("Clicked!")
         rerender(render_id + 1)
 
     return (

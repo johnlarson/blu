@@ -3,11 +3,6 @@ import { createElement as $, Fragment } from 'https://esm.sh/react';
 import { createRoot } from 'https://esm.sh/react-dom/client';
 import * as PyScript from 'https://pyscript.net/releases/2026.1.1/core.js';
 
-window.ps = PyScript;
-
-console.log('Hello from client utils!');
-console.log('PYSCRIPT INTERPRETER:', PyScript)
-
 let create_proxy;
 let blu;
 let builtins;
@@ -109,7 +104,6 @@ function getReactNode(pyNode) {
   } else if (builtins.hasattr(pyNode, '__iter__')) {
     return getArray(pyNode);
   } else if (isOfType(pyNode, blu.HTMLElement)) {
-    // TODO: Figure out how to deal with props and ref
     const attrs = {};
     let hasRef = false;
     for (const [k, v] of pyNode._attrs.items()) {
@@ -305,7 +299,7 @@ export function useEffect(callback) {
         try {
           coro.close();
         } catch (e) {
-          /* ignore close errors during unmount */
+          // ignore close errors during unmount
         }
         destroy(coro);
         destroy(callbackProxy);

@@ -1,9 +1,8 @@
 from collections import defaultdict
-from blu._utils.typing import Iterator, Mapping
-
 import urllib.parse
 
 from blu._nodes import Node
+from blu._utils.typing import Iterator, Mapping
 
 type QueryInit = Mapping[str, str | list[str]]
 

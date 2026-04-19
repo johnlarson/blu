@@ -85,7 +85,7 @@ def __getattr__(import_name: str) -> _HTMLElement:
 
     if import_name == "__mro__":
         raise AttributeError(
-            "module 'blu.html' has no attribute '__mro'",
+            "module 'blu.html' has no attribute '__mro__'",
         )
 
     return _HTMLElement(py_to_html_name(import_name), {}, [])

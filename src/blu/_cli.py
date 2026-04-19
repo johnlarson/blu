@@ -1,8 +1,5 @@
 import asyncio
-import os
 import subprocess
-import sys
-import uvicorn
 
 from blu._utils import get_available_port
 
@@ -26,27 +23,3 @@ def _run_server():
 
 def cli_other():
     asyncio.run(_run_server())
-
-
-async def _run_server_async():
-    config = uvicorn.Config("blu:app", port=get_available_port(), reload=True)
-    server = uvicorn.Server(config)
-    await server.serve()
-
-
-async def _run_server_3():
-    proc = await asyncio.create_subprocess_exec(
-        "uvicorn",
-        "--port",
-        str(get_available_port()),
-        "--reload",
-        "blu:app",
-        cwd=os.getcwd(),
-        env={
-            "PYTHONPATH": ":".join(sys.path),
-        },
-    )
-    try:
-        await proc.wait()
-    except asyncio.CancelledError:
-        proc.kill()

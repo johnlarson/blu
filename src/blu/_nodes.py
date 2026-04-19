@@ -4,10 +4,10 @@ import inspect
 from logging import getLogger
 from numbers import Number
 import re
-from blu._utils.typing import Any, Mapping, Protocol, Sequence, cast
-from blu._utils.client import is_client
 
 from blu._exceptions import WrongEnvironmentError
+from blu._utils.typing import Any, Mapping, Protocol, Sequence, cast
+from blu._utils.client import is_client
 
 log = getLogger("blu")
 
@@ -258,20 +258,6 @@ def _get_children(index: Node | tuple[Node, ...]) -> list[Node]:
         children = list(cast(tuple[Node], index))
     else:
         children = [index]
-    # for child in children:
-    #     if child is not None and not isinstance(
-    #         child,
-    #         (HTMLElement, Key, ClientElement, Sequence, str, Number, bool),
-    #     ):
-    #         print(f"Wrong child:", child)
-    #         print("Wrong child type:", type(child))
-    #         raise TypeError(
-    #             "HTMLElement's children must be valid nodes, i.e. they "
-    #             "must be one of the following types: "
-    #             "`blu.react.HTMLElement`, "
-    #             "`blu.react.CustomElement`, `typing.Sequence`, "
-    #             f"`str`, `int`, `float`, `None`. Got {child}"
-    #         )
     return [_convert_to_string(x) for x in children]
 
 
@@ -620,26 +606,6 @@ class ClientElement:
                 self._has_key,
             ),
         )
-
-
-def _render_client_element(props_js: Any):
-    assert is_client
-    from pyodide.ffi import JsDoubleProxy
-
-    props_wrapped = props_js.as_py_json()
-    props = {
-        k: v.unwrap() if isinstance(v, JsDoubleProxy) else v
-        for k, v in props_wrapped.items()
-    }
-    result = props["renderer"](*props["args"], **props["kwargs"])
-    if isinstance(result, Generator):
-        next(result)
-        try:
-            result.send(props["pyChildren"])
-        except StopIteration as e:
-            return e.value
-    else:
-        return result
 
 
 def _import_client_module(

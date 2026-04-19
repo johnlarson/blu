@@ -1,3 +1,4 @@
+get e2e tests to pass the first time
 cleanup
 ----------------------
 Ready to Publish

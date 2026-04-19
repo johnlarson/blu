@@ -1,5 +1,5 @@
 from blu._http import Request
-from tests.file_conventions._utils import router
+from tests.fast.file_conventions._utils import router
 
 
 async def test_matches_arbitrary_segment():

@@ -3,7 +3,7 @@ import sys
 from tempfile import TemporaryDirectory
 import pytest
 from blu._http import Request
-from tests.file_conventions._utils import router
+from tests.fast.file_conventions._utils import router
 from blu._settings import settings
 
 

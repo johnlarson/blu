@@ -1,7 +1,7 @@
 import pytest
 from blu._app.router import NotFound
 from blu._http import Request
-from tests.file_conventions._utils import router
+from tests.fast.file_conventions._utils import router
 
 
 async def test_full_match():

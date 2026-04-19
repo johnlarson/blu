@@ -1,8 +1,9 @@
 from pytest import MonkeyPatch
 import pytest
 from blu import WrongEnvironmentError, app
-from tests.utils import Sender, receive
 from blu import _utils
+
+from tests.utils import Sender, receive
 
 
 async def test_runs_blu_from_app_module(patch_app):  # type: ignore

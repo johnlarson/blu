@@ -2,7 +2,7 @@
 name = "blu"
 version = "0.0.1"
 requires-python = ">=3.14"
-dependencies = ["aiofiles", "uvicorn", "click", "watchdog"]
+dependencies = ["aiofiles", "uvicorn"]
 
 [project.scripts]
 blu = "blu._cli:cli"

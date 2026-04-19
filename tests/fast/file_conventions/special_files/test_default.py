@@ -1,6 +1,7 @@
 import pytest
 from blu._app.router import NotFound
 from blu._http import Request
+
 from tests.fast.file_conventions._utils import router
 
 

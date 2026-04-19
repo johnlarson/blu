@@ -3,11 +3,6 @@ from collections.abc import Awaitable, Callable
 import importlib
 from unittest import mock
 
-import aiohttp
-from blu._settings import settings
-from blu._app import _get_app_def, _get_router
-from blu._nodes import ClientElement, HTMLElement, Key, Node
-from blu._utils.typing import AsyncGenerator, Generator, Iterable, Mapping
 from contextlib import asynccontextmanager, contextmanager
 from importlib import import_module
 import os
@@ -18,13 +13,19 @@ import sys
 from tempfile import TemporaryDirectory
 from threading import Thread
 from typing import Any, Literal, Optional, TypedDict, cast
-from bs4 import BeautifulSoup
-import uvicorn
+
+import aiohttp
+from blu._settings import settings
+from blu._app import _get_app_def, _get_router
+from blu._nodes import ClientElement, HTMLElement, Key, Node
+from blu._utils.typing import AsyncGenerator, Generator, Iterable, Mapping
 from blu._utils import asgi, get_available_port
 from blu._utils import json
 from blu import is_client
 from blu import _utils
 from blu._utils import client as client_utils
+from bs4 import BeautifulSoup
+import uvicorn
 
 if not is_client:
     import shutil

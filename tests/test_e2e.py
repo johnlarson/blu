@@ -1,22 +1,23 @@
-from asyncio import sleep
 import asyncio
+from asyncio import sleep
 from collections.abc import Awaitable, Callable
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
 from tempfile import TemporaryDirectory
 import time
+
 from playwright.async_api import (
     async_playwright,
     Page,
     expect,
 )
 import pytest
-import re
-
 from blu import is_client
+
 from tests.utils import ClientFixture, PageFixture
 
 pytestmark = pytest.mark.slow

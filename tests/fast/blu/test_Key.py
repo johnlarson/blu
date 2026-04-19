@@ -1,5 +1,4 @@
 from blu import Key, client
-
 from blu.html import div, span
 
 

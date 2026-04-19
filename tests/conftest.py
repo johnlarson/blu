@@ -6,15 +6,14 @@ import shutil
 import sys
 from tempfile import TemporaryDirectory
 from typing import Generator
+
 import aiohttp
 from playwright.async_api import async_playwright, Page
 import pytest
 import uvicorn
-
 from blu._app import _get_app_def, _get_router  # type: ignore
 from blu._settings import settings
 from blu._utils import get_available_port
-
 
 HEADLESS = True
 
@@ -103,25 +102,6 @@ async def _wait_for_server_start(session: aiohttp.ClientSession):
         except aiohttp.ClientConnectorError:
             pass
     raise TimeoutError("Dev server never started.")
-
-
-# @pytest.fixture
-# async def page() -> AsyncGenerator[Page, None]:
-#     async with async_playwright() as playwright:
-#         chromium = playwright.chromium
-#         headless = False
-#         # headless = True
-#         browser = await chromium.launch(headless=headless)
-#         print("START")
-#         yield await browser.new_page()
-#         print("END")
-#         pass
-
-
-# @pytest.fixture
-# async def client() -> AsyncGenerator[ClientSession]:
-#     async with aiohttp.ClientSession() as session:
-#         yield session
 
 
 TESTS_DIR = Path(__file__).parent

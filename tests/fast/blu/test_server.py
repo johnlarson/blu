@@ -3,6 +3,7 @@ from unittest import mock
 
 from blu import server
 from blu import _server_functions
+
 from tests.utils import reload_is_client
 
 

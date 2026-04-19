@@ -1,10 +1,12 @@
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
+
 import pytest
 from blu._http import Request
-from tests.fast.file_conventions._utils import router
 from blu._settings import settings
+
+from tests.fast.file_conventions._utils import router
 
 
 @pytest.fixture

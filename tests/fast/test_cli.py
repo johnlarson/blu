@@ -1,9 +1,9 @@
 import asyncio
 import contextlib
 from unittest.mock import patch
+
 import aiohttp
 import pytest
-
 from blu._utils import get_available_port
 from blu._cli import _run_server
 

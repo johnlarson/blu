@@ -118,9 +118,6 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     await assert_405("DELETE")
     await assert_405("MADEUPMETHOD")
 
-    # TODO specifically test to ensure the server function call is
-    # blocked when origin header doesn't match "Host" header.
-
     async with aiohttp.ClientSession(p.base_url) as session:
 
         # Non-matching Host and Origin

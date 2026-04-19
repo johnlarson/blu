@@ -167,7 +167,6 @@ async def test_dev_server(patch_app: Callable[[str], None]):
     the server reloads any time there is a change to Python files in the
     app package.
     """
-    # patch_app('e2e')
     e2e_app_dir = Path(__file__).parent / "apps/e2e"
     with TemporaryDirectory() as temp_dir_str:
         temp_dir = Path(temp_dir_str)

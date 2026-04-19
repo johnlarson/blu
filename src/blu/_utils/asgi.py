@@ -161,7 +161,7 @@ class WSAcceptSendEvent(TypedDict):
 class WSSendSendEvent(TypedDict):
     type: Literal["websocket.send"]
     bytes: NotRequired[Optional[bytes]]  # default: None
-    test: NotRequired[Optional[str]]  # default: None
+    text: NotRequired[Optional[str]]  # default: None
     # exactly one of bytes or text must be non-None
 
 

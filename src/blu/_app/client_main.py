@@ -116,7 +116,6 @@ def PythonElement(props: PythonElementProps, extra: Any = None):
         next(result)
         try:
             result.send(props.py_children)
-            # next(result)
         except StopIteration as e:
             return get_node(e.value)
     elif isinstance(result, AsyncGenerator):
@@ -130,7 +129,6 @@ def PythonElement(props: PythonElementProps, extra: Any = None):
 def py_to_js_node(py_node: Node):
     print("PY NODE:", py_node)
     if isinstance(py_node, ClientElement):
-        console.log("RENDERER?", py_node, py_node.renderer)
         return react.createElement(
             PythonElement,
             to_js(

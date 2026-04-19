@@ -11,19 +11,19 @@ from blu._utils.client import is_client
 
 log = getLogger("blu")
 
-# """
-# JSON-serializable primitive value.
-# """
+"""
+JSON-serializable primitive value.
+"""
 type JsonPrimitive = bool | Number | str | None
 
 
-# """JSON-serializable value."""
+"""JSON-serializable value."""
 type Jsonable = JsonPrimitive | Sequence[Jsonable] | Mapping[str, Jsonable]
 
-# """Basic item that can serialized and sent from server to client."""
+"""Basic item that can serialized and sent from server to client."""
 type SerializableItem = JsonPrimitive | Node
 
-# """Can be serialized and sent from server to client."""
+"""Can be serialized and sent from server to client."""
 type Serializable = (
     SerializableItem | Sequence[Serializable] | Mapping[str, Serializable]
 )
@@ -39,7 +39,7 @@ type Node = """
     None
 """
 
-# """Valid value for a prop of a `ReactElement`."""
+"""Valid value for a prop of a `ReactElement`."""
 type PropValue = Jsonable | Node
 
 
@@ -75,10 +75,10 @@ def is_node(item: Any) -> bool:
         return False
 
 
-# """Valid props for a `ReactElement`."""
+"""Valid props for a `ReactElement`."""
 type Props = Mapping[str, PropValue]
 
-# """Valid children of a `ReactElement`."""
+"""Valid children of a `ReactElement`."""
 type Children = list[Node]
 
 

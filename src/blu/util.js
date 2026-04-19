@@ -152,7 +152,6 @@ function PythonElement(proxies) {
       } else {
         result.send(pyChildren);
       }
-      // result.send([])
     } catch(e) {
       if (e.name === 'PythonError') {
         const pyExc = sys.last_exc;

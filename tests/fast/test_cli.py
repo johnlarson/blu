@@ -18,11 +18,9 @@ async def dev_server_client():  # type: ignore
 async def get_dev_server_client():
     port = get_available_port()
     with patch("blu._cli.get_available_port", return_value=port):
-        # task = Task(_run_server())
         proc = _run_server()
         base_url = f"http://127.0.0.1:{port}"
         async with aiohttp.ClientSession(base_url) as session:
-            # await asyncio.sleep(5)
             for _ in range(25):
                 await asyncio.sleep(0.1)
                 try:
@@ -30,11 +28,9 @@ async def get_dev_server_client():
                         pass
                     yield session
                     proc.kill()
-                    # task.cancel()
                     return
                 except aiohttp.ClientConnectorError:
                     pass
-        # task.cancel()
         proc.kill()
         raise TimeoutError("Dev server never started.")
 

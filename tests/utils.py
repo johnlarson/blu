@@ -146,14 +146,12 @@ async def _test_serve(
     except Exception as exc:
         if server_task is not None:
             server_task.cancel()
-            # await server_task
             await asyncio.sleep(0)
             raise exc
     else:
         assert server_task is not None
         server_task.cancel()
         await server.shutdown()
-        # await server_task
         await asyncio.sleep(0)
 
 

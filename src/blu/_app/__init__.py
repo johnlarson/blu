@@ -132,7 +132,6 @@ async def _http(
         }
     )
     body_str = await render_to_str(response._body)
-    # await send({'type': 'http.response.body', 'body': b'Hello!'})
     await send(
         {
             "type": "http.response.body",

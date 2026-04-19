@@ -1,7 +1,7 @@
 from pathlib import Path
-from blu._utils.client import is_client
 
 from blu._utils.asyncio import io_bound
+from blu._utils.client import is_client
 
 if not is_client:
     import shutil

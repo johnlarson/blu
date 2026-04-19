@@ -2,7 +2,6 @@ from collections.abc import Iterable, Mapping
 import json
 
 from blu._utils.asyncio import io_bound
-
 from blu._utils.client import is_client
 
 type JsonData = (

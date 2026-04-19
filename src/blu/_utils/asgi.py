@@ -3,6 +3,7 @@ Types based on https://asgi.readthedocs.io/en/latest/specs/www.html
 """
 
 from collections.abc import Iterable
+
 from blu._utils.typing import Any, Literal, NotRequired, Optional, Protocol, TypedDict
 
 
@@ -21,7 +22,8 @@ class LifespanScope(TypedDict):
 
 class ConnectionScopeASGIInfo(TypedDict):
     version: str
-    spec_version: NotRequired[Literal["2.0", "2.1", "2.2", "2.3"]]  # default: '2.0'
+    # default: '2.0'
+    spec_version: NotRequired[Literal["2.0", "2.1", "2.2", "2.3"]]
 
 
 class ConnectionScope(TypedDict):
@@ -50,7 +52,8 @@ class WSConnectionScope(ConnectionScope):
     http_version: NotRequired[Literal["1.1", "2"]]  # default: '1.1'
     scheme: NotRequired[str]  # default: 'ws'. Must not be ''.
     subprotocols: NotRequired[Iterable[str]]  # default: []
-    query_string: NotRequired[Optional[bytes]]  # if missing or None, Default is ''.
+    # if missing or None, Default is ''.
+    query_string: NotRequired[Optional[bytes]]
 
 
 type Scope = HTTPConnectionScope | WSConnectionScope | LifespanScope
@@ -178,4 +181,9 @@ class Sender(Protocol):
 
 
 class App(Protocol):
-    async def __call__(self, scope: Scope, receive: Receiver, send: Sender): ...
+    async def __call__(
+        self,
+        scope: Scope,
+        receive: Receiver,
+        send: Sender,
+    ): ...

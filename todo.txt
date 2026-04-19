@@ -1,7 +1,4 @@
 get e2e tests to pass on the first try
-2 QueryParams classes?
-2 WrongEnvironmentError classes?
-2 sets of HTTP classes?
 Add note about not being ready for use? (README and Docs)
 License
 Move to-dos

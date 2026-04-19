@@ -1,33 +1,38 @@
 look closer at test utils
 cleanup
+get e2e tests to pass on the first try
 2 QueryParams classes?
 2 WrongEnvironmentError classes?
 2 sets of HTTP classes?
-get e2e tests to pass on the first try
+Add note about not being ready for use? (README and Docs)
+License
+Version it (Git, pyproject.toml)
+Move to-dos
 ----------------------
 Ready to Publish
 ----------------------
-Create GitHub issues?
-Add note about not being ready for use? (README and Docs)
-Version it
 Put on PyPI
 Docs on readthedocs
+Link to readthedocs in README
 Make git repo public
-Create issues on GitHub
-Work on it, get feedback from people I know
-Add server functions?
-Work on it, get feedback from people I know
+Figure out how to get it tested
+Work on it, get feedback
 ----------------------
-Ready
+After Alpha Testing
 ----------------------
+Change note from "Alpha Testing" to "Open Beta Testing" (README and Docs)
 Social media account(s)
 workshop
 get word out
 get feedback
 respond to feedback and issues
+----------------------
+After Beta Testing
+----------------------
+Remove note about beta testing from README and Docs
 add other stuff
 ----------------------
-When Ready
+When Ready to commit to API
 ----------------------
 v1.0
 ----------------------

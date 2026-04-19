@@ -1,19 +1,16 @@
 import ast
+from collections.abc import Generator
 from functools import cache
+import mimetypes
+from pathlib import Path
 import shutil
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
-from blu._exceptions import WrongEnvironmentError
-from blu._utils import asgi
-
-
-from collections.abc import Generator
-from blu._nodes import ClientElement, HTMLElement, Key, Node
-from blu._utils.typing import Iterable
-import mimetypes
-from pathlib import Path
 
 import aiofiles
+
+from blu._exceptions import WrongEnvironmentError
+from blu._utils import asgi
 from blu._app.router import NotFound, router_from_root_package
 from blu._http import QueryParams, Request, Response
 from blu._server_functions import (
@@ -21,8 +18,10 @@ from blu._server_functions import (
     decorator_is_server,
 )
 from blu._utils import asgi
-from .render import render_to_str
+from blu._nodes import ClientElement, HTMLElement, Key, Node
+from blu._utils.typing import Iterable
 from blu import _utils
+from .render import render_to_str
 
 
 async def app(scope: asgi.Scope, receive: asgi.Receiver, send: asgi.Sender):
@@ -382,67 +381,6 @@ def _get_app_def():
     import app
 
     return app
-
-
-async def _serve_app_module(
-    scope: asgi.HTTPConnectionScope,
-    send: asgi.Sender,
-):
-    rel_path = scope["path"].replace("/_blu_internal/app_module/", "")
-    stripped_rel_path = rel_path.strip("/")
-    import app
-
-    assert app.__spec__ is not None
-    app_pkg_locations = app.__spec__.submodule_search_locations
-    assert app_pkg_locations
-    app_pkg_path = Path(app_pkg_locations[0])
-    parts = Path(stripped_rel_path).parts
-    assert ".." not in parts
-    assert "__pycache__" not in parts
-    assert "*" not in str(stripped_rel_path)
-    try:
-        path = app_pkg_path / (stripped_rel_path + ".py")
-        source_code = path.read_text()
-    except FileNotFoundError:
-        try:
-            path = app_pkg_path / stripped_rel_path / "__init__.py"
-            source_code = path.read_text()
-        except FileNotFoundError:
-            await _serve_404("", send)
-            return
-    parsed = ast.parse(source_code)
-    for stmt in ast.iter_child_nodes(parsed):
-        if isinstance(stmt, ast.Assign):
-            stmt_source = ast.get_source_segment(source_code, stmt)
-            if stmt_source == "__client__ = True":
-                parts = path.parts
-                await _serve_module(path, send)
-                return
-    await _serve_404("", send)
-
-
-async def _serve_blu_module(
-    scope: asgi.HTTPConnectionScope,
-    send: asgi.Sender,
-):
-    url_path_stripped = scope["path"].strip("/")
-    parts = Path(url_path_stripped).parts
-    assert ".." not in parts
-    assert "__pycache__" not in parts
-    assert "*" not in url_path_stripped
-    rel_path = url_path_stripped.replace("_blu_internal/blu_module", "")
-    stripped_rel_path = rel_path.strip("/")
-    blu_root = Path(__file__).parent.parent
-    try:
-        path = blu_root / (stripped_rel_path + ".py")
-        await _serve_module(path, send)
-    except FileNotFoundError:
-        path = blu_root / stripped_rel_path / "__init__.py"
-        await _serve_module(path, send)
-
-
-async def _serve_module(path: Path, send: asgi.Sender):
-    await _serve_file(path, "text/x-python", send)
 
 
 @cache

@@ -1,40 +1,22 @@
 print("Hello, World!")
 
 import base64
-from collections import defaultdict
-import logging
-import pickle
-from types import NoneType
-from blu._utils.typing import Generator
-
-from pyscript.js_modules import _blu_js_utils
-
-print("defaultdic:", defaultdict)
-
-
-print("Generator:", Generator)
-
-
 from collections.abc import AsyncGenerator, Generator, Iterable
 import importlib
+from importlib import import_module
+import logging
+import pickle
 from typing import Any, TypedDict, cast
 
 from js import console, document  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
+from pyscript.js_modules import _blu_react as react
+from pyscript.js_modules import _blu_js_utils
 
 from blu._nodes import ClientRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
-from blu.html import div
-
-# react_dom = await js_import('https://esm.sh/react-dom/client')
-# react = await js_import('https://esm.sh/react')
-
-from pyscript.js_modules import _blu_react_dom as react_dom
-from pyscript.js_modules import _blu_react as react
-from importlib import import_module
-
+from blu._utils.typing import Generator
 
 logging.basicConfig(level=logging.DEBUG)
-
 
 PYTHON_TYPES = create_proxy(  # type: ignore
     {
@@ -53,19 +35,6 @@ async def main():
     pickled = base64.b64decode(b64_bytes)
     unpickled = pickle.loads(pickled)
     _blu_js_utils.renderRoot(unpickled)  # type: ignore
-    return
-    if not isinstance(
-        unpickled,
-        (HTMLElement, ClientElement, Key, tuple, NoneType),
-    ):
-        if isinstance(unpickled, str) or not isinstance(unpickled, Iterable):
-            unpickled = div[unpickled]
-    root_node = get_node(unpickled)
-    print("ROOT NODE:", root_node.to_py())
-    if isinstance(root_node, dict) and root_node.get("type", None) == "html":
-        react_dom.createRoot(document).render(root_node)
-    else:
-        react_dom.createRoot(document.body).render(root_node)  # type: ignore
 
 
 def get_node(data: Any):

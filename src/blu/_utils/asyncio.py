@@ -2,8 +2,9 @@ import asyncio
 from collections.abc import Awaitable, Callable, Coroutine
 import functools
 
+from blu._exceptions import WrongEnvironmentError
 from blu._utils.typing import Any, cast
-from blu._utils.client import is_client, WrongEnvironmentError
+from blu._utils.client import is_client
 
 if not is_client:
     from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor

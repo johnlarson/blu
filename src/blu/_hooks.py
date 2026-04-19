@@ -1,11 +1,10 @@
 from collections.abc import AsyncGenerator, Callable, Coroutine, Generator
 from typing import Any
 import typing
+
 from blu._utils import is_client
 
 if is_client or typing.TYPE_CHECKING:
-    from pyscript.ffi import create_proxy
-    from pyodide.ffi import JsDoubleProxy
     from pyscript.js_modules._blu_js_utils import useEffect, useRefObj, useState
 
 # Integers for JS `useEffect` (avoid classifying return values in JS, where
@@ -275,104 +274,6 @@ class Ref[T]:
         if empty_slice.start or empty_slice.stop or empty_slice.step:
             raise
         self._value = new_value
-
-
-class RefOld[T]:
-    """
-    The object returned by :func:`blu.use_ref`.
-
-    .. code-block:: python
-
-        from blu import client
-        from blu.tml import button
-
-        __client__ = True
-
-
-        @client
-        def TwoButtons():
-            # assigns variable ref to an instance of Ref.
-            ref = use_ref()
-    """
-
-    _js_ref: Any
-
-    def __getitem__(self, empty_slice: slice) -> T:
-        """
-        Get the value currently stored in the :class:`Ref <blu.Ref>`.
-
-        .. code-block:: python
-
-            from blu import client
-            from blu.html import button
-
-            __client__ = True
-
-
-            @client
-            def TwoButtons():
-                ref = use_ref('Hello')
-                ref[:]  # 'Hello'
-
-        :param empty_slice: Must be an empty slice, i.e. you must put a
-            single colon between the square brackets, without any
-            numbers.
-        :return: The value currently stored in ``self``.
-        """
-        print("EMPTY SLICE:", empty_slice)
-        if empty_slice.start or empty_slice.stop or empty_slice.step:
-            raise
-        current = self._js_ref.current
-        if isinstance(current, JsDoubleProxy):
-            return current.unwrap()
-        else:
-            return current
-
-    def __setitem__(self, empty_slice: slice, new_value: T):
-        """
-        Set the :class:`Ref <blu.Ref>` to point to a different value.
-
-        .. code-block:: python
-
-            from blu import client
-            from blu.tml import button
-
-            __client__ = True
-
-
-            @client
-            def TwoButtons():
-                ref = use_ref('Hello')
-                ref[:] = 'Goodbye'
-                ref[:]  # 'Goodbye'
-
-        :param empty_slice: Must be an empty slice, i.e. you must put a
-            single colon between the square brackets, without any
-            numbers.
-        :param new_value: The new value that should be stored in
-            ``self``.
-
-        Once this method has been called, the :class:`Ref <blu.Ref>`\\'s
-        stored value will be set to ``new_value``.
-        """
-        if empty_slice.start or empty_slice.stop or empty_slice.step:
-            raise
-        try:
-            current = self._js_ref.current
-        except AttributeError:
-            pass
-        else:
-            current.destroy()
-        self._js_ref.current = create_proxy(new_value)
-
-    def _cleanup(self):
-        try:
-            current = self._js_ref.current
-        except AttributeError:
-            pass
-        else:
-            if isinstance(current, JsDoubleProxy):
-                current.destroy()
 
 
 def use_ref[T](init: T = None) -> Ref[T]:

@@ -1,21 +1,11 @@
-from asyncio import CancelledError, Task
 import asyncio
 import contextlib
-from datetime import datetime
-from operator import index
-import os
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from textwrap import dedent
-from threading import Thread
 from unittest.mock import patch
 import aiohttp
-from aiohttp import ClientSession
 import pytest
 
 from blu._utils import get_available_port
-from blu._cli import cli, _run_server
-from blu._utils.asyncio import cpu_bound
+from blu._cli import _run_server
 
 
 @pytest.fixture

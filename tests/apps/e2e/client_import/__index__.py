@@ -10,7 +10,5 @@ def __page__():
 
 @client
 def Foo():
-    from js import window
-    from pyscript.ffi import create_proxy
 
     return div(id="status")["Success!"]

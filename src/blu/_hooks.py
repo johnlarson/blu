@@ -4,7 +4,7 @@ import typing
 from blu._utils import is_client
 
 if is_client or typing.TYPE_CHECKING:
-    from pyscript.ffi import create_proxy, to_js
+    from pyscript.ffi import create_proxy
     from pyodide.ffi import JsDoubleProxy
     from pyscript.js_modules._blu_js_utils import useEffect, useRefObj, useState
 

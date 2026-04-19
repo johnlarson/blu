@@ -1,13 +1,7 @@
-from contextlib import contextmanager
-import importlib
-import sys
-from types import ModuleType
 from pytest import MonkeyPatch
 import pytest
-import blu
 from blu import WrongEnvironmentError, app
-from tests.utils import Sender, projects, receive
-from blu._app import _get_router, _get_app_def  # type: ignore
+from tests.utils import Sender, receive
 from blu import _utils
 
 

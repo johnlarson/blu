@@ -1,15 +1,10 @@
-from asyncio import sleep
 import asyncio
-import importlib
 from pathlib import Path
-from tempfile import TemporaryDirectory
-from typing import Any, cast
-from unittest.mock import patch
+from typing import cast
 from zipfile import ZipFile
 
 import aiohttp
 from pytest_httpserver import HTTPServer
-import requests
 
 from tests.utils import ClientFixture, PageFixture
 

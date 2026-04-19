@@ -1,4 +1,3 @@
-import copyreg
 from blu import Key, client
 from blu.html import del_, span
 

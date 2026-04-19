@@ -111,7 +111,9 @@ class Router:
         )
         return await awaitable(self.index_page(*args, **kwargs))
 
-    def _get_handler_kwargs[**P](
+    def _get_handler_kwargs[
+        **P
+    ](
         self,
         handler: Callable[P, Response | Node],
         route_params: dict[str, str],
@@ -215,7 +217,9 @@ class Router:
         )
         return await awaitable(self.default_page(*args, **kwargs))
 
-    def _get_handler_args[**P](
+    def _get_handler_args[
+        **P
+    ](
         self,
         default_handler: Callable[P, Response | Node],
         path: list[str],

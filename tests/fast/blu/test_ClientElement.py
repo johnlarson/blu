@@ -1,7 +1,6 @@
 import pytest
 from blu import client, Key
-from blu.html import div, span
-from tests.utils import renders_as
+from blu.html import div
 
 
 def test_args():

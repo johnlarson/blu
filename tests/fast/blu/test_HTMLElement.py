@@ -1,6 +1,5 @@
 from blu._nodes import Key, client
-from blu.html import div, span
-from tests.utils import node_eq, renders_as
+from blu.html import div
 
 
 def test_kwarg_props():

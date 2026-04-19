@@ -23,7 +23,6 @@ import uvicorn
 from blu._utils import asgi, get_available_port
 from blu._utils import json
 from blu import is_client
-import blu
 from blu import _utils
 from blu._utils import client as client_utils
 

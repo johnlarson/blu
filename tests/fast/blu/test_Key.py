@@ -1,7 +1,6 @@
 from blu import Key, client
 
 from blu.html import div, span
-from tests.utils import node_eq, renders_as
 
 
 def test_uses_key():

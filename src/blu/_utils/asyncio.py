@@ -28,21 +28,23 @@ def to_sync[**P, R](fn: Callable[P, Coroutine[Any, Any, R]]) -> Callable[P, R]:
     return ret
 
 
-def io_bound[**P, R](
-    fn: Callable[P, R],
-) -> Callable[P, Coroutine[Any, Any, R]]:
+def io_bound[
+    **P, R
+](fn: Callable[P, R],) -> Callable[P, Coroutine[Any, Any, R]]:
     return _asyncify(fn, ThreadPoolExecutor)  # type: ignore
 
 
-def cpu_bound[**P, R](
-    fn: Callable[P, R],
-) -> Callable[P, Coroutine[Any, Any, R]]:
+def cpu_bound[
+    **P, R
+](fn: Callable[P, R],) -> Callable[P, Coroutine[Any, Any, R]]:
     return _asyncify(fn, ProcessPoolExecutor)  # type: ignore
 
 
-def _asyncify[**P, R](
-    fn: Callable[P, R], executor: type[Executor]  # type: ignore
-) -> Callable[P, Awaitable[R]]:
+def _asyncify[
+    **P, R
+](fn: Callable[P, R], executor: type[Executor]) -> Callable[  # type: ignore
+    P, Awaitable[R]
+]:
     async def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:
         if is_client:
             raise WrongEnvironmentError(

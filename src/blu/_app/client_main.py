@@ -15,15 +15,11 @@ print("defaultdic:", defaultdict)
 print("Generator:", Generator)
 
 
-import asyncio
-from collections.abc import AsyncGenerator, Callable, Generator, Iterable, Sequence
+from collections.abc import AsyncGenerator, Generator, Iterable
 import importlib
-from typing import Any, Protocol, TypedDict, cast
-from xml.dom.minidom import Element
+from typing import Any, TypedDict, cast
 
-from js import alert, console, document  # type: ignore
-import json
-from pyscript import js_import  # type: ignore
+from js import console, document  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
 
 from blu._nodes import ClientRenderer, ClientElement, HTMLElement, Jsonable, Node, Key

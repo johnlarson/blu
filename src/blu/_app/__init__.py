@@ -1,11 +1,8 @@
 import ast
 from functools import cache
-from importlib import import_module
 import shutil
 from tempfile import TemporaryDirectory
-from types import ModuleType
 from zipfile import ZipFile
-import zipfile
 from blu._exceptions import WrongEnvironmentError
 from blu._utils import asgi
 

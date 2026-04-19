@@ -1,14 +1,11 @@
 from asyncio import Task
 import asyncio
 from collections.abc import AsyncGenerator, Awaitable, Callable
-from os import getcwd
-import os
 from pathlib import Path
 import shutil
 import sys
 from tempfile import TemporaryDirectory
 from typing import Generator
-from aiohttp import ClientSession
 import aiohttp
 from playwright.async_api import async_playwright, Page
 import pytest
@@ -67,7 +64,7 @@ async def client(patch_app, server: Callable[[], Awaitable[str]]):  # type: igno
         yield ret
     finally:
         if session is not None:
-            await session.__aexit__()
+            await session.__aexit__(None, None, None)
 
 
 @pytest.fixture

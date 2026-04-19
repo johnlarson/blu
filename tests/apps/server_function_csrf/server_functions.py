@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from blu import server
 
 value = ["UNTOUCHED"]

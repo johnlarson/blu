@@ -2,12 +2,9 @@ import asyncio
 import os
 import subprocess
 import sys
-import click
 import uvicorn
 
-from blu._utils.asyncio import to_sync
 from blu._utils import get_available_port
-from blu import app
 
 
 def cli():

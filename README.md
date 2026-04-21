@@ -1,4 +1,8 @@
+
+
 # Blu
+
+*Blu is still in early testing and should not be used in production applications.*
 
 A full stack React framework for Python.
 

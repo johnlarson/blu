@@ -1,6 +1,7 @@
 from asyncio import Task
 import asyncio
 from collections.abc import AsyncGenerator, Awaitable, Callable
+import importlib
 from pathlib import Path
 import shutil
 import sys
@@ -11,6 +12,7 @@ import aiohttp
 from playwright.async_api import async_playwright, Page
 import pytest
 import uvicorn
+from blu import _app
 from blu._app import _get_app_def, _get_router  # type: ignore
 from blu._settings import settings
 from blu._utils import get_available_port
@@ -134,6 +136,7 @@ def patch_project(patch_project_dir):  # type: ignore
 @pytest.fixture
 def patch_project_dir(monkeypatch: pytest.MonkeyPatch):
     def handler(path: Path):
+        importlib.reload(_app)
         to_delete = [x for x in sys.modules if x == "app" or x.startswith("app.")]
         for name in to_delete:
             del sys.modules[name]

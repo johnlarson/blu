@@ -3,6 +3,13 @@
 {% block document %}
   {{ super() }}
 {% endblock %}
+{% block content %}
+  <div class="admonition warning">
+    <p class="admonition-title">Warning</p>
+    <p>Blu is still in early testing and should not be used in production applications.</p>
+  </div>
+  {{ super() }}
+{% endblock %}
 {% block footer %}
   <div class="custom-footer">
   <div class="custom-footer-spacer"></div>

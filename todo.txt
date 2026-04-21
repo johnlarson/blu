@@ -1,4 +1,3 @@
-get e2e tests to pass on the first try
 Add note about not being ready for use? (README and Docs)
 License
 Move to-dos

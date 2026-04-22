@@ -1,6 +1,6 @@
 [project]
 name = "blu-react"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
     { name="John Larson", email="john.robert.larson@gmail.com" },
 ]
@@ -17,6 +17,7 @@ dependencies = ["aiofiles", "uvicorn"]
 
 [project.urls]
 Homepage = "https://github.com/johnlarson/blu"
+Documentation = "https://blu-react.readthedocs.io"
 Issues = "https://github.com/johnlarson/blu/issues"
 
 [project.scripts]

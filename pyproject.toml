@@ -1,5 +1,5 @@
 [project]
-name = "blu"
+name = "blu-react"
 version = "0.0.1-rc1"
 authors = [
     { name="John Larson", email="john.robert.larson@gmail.com" },
@@ -19,9 +19,11 @@ dependencies = ["aiofiles", "uvicorn"]
 Homepage = "https://github.com/johnlarson/blu"
 Issues = "https://github.com/johnlarson/blu/issues"
 
-
 [project.scripts]
 blu = "blu._cli:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/blu"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -49,5 +51,6 @@ dev = [
     "sphinx>=9.1.0",
     "sphinx-autobuild>=2025.8.25",
     "sphinx-copybutton>=0.5.2",
+    "twine>=6.2.0",
 ]
 

@@ -1,5 +1,6 @@
 /.venv/*
 !/.venv/.gitkeep
+/dist
 /docs/_build
 /docs/build
 

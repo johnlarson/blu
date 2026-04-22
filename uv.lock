@@ -168,7 +168,7 @@ wheels = [
 
 [[package]]
 name = "blu-react"
-version = "0.0.1rc1"
+version = "0.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },

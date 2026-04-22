@@ -44,4 +44,4 @@ pip install -U blu-react
 
 ## Documentation
 
-Documentation available on  {TODO add link here.} `readthedocs.io <https://blu-react.readthedocs.io>`_
+Documentation available on  [readthedocs.io](<https://blu-react.readthedocs.io>)

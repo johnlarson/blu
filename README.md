@@ -39,7 +39,7 @@ def ClickCounter():
 ## Installation
 
 ```bash
-pip install -U blu
+pip install -U blu-react
 ```
 
 ## Documentation

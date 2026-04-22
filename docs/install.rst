@@ -7,4 +7,4 @@ To install Blu:
 
 .. code-block:: console
    
-   $ pip install -U blu
+   $ pip install -U blu-react

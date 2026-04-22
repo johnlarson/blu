@@ -1,8 +1,24 @@
 [project]
 name = "blu"
-version = "0.0.1"
+version = "0.0.1-rc1"
+authors = [
+    { name="John Larson", email="john.robert.larson@gmail.com" },
+]
+description = "A full stack React framework for Python"
+readme = "README.md"
 requires-python = ">=3.14"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = ["aiofiles", "uvicorn"]
+
+[project.urls]
+Homepage = "https://github.com/johnlarson/blu"
+Issues = "https://github.com/johnlarson/blu/issues"
+
 
 [project.scripts]
 blu = "blu._cli:cli"

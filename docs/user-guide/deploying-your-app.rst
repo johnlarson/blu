@@ -5,7 +5,7 @@ Blu is an ASGI framework, meaning it doesn't include tools for running a product
 
 If you're familiar with ASGI frameworks, you may be wondering, "Where is the ASGI app?" The app you'll use to deploy is :data:`blu.app`.
 
-For example, to deploy your app using `Uvicorn <uvicorn.org>`_, run the following from your ``app/`` directory's parent directory (not the ``app/`` directory itself):
+For example, to deploy your app using `Uvicorn <https://uvicorn.dev>`_, run the following from your ``app/`` directory's parent directory (not the ``app/`` directory itself):
 
 .. code-block:: console
    

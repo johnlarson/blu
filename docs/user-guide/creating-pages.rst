@@ -3,7 +3,7 @@
 Creating Pages
 ==============
 
-The :ref:`Quickstart` guide shows how to make a simple page using Blu.
+The :ref:`quickstart:Quickstart` guide shows how to make a simple page using Blu.
 
 This section goes into greater depth on how to generate user interfaces using Blu.
 
@@ -11,7 +11,7 @@ This section goes into greater depth on how to generate user interfaces using Bl
 HTML Elements
 -------------
 
-The :ref:`Quickstart` guide shows how to make a simple page with html, head, and body elements:
+The :ref:`quickstart:Quickstart` guide shows how to make a simple page with html, head, and body elements:
 
 .. code-block:: python
 
@@ -140,7 +140,7 @@ You can set the HTML attributes of an element by calling it as a function:
 
 .. note::
 
-    Event-handling attributes like "onClick" are only supported in client-side rendering (see :ref:`Client-Side Rendering` for more details).
+    Event-handling attributes like "onClick" are only supported in client-side rendering (see :ref:`user-guide/client-side-rendering:Client-Side Rendering` for more details).
 
     .. code-block:: python
 

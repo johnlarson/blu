@@ -49,6 +49,8 @@ html_css_files = ["styles.css"]
 
 todo_include_todos = True
 
+autosectionlabel_prefix_document = True
+
 # autodoc
 
 autoclass_content = "both"

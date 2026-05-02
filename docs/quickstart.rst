@@ -1,7 +1,7 @@
 Quickstart
 ==========
 
-If you haven't already, :ref:`install Blu <install>`.
+If you haven't already, :ref:`install Blu <install:Install>`.
 
 Next, create a directory called ``app``. Inside this directory, create a file called ``__index__.py`` with the following content:
 
@@ -39,4 +39,4 @@ This will start up the app and output a url where you can access it (``http://12
 
 If it works, you've created a simple web app using Blu.
 
-To learn how make more complex pages in Blu, see :ref:`Creating Pages`.
+To learn how make more complex pages in Blu, see :ref:`user-guide/creating-pages:Creating Pages`.

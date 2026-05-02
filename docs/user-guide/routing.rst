@@ -1,7 +1,7 @@
 Routing
 =======
 
-The :ref:`Quickstart` guide shows how to serve a page from ``/`` using Blu.
+The :ref:`quickstart:Quickstart` guide shows how to serve a page from ``/`` using Blu.
 
 This section explains how to serve pages from other paths.
 
@@ -11,7 +11,7 @@ File-Based Routing
 
 Blu uses file-based routing. This means that the path that a page is served from is based on the file's location in the ``app/`` directory.
 
-For example, if you want to serve the page in the :ref:`Quickstart` guide from ``/path/to/page`` instead of from ``/``, you would move the ``__index__.py`` file from ``app/`` to ``app/path/to/page/``:
+For example, if you want to serve the page in the :ref:`quickstart:Quickstart` guide from ``/path/to/page`` instead of from ``/``, you would move the ``__index__.py`` file from ``app/`` to ``app/path/to/page/``:
 
 .. code-block:: python
     :caption: app/path/to/page/__index__.py
@@ -323,7 +323,7 @@ In this example, visiting ``/foo?bar=A&baz=B&hello=C`` gives us:
 Return Values
 -------------
 
-A *__page__()* function can return any valid child of an HTML element (see the :ref:`Children` subsection of :ref:`Creating Pages`). The same rules apply for :py:class:`Iterable <collections.abc.Iterable>`\ s (again, see the :ref:`Children` subsection of :ref:`Creating Pages`):
+A *__page__()* function can return any valid child of an HTML element (see the :ref:`user-guide/creating-pages:Children` subsection of :ref:`user-guide/creating-pages:Creating Pages`). The same rules apply for :py:class:`Iterable <collections.abc.Iterable>`\ s (again, see the :ref:`user-guide/creating-pages:Children` subsection of :ref:`user-guide/creating-pages:Creating Pages`):
 
 .. code-block:: python
 

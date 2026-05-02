@@ -51,7 +51,7 @@ A child of an HTML element can be any of the following types:
 - A :py:class:`int`. This renders as a text node whose text is the :py:class:`str` representation of the integer.
 - A :py:class:`float`. This renders as a text node whose text is the :py:class:`str` representation of the float.
 - An :py:class:`Iterable <collections.abc.Iterable>` of valid children. This renders as all the child nodes contained in the :py:class:`Iterable <collections.abc.Iterable>`.
-- A :class:`blu.ClientElement` (see :ref:`Client-Side Rendering`).
+- A :class:`blu.ClientElement` (see :ref:`user-guide/client-side-rendering:Client-Side Rendering`).
 - A :class:`blu.Key`.
 
 .. code-block:: python

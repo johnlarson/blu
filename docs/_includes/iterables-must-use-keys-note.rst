@@ -56,4 +56,4 @@
         # Right.
         div['Hello, Ana! Hello, Bill! Hello, Charlotte!']
 
-    The rationale here is that, in :ref:`client-side rendering <Client-Side Rendering>`, items in a sequence may be moved around in response to user interaction. Giving keys to these items allows React to maintain state and render efficiently even when an item's position in a sequence changes.
+    The rationale here is that, in :ref:`client-side rendering <user-guide/client-side-rendering:Client-Side Rendering>`, items in a sequence may be moved around in response to user interaction. Giving keys to these items allows React to maintain state and render efficiently even when an item's position in a sequence changes.

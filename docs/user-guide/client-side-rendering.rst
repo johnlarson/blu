@@ -224,7 +224,7 @@ What's going on here is:
 7. React sets the state value to 1, and then calls *MyClientElement*'s render function again. This time, the current value is 1, so *click_count* is 1, so the button will say "Click Count: 1".
 8. If the user clicks the button again, the current value will again be incremented, and the render function will be called again, resulting in a button that says "Click Count: 2".
 
-.. note:: :func:`use_state <blu.use_state>` is a special type of function used in React called a *hook*. There are specific rules you have to follow when using hooks. See :ref:`Hooks` for more details.
+.. note:: :func:`use_state <blu.use_state>` is a special type of function used in React called a *hook*. There are specific rules you have to follow when using hooks. See :ref:`user-guide/client-side-rendering:Hooks` for more details.
 
 
 Directly Manipulating Rendered Elements
@@ -272,7 +272,7 @@ What's happening here is:
     1. Gets the current value of *input_ref* using ``[:]`` (remember that the current value is the rendered input element).
     2. Calls the *focus()* method on that value. Because the current value is a rendered HTML input element, calling its *focus()* method causes the input element to receive the browser's focus.
 
-.. note:: :func:`use_ref <blu.use_ref>` is a special type of function used in React called a *hook*. There are specific rules you have to follow when using hooks. See :ref:`Hooks` for more details.
+.. note:: :func:`use_ref <blu.use_ref>` is a special type of function used in React called a *hook*. There are specific rules you have to follow when using hooks. See :ref:`user-guide/client-side-rendering:Hooks` for more details.
 
 
 Performing an Action Immediately After Rendering
@@ -316,7 +316,7 @@ What's happening here:
 7. This causes an alert modal to pop up in front of the page with the provided message.
 8. The user can then dismiss the alert modal.
 
-.. note:: :func:`use_effect <blu.use_effect>` is a special type of function used in React called a *hook*. There are specific rules you have to follow when using hooks. See :ref:`Hooks` for more details.
+.. note:: :func:`use_effect <blu.use_effect>` is a special type of function used in React called a *hook*. There are specific rules you have to follow when using hooks. See :ref:`user-guide/client-side-rendering:Hooks` for more details.
 
 .. note::
 

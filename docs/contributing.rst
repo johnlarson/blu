@@ -16,7 +16,7 @@ Setup
 Making Changes
 --------------
 
-1. Update the :ref:`API Reference` (and :ref:`User Guide`, if appropriate) to reflect intended changes.
+1. Update the :ref:`api-reference/index:API Reference` (and :ref:`user-guide/index:User Guide`, if appropriate) to reflect intended changes.
 
 2. Write tests or update existing ones to test the feature or bug fix you are implementing.
 

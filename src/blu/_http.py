@@ -183,8 +183,8 @@ class Response:
     """
     An HTTP response for a page in a web application. Return a
     :class:`Response <blu.Response>` from a ``__page__`` function (see
-    :ref:`File Conventions`) to set HTTP status and headers for that
-    page.
+    :ref:`api-reference/file-conventions:File Conventions`) to set HTTP
+    status and headers for that page.
 
     .. code-block:: python
         :caption: __index__.py

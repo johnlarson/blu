@@ -1,11 +1,11 @@
 File Conventions
 ================
 
-A Blu app is defined by the :ref:`special files <Special Files>` under its ``app/`` directory. The ``app/`` directory should be placed in the project root (this is the working directory where you run the development server using the ``blu`` command).
+A Blu app is defined by the :ref:`special files <api-reference/file-conventions:Special Files>` under its ``app/`` directory. The ``app/`` directory should be placed in the project root (this is the working directory where you run the development server using the ``blu`` command).
 
-Note that some special files' behavior is influenced by :ref:`the directories in their paths <Directories>`, relative to the ``app/`` directory.
+Note that some special files' behavior is influenced by :ref:`the directories in their paths <api-reference/file-conventions:Directories>`, relative to the ``app/`` directory.
 
-You can also put :ref:`static files <Static Files>` in the ``app/`` directory.
+You can also put :ref:`static files <api-reference/file-conventions:Static Files>` in the ``app/`` directory.
 
 
 Directories

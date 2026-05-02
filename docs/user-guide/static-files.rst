@@ -19,7 +19,7 @@ Now, visiting ``/path/to/static/file.txt`` will give us a response whose body is
 
 .. note::
    
-   When a static file is placed under a :ref:`dynamic route segment <Dynamic Route Segments>`, it is still served from a static path. So for example, a file at
+   When a static file is placed under a :ref:`dynamic route segment <user-guide/routing:Dynamic Route Segments>`, it is still served from a static path. So for example, a file at
    
    ``app/static_segment/_dynamic_segment_/my_file.txt``
    

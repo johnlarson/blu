@@ -15,4 +15,4 @@ The deveopment server will automatically find an available port to run on, and o
 
   INFO:     Uvicorn running on http://127.0.0.1:50227 (Press CTRL+C to quit)
 
-Don't run the development server in production. See :ref:`Deploying Your App` for details on how to deploy an app to a production environment.
+Don't run the development server in production. See :ref:`user-guide/deploying-your-app:Deploying Your App` for details on how to deploy an app to a production environment.

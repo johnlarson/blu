@@ -1,7 +1,7 @@
 ``js`` (client-only)
 ====================
 
-Because Blu's client-side code :ref:`runs in a PyScript environment <external-packages/pyscript>`, the ``js`` module is also available client-side.
+Because Blu's client-side code :ref:`runs in a PyScript environment <pyscript>`, the ``js`` module is also available client-side.
 
 This module allows access to the JavaScript environment's global namespace:
 

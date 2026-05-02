@@ -1,3 +1,5 @@
+.. _pyscript:
+
 ``pyscript`` (client-only)
 ==========================
 

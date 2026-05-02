@@ -92,10 +92,10 @@ Handles a request whose full URL matches all directories in the path to this fil
     /foo/some/other/path
     /foo/bar/extra/segments
 
-Top-level functions
-^^^^^^^^^^^^^^^^^^^
+An __index__.py file should have the following top-level function:
 
 .. py:function:: __page__(***url) -> blu.Node | blu.Response
+    :no-index:
 
     Handle a request whose URL path is matched by this file.
 
@@ -148,11 +148,10 @@ Handles a request for which the directories in the path to this file from the ``
     /
     /hello
 
-Top-level functions
-^^^^^^^^^^^^^^^^^^^
-
+A __default__.py file should have the following top-level function:
 
 .. py:function:: __page__(***url) -> blu.Node | blu.Response
+    :no-index:
 
     Handle a request whose URL path is matched by this file.
     

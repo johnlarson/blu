@@ -101,7 +101,7 @@ __all__ = [
     "aside",
     "audio",
     "b",
-    "base",  # type: ignore
+    "base",
     "bdi",
     "bdo",
     "blockquote",
@@ -109,14 +109,14 @@ __all__ = [
     "br",
     "button",
     "canvas",
-    "caption",  # type: ignore
+    "caption",
     "cite",
     "code",
     "col",
     "colgroup",
     "data",
     "datalist" "dd",
-    "del_",  # type: ignore
+    "del_",
     "details",
     "dfn",
     "dialog",
@@ -125,7 +125,7 @@ __all__ = [
     "dt",
     "em",
     "embed",
-    "fieldset",  # type: ignore
+    "fieldset",
     "figcaption",
     "figure",
     "footer",
@@ -134,7 +134,7 @@ __all__ = [
     "h2",
     "h3",
     "h4",
-    "h5",  # type: ignore
+    "h5",
     "h6",
     "head",
     "hgroup",
@@ -143,7 +143,7 @@ __all__ = [
     "i",
     "iframe",
     "img" "input_",
-    "ins",  # type: ignore
+    "ins",
     "kbd",
     "label",
     "legend",
@@ -152,7 +152,7 @@ __all__ = [
     "main",
     "map",
     "mark",
-    "menu",  # type: ignore
+    "menu",
     "meta",
     "meter",
     "nav",
@@ -160,7 +160,7 @@ __all__ = [
     "object",
     "ol",
     "optgroup",
-    "option",  # type: ignore
+    "option",
     "output",
     "p",
     "picture",
@@ -170,7 +170,7 @@ __all__ = [
     "rb",
     "rp",
     "rt",
-    "rtc",  # type: ignore
+    "rtc",
     "ruby",
     "s",
     "samp",
@@ -178,7 +178,7 @@ __all__ = [
     "search",
     "section",
     "select",
-    "slot",  # type: ignore
+    "slot",
     "small",
     "source",
     "span",
@@ -186,7 +186,7 @@ __all__ = [
     "style",
     "sub",
     "summary",
-    "sup",  # type: ignore
+    "sup",
     "table",
     "tbody",
     "td",
@@ -194,7 +194,7 @@ __all__ = [
     "textarea",
     "tfoot",
     "th",
-    "thead",  # type: ignore
+    "thead",
     "time",
     "title",
     "tr",
@@ -203,60 +203,60 @@ __all__ = [
     "ul",
     "var",
     "video",
-    "wbr",  # type: ignore
+    "wbr",
     # SVG
     "animate",
     "animateMotion",
     "animateTransform",
     "circle",
-    "clipPath",  # type: ignore
+    "clipPath",
     "defs",
     "desc",
     "ellipse",
     "feBlend",
-    "feColorMatrix",  # type: ignore
+    "feColorMatrix",
     "feComponentTransfer",
     "feComposite",
-    "fConvolveMatrix",  # type: ignore
+    "fConvolveMatrix",
     "feDiffuseLigthing",
     "feDisplacementMap",
     "feDistantLight",
-    "feDropShadow",  # type: ignore
+    "feDropShadow",
     "feFlood",
     "feFuncA",
     "feFuncB",
     "feFuncG",
     "feFuncR",
-    "feGaussianBlur",  # type: ignore
+    "feGaussianBlur",
     "feImage",
     "feMerge",
     "feMergeNode",
     "feMorphology",
-    "feOffset",  # type: ignore
+    "feOffset",
     "fePointLight",
     "feSpecularLighting",
     "feSpotLight",
-    "feTile",  # type: ignore
+    "feTile",
     "feTurbulence",
     "filter",
     "foreignObject",
     "g",
     "image",
-    "line",  # type: ignore
+    "line",
     "linearGradient",
     "marker",
     "mask",
     "metadata",
     "mpath",
     "path",
-    "pattern",  # type: ignore
+    "pattern",
     "polygon",
     "polyline",
     "radialGradient",
     "rect",
     "script",
     "set",
-    "stop",  # type: ignore
+    "stop",
     "style",
     "svg",
     "switch",
@@ -264,7 +264,7 @@ __all__ = [
     "text",
     "textPath",
     "title",
-    "tspan",  # type: ignore
+    "tspan",
     "use",
-    "view",  # type: ignore
+    "view",
 ]

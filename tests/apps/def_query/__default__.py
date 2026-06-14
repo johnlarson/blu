@@ -1,2 +1,2 @@
-def __page__(_, *, a, b, c):
+def __page__(*, a, b, c):
     return (a, b, c)

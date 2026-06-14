@@ -121,13 +121,23 @@ class Router:
         path: list[str],
     ) -> dict[str, Any]:
         fn_params = inspect.signature(handler).parameters
-        if any(p.kind is p.POSITIONAL_ONLY for p in fn_params.values()):
-            if any(p.kind is p.VAR_KEYWORD for p in fn_params.values()):
-                return {name: query_list[0] for name, query_list in request.query}
+        if self._handler_has_query_params(fn_params):
+            ret: dict[str, Any] = {}
+            for p in fn_params.values():
+                if p.kind in (Parameter.KEYWORD_ONLY, Parameter.VAR_KEYWORD):
+                    continue
+                if p.kind is Parameter.POSITIONAL_ONLY:
+                    continue
+                ret.update(
+                    self._get_route_param_kwargs(
+                        p, route_params, path, handler, request
+                    )
+                )
+            if any(p.kind is Parameter.VAR_KEYWORD for p in fn_params.values()):
+                ret.update({name: query_list[0] for name, query_list in request.query})
             else:
-                ret = {}
                 for p in fn_params.values():
-                    if p.kind is p.POSITIONAL_ONLY:
+                    if p.kind is not Parameter.KEYWORD_ONLY:
                         continue
                     value = request.query.get(p.name, p.default)
                     if value is Parameter.empty:
@@ -137,24 +147,47 @@ class Router:
                             f'no argument named "{p.name}".'
                         )
                     ret[p.name] = value
-                return ret
-        ret: dict[str, Any] = {}
+            return ret
+        ret = {}
         for fn_param in fn_params.values():
-            if fn_param.name == "_":
-                ret["_"] = None
-            elif fn_param.name.endswith("__"):
-                ret[fn_param.name] = "/".join(path)
-            else:
-                try:
-                    ret[fn_param.name] = route_params[fn_param.name]
-                except KeyError:
-                    raise TypeError(
-                        f"__page__ handler {handler} has route "
-                        f'argument "{fn_param.name}", which does not '
-                        "exist for this route (URL path: "
-                        f"{request.path})."
-                    )
+            if fn_param.kind is Parameter.POSITIONAL_ONLY:
+                continue
+            ret.update(
+                self._get_route_param_kwargs(
+                    fn_param,
+                    route_params,
+                    path,
+                    handler,
+                    request,
+                )
+            )
         return ret
+
+    def _handler_has_query_params(self, fn_params: Mapping[str, Parameter]) -> bool:
+        return any(
+            p.kind in (Parameter.KEYWORD_ONLY, Parameter.VAR_KEYWORD)
+            for p in fn_params.values()
+        )
+
+    def _get_route_param_kwargs(
+        self,
+        fn_param: Parameter,
+        route_params: Mapping[str, str],
+        path: list[str],
+        handler: Callable[..., Response | Node],
+        request: Request,
+    ) -> dict[str, Any]:
+        if fn_param.name.endswith("__"):
+            return {fn_param.name: "/".join(path)}
+        try:
+            return {fn_param.name: route_params[fn_param.name]}
+        except KeyError:
+            raise TypeError(
+                f"__page__ handler {handler} has route "
+                f'argument "{fn_param.name}", which does not '
+                "exist for this route (URL path: "
+                f"{request.path})."
+            )
 
     async def _handle_static(
         self,
@@ -230,9 +263,7 @@ class Router:
         for p in parameters.values():
             if p.kind is not Parameter.POSITIONAL_ONLY:
                 break
-            if p.name == "_":
-                ret += (None,)
-            elif p.name.endswith("__"):
+            if p.name.endswith("__"):
                 ret += ("/".join(path),)
             else:
                 ret += (route_params[p.name],)

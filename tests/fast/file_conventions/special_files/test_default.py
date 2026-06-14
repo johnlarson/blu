@@ -220,17 +220,6 @@ async def test_pos_only_path_param():
     assert response._body == "foo/bar"  # type: ignore
 
 
-async def test_star_no_args():
-    """
-    If a __page__ handler has positional-only arguments, and one of
-    those is named _ (single underscore), then that argument's value
-    will be set to None when __page__ is called.
-    """
-    r = router("def_star_no_args")
-    response = await r.handle(Request("/"))
-    assert response._body == None  # type: ignore
-
-
 async def test_handler_dunder_is_empty_string():
     """
     If there is not remaining path to match, the path param (non-query

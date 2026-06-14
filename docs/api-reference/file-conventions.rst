@@ -250,16 +250,16 @@ You can capture route parameters from dynamic route segments by passing them in 
 Capturing query parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Any arguments specified after ``/`` in your call signature will capture query parameters instead of route parameters:
+Any arguments specified after ``*`` in your call signature will capture query parameters instead of route parameters:
 
 .. code-block:: python
     :caption: app/_id_/__index__.py
 
     from blu.html import p
 
-    def __page__(id, /, foo):
+    def __page__(id, *, foo):
         return (
-            p['ID: ', id],
+            p['ID:', id],
             p['foo:', foo],
         )
 
@@ -270,7 +270,7 @@ Any arguments specified after ``/`` in your call signature will capture query pa
     <p>foo: 3</p>
 
 
-Python doesn't allow a ``/`` at the beginning of the call signature, so use ``_`` (single underscore) before the ``/`` if there are no route parameters:
+You can capture query parameters without route parameters:
 
 .. code-block:: python
     :caption: app/greet_me/__index__.py
@@ -278,7 +278,7 @@ Python doesn't allow a ``/`` at the beginning of the call signature, so use ``_`
     from blu.html import p
 
 
-    def __page__(_, /, my_name):
+    def __page__(*, my_name):
         return p['Hello ', my_name, '!']
 
 .. code-block:: html
@@ -294,7 +294,7 @@ You can set default values for query parameters:
     from blu.html import p
 
 
-    def __page__(_, /, my_name='World'):
+    def __page__(*, my_name='World'):
         return p['Hello ', my_name, '!']
 
 .. code-block:: html
@@ -310,7 +310,57 @@ You can also use ``**kwargs`` for query parameters:
     from blu.html import p
 
 
-    def __page__(_, /, my_name, **kwargs):
+    def __page__(**kwargs):
+        greeting = kwargs.get('greeting', 'Hello')
+        return p[greeting, '!']
+
+.. code-block:: html
+    :caption: GET /greet_me?greeting=Hi
+
+    <p>Hi!</p>
+
+.. note::
+
+    If you capture query parameters using ``**kwargs`` while also capturing route paramaters, use ``/`` to avoid name collisions:
+
+    .. code-block:: python
+        :caption: app/show_params/__index__.py
+
+        from blu.html import p
+
+
+        def __page__(x, /, **kwargs):
+            return p[
+                div['x: ', x],
+                div['**kwargs:'],
+                ul[
+                    li[f'{k}: ', v] for k, v in **kwargs
+                ],
+            ]
+
+.. code-block:: html
+    :caption: GET /show_params/A?x=1&y=2&z=3
+
+    <p>
+        <div>x: A</div>
+        <div>**kwargs:</div>
+        <ul>
+            <li>x: 1</li>
+            <li>y: 2</li>
+            <li>z: 3</li>
+        </ul>
+    </p>
+
+
+This can also be paired with non-``**kwarg`` query parameters:
+
+.. code-block:: python
+    :caption: app/greet_me/__index__.py
+
+    from blu.html import p
+
+
+    def __page__(*, my_name, **kwargs):
         greeting = kwargs.get('greeting', 'Hello')
         return p[greeting, ' ', my_name, '!']
 
@@ -338,18 +388,18 @@ Since a call to a ``__page__`` handler in a ``__default__.py`` file usually resu
 
     <p>Remaining path: bar/baz</p>
 
-This can be used alongside route parameters and query parameters. In this case, it should come before the ``/``:
+This can be used alongside route parameters and query parameters. In this case, it should come before the ``*``:
 
 .. code-block:: python
     :caption: app/_id_/__default__.py
 
     from blu.html import p
 
-    def __page__(id, path__, /, baz):
+    def __page__(id, path__, *, baz):
         return (
             p['ID: ', id],
-            p['Remaining path:', __],
-            p['baz:', baz],
+            p['Remaining path: ', path__],
+            p['baz: ', baz],
         )
 
 .. code-block:: html

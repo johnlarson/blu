@@ -105,7 +105,7 @@ An __index__.py file should have the following top-level function:
         from blu.html import p
 
         
-        def __page__(slug, /, q):
+        def __page__(slug, *, q):
             return (
                 p['The slug value is: ', slug],
                 p['The query param value is: ', q],
@@ -161,7 +161,7 @@ A __default__.py file should have the following top-level function:
         from blu.html import p
 
         
-        def __page__(slug, path__, /, q):
+        def __page__(slug, path__, *, q):
             return (
                 p['The slug value is: ', slug],
                 p['The remaining path is: ', path],

@@ -1,2 +1,2 @@
-def __page__(_, /, **kwargs):
+def __page__(**kwargs):
     return (kwargs["a"], kwargs["b"])

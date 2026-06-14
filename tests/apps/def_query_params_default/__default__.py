@@ -1,2 +1,2 @@
-def __page__(_, /, a=3):
+def __page__(*, a=3):
     return a

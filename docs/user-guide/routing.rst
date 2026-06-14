@@ -208,7 +208,7 @@ In this example, visiting ``/my-param-value/a/b/c`` gives us:
 Query Parameters
 ----------------
 
-You can also capture query parameters in an ``__index__.py`` or ``__default__.py`` handler. These must be separated from route parameters with a ``/``:
+You can also capture query parameters in an ``__index__.py`` or ``__default__.py`` handler. These must be separated from route parameters with a ``*``:
 
     app/
       _foo_/
@@ -220,7 +220,7 @@ You can also capture query parameters in an ``__index__.py`` or ``__default__.py
     from blu.html import b, p
 
 
-    def __page__(foo, /, bar, baz):
+    def __page__(foo, *, bar, baz):
         return (
             p[
                 b['foo:'], ' ', foo,
@@ -247,7 +247,7 @@ In this example, visiting ``/A?bar=B&baz=C`` gives us:
             <b>baz:</b> C
         </p>
 
-A python function's arguments cannot start with ``/``. To create a route with query parameters but no route parameters, put a single underscore (``_``) before the ``/``::
+Here's an example with query parameters and no route parameters::
 
     app/
       foo/
@@ -259,7 +259,7 @@ A python function's arguments cannot start with ``/``. To create a route with qu
     from blu.html import b, p
 
 
-    def __page__(_, /, bar, baz):
+    def __page__(*, bar, baz):
         return (
             p[
                 b['bar:'], ' ', bar,
@@ -292,7 +292,7 @@ The *__page__()* function can also accept query parameters using keyword argumen
     from blu.html import b, p
 
 
-    def __page__(_, /, bar, **kwargs):
+    def __page__(*, bar, **kwargs):
         return (
             p[
                 b['bar:'], ' ', bar,

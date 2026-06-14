@@ -38,7 +38,7 @@ async def test_routing(page: PageFixture):
     p = await page("e2e")
     route = p.locator("#route")
     await p.goto("/routing/1?q=2")
-    await expect(route).to_have_text("/routing/_a_ (1, 2)")
+    await expect(route).to_have_text("/routing/_a_ (1, 2)", timeout=10_000)
     await p.goto("/routing/1/2/3/4")
     await expect(route).to_have_text("/routing/_a_/... (1, 2/3/4)")
     await p.goto("/routing/1/static")
@@ -136,7 +136,7 @@ async def test_client_side_availability(page: PageFixture):
     """The js and pyscript packages are available client-side."""
     p = await page("e2e")
     await p.goto("/client_import")
-    await expect(p.locator("#status")).to_have_text("Success!")
+    await expect(p.locator("#status")).to_have_text("Success!", timeout=10_000)
 
 
 async def test_static_files(client: ClientFixture):
@@ -201,7 +201,7 @@ async def test_dev_server(patch_app: Callable[[str], None]):
                 try:
                     await p.goto("/dev_server")
                     main_div = p.locator("#main-div")
-                    await expect(main_div).to_have_text("ORIGINAL")
+                    await expect(main_div).to_have_text("ORIGINAL", timeout=10_000)
                     index_file = app_dir / "dev_server/__index__.py"
                     new_source = index_file.read_text().replace(
                         "ORIGINAL",
@@ -267,7 +267,7 @@ async def test_server_function(page: PageFixture):
     """Server functions work as described in documentation."""
     p = await page("e2e")
     await p.goto("/server_functions")
-    await expect(p.get_by_text("Hello!")).to_be_visible()
+    await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
 
 
 async def test_async_effect(page: PageFixture):

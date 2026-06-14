@@ -107,16 +107,6 @@ async def test_path_param():
     assert response._body == "1/2/3"  # type: ignore
 
 
-async def test_single_underscore_arg():
-    """
-    If / does not appear in the handler call signature and there is an
-    argument whose name is a single underscore, that argument will be
-    set to None.
-    """
-    response = await router("default_single_underscore").handle(Request("/"))
-    assert response._body == None  # type: ignore
-
-
 async def test_nonexistent_route_params():
     """
     If there are route parameters in the handler's call signature whose

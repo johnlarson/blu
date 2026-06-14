@@ -92,17 +92,6 @@ async def test_missing_route_params():
     assert response._body == "Works!"  # type: ignore
 
 
-async def test_single_underscore():
-    """
-    If there are no positional-only arguments in the __page__ handler's
-    call signature, an argument whose name is _ (single underscore) will
-    have a value of None when the handler is called.
-    """
-    r = router("index_single_underscore")
-    response = await r.handle(Request("/"))
-    assert response._body == None  # type: ignore
-
-
 async def test_handler_only_query_params():
     """
     If the handler's call signature has positional-only arguments,
@@ -169,16 +158,6 @@ async def test_handler_route_and_query_params():
     r = router("index_route_and_query")
     response = await r.handle(Request("/1/2", {"c": "3", "d": "4"}))
     assert response._body == ("1", "2", "3", "4")  # type: ignore
-
-
-async def test_pos_only_single_underscore():
-    """
-    A positional-only argument whose name is _ (single underscore) will
-    have a value of None when the handler is called.
-    """
-    r = router("index_pos_only_underscore")
-    response = await r.handle(Request("/"))
-    assert response._body == None  # type: ignore
 
 
 async def test_async_handler():

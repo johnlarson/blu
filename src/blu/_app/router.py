@@ -1,12 +1,12 @@
 from types import ModuleType
 from typing import Mapping
-from blu._utils.typing import Callable
+from blu._typing.typing import Callable
 from importlib import import_module
 import inspect
 from inspect import Parameter
 from pathlib import Path
 
-from blu._utils.typing import Any, Optional, Protocol
+from blu._typing.typing import Any, Optional, Protocol
 from blu._http import Request, Response
 from blu._nodes import Node
 from blu._utils.asyncio import awaitable

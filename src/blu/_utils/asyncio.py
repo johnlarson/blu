@@ -3,13 +3,13 @@ from collections.abc import Awaitable, Callable, Coroutine
 import functools
 
 from blu._exceptions import WrongEnvironmentError
-from blu._utils.typing import Any, cast
+from blu._typing.typing import Any, cast
 from blu._utils.client import is_client
 
 if not is_client:
     from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 else:
-    from blu._utils.typing import type_place_holder
+    from blu._typing.typing import type_place_holder
 
     Executor = type_place_holder
     ProcessPoolExecutor = type_place_holder

@@ -2,7 +2,7 @@ from collections import defaultdict
 import urllib.parse
 
 from blu._nodes import Node
-from blu._utils.typing import Iterator, Mapping
+from blu._typing.typing import Iterator, Mapping
 
 type QueryInit = Mapping[str, str | list[str]]
 

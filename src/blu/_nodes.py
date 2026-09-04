@@ -6,7 +6,7 @@ from numbers import Number
 import re
 
 from blu._exceptions import WrongEnvironmentError
-from blu._utils.typing import Any, Mapping, Protocol, Sequence, cast
+from blu._typing.typing import Any, Mapping, Protocol, Sequence, cast
 from blu._utils.client import is_client
 
 log = getLogger("blu")

@@ -12,7 +12,7 @@ from pyscript.js_modules import _blu_react as react
 from pyscript.js_modules import _blu_js_utils
 
 from blu._nodes import ClientRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
-from blu._utils.typing import Generator
+from blu._typing.typing import Generator
 
 logging.basicConfig(level=logging.DEBUG)
 

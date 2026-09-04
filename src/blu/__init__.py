@@ -3,7 +3,7 @@
 from typing import Callable
 
 from blu._utils.client import is_client
-from blu._utils.typing import Protocol, Any
+from blu._typing.typing import Protocol, Any
 from blu import html
 from blu._exceptions import WrongEnvironmentError
 from blu._nodes import (

@@ -3,8 +3,7 @@ from collections.abc import Generator
 from functools import cache
 import mimetypes
 from pathlib import Path
-import shutil
-from tempfile import TemporaryDirectory
+from tempfile import mkdtemp
 from zipfile import ZipFile
 
 import aiofiles
@@ -384,7 +383,9 @@ def _get_app_def():
 
 @cache
 def _python_zip_dir():
-    ret = Path(TemporaryDirectory().name)
+    # mkdtemp (not TemporaryDirectory) so the dir survives for the process;
+    # TemporaryDirectory().name is cleaned up as soon as the object is dropped.
+    ret = Path(mkdtemp())
     _blu_pkg_zip(ret)
     _app_pkg_zip(ret)
     return ret
@@ -392,8 +393,12 @@ def _python_zip_dir():
 
 def _blu_pkg_zip(zips_root: Path):
     src_dir = Path(__file__).parent.parent
-    base_name = str(zips_root / "blu")
-    shutil.make_archive(base_name, "zip", src_dir, src_dir)
+    dest_path = zips_root / "blu.zip"
+    with ZipFile(dest_path, "w") as dest_f:
+        for path in src_dir.rglob("*"):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            dest_f.write(path, arcname=path.relative_to(src_dir).as_posix())
 
 
 def _app_pkg_zip(zips_root: Path):

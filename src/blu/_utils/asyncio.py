@@ -9,11 +9,11 @@ from blu._utils.client import is_client
 if not is_client:
     from concurrent.futures import Executor, ProcessPoolExecutor, ThreadPoolExecutor
 else:
-    from blu._typing.typing import type_place_holder
+    from blu._typing.utils import _TypeStub
 
-    Executor = type_place_holder
-    ProcessPoolExecutor = type_place_holder
-    ThreadPoolExecutor = type_place_holder
+    Executor = _TypeStub()
+    ProcessPoolExecutor = _TypeStub()
+    ThreadPoolExecutor = _TypeStub()
 
 
 async def awaitable[T](input: T | Awaitable[T]) -> T:

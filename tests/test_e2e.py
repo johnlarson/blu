@@ -27,6 +27,7 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""
     p = await page("e2e")
     await p.goto("/rendering")
+    await sleep(3600)
     del_ = p.locator("del")
     await expect(del_).to_have_count(1, timeout=10_000)
     await expect(del_).to_have_id("my-id")
@@ -240,6 +241,13 @@ async def test_unusual_root_nodes(page: PageFixture):
     await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
     await p.goto("/unusual_root_nodes/tuple")
     await expect(p.get_by_text("ABC")).to_be_visible(timeout=10_000)
+
+
+async def test_simple_app_e2e(page: PageFixture):
+    p = await page("e2e_simple_app")
+    await p.goto("/")
+    await sleep(3600)
+    await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
 
 
 async def test_settings(page: PageFixture):

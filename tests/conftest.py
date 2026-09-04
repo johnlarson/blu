@@ -17,7 +17,7 @@ from blu._app import _get_app_def, _get_router  # type: ignore
 from blu._settings import settings
 from blu._utils import get_available_port
 
-HEADLESS = True
+HEADLESS = False
 
 
 @pytest.fixture

@@ -3,7 +3,7 @@ from .utils import type_import as _type_import  # type: ignore
 
 if _type_import(
     "typing",
-    globals,
+    globals(),
     [
         "Any",
         "Literal",

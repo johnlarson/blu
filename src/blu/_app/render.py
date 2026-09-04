@@ -82,7 +82,7 @@ async def _get_python_script() -> ET.Element:
     return ET.Element(
         "script",
         {
-            "type": "py",
+            "type": "mpy",
             "config": await json.dumps(await _get_config()),
             "src": "/_blu_internal/client_main.py",
         },

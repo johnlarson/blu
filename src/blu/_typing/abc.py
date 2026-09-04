@@ -1,4 +1,4 @@
-from .utils import type_import as _type_import
+from .utils import type_import as _type_import  # type: ignore
 
 
 if _type_import(

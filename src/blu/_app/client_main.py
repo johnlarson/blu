@@ -1,12 +1,10 @@
 import base64
-from collections.abc import AsyncGenerator, Generator, Iterable
-import importlib
-from importlib import import_module
+
+# from importlib import import_module
 import logging
 
 # import pickle
 from blu.mPickle import mpickle as pickle
-from typing import Any, TypedDict, cast
 
 from js import document  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
@@ -14,7 +12,8 @@ from pyscript.js_modules import _blu_react as react
 from pyscript.js_modules import _blu_js_utils
 
 from blu._nodes import ClientRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
-from blu._typing.typing import Generator
+from blu._micropython.typing import Any, TypedDict, cast
+from blu._micropython.utils import import_module
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -65,7 +64,7 @@ def get_node(data: Any):
         )
     elif isinstance(data, str):
         return data
-    elif isinstance(data, Iterable):
+    elif is_iterable(data):
         return get_array(data)
     elif isinstance(data, HTMLElement):
         props = {k: v for k, v in data._attrs.items() if k != "ref"}
@@ -104,13 +103,13 @@ class PythonElementProps(TypedDict):
 @create_proxy
 def PythonElement(props: PythonElementProps, extra: Any = None):
     result = props.renderer(*props.args, **props.kwargs.as_object_map())
-    if isinstance(result, Generator):
+    if is_generator(result):
         next(result)
         try:
             result.send(props.py_children)
         except StopIteration as e:
             return get_node(e.value)
-    elif isinstance(result, AsyncGenerator):
+    elif is_async_generator(result):
         raise TypeError(
             "ClientElements cannot be created from async rendering functions."
         )
@@ -154,8 +153,32 @@ def parse_py_element(data: dict[str, Any]):
 
 
 def get_renderer(data: Any) -> ClientRenderer:
-    module = importlib.import_module(data["module"])
+    module = import_module(data["module"])
     return getattr(module, data["name"])
+
+
+def is_iterable(obj):
+    return hasattr(obj, "__iter__")
+
+
+def is_generator(obj):
+    return (
+        hasattr(obj, "__iter__")
+        and hasattr(obj, "__next__")
+        and hasattr(obj, "send")
+        and hasattr(obj, "throw")
+        and hasattr(obj, "close")
+    )
+
+
+def is_async_generator(obj):
+    return (
+        hasattr(obj, "__aiter__")
+        and hasattr(obj, "__anext__")
+        and hasattr(obj, "asend")
+        and hasattr(obj, "athrow")
+        and hasattr(obj, "aclose")
+    )
 
 
 await main()

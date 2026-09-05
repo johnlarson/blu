@@ -8,12 +8,12 @@ let blu;
 let builtins;
 let abc;
 let sys;
-let renderClientElement;
 let useEffectInvoke;
 let operator;
 let useEffectCleanupAsyncGen;
+let isGenerator;
 
-export function init(innerPyImport) {
+export function init(innerPyImport, isGeneratorFn) {
   const ffi = innerPyImport('pyscript.ffi');
   create_proxy = ffi.create_proxy(ffi.create_proxy);
   function pyImport(location) {
@@ -21,13 +21,13 @@ export function init(innerPyImport) {
   }
   blu = pyImport('blu');
   builtins = pyImport('builtins');
-  abc = pyImport('collections.abc');
+  abc = pyImport('blu._micropython.abc');
   sys = pyImport('sys');
   operator = pyImport('operator');
-  renderClientElement = pyImport('blu._nodes')._render_client_element;
   const hooksMod = pyImport('blu._hooks');
   useEffectInvoke = getProxy(hooksMod._use_effect_invoke);
   useEffectCleanupAsyncGen = getProxy(hooksMod._use_effect_cleanup_async_gen);
+  isGenerator = getProxy(isGeneratorFn);
 }
 
 const idToProxyInfo = new Map();
@@ -144,7 +144,7 @@ function PythonElement(proxies) {
   const { renderer, args, kwargs, pyChildren } = unwrapProxyProps(proxies);
   const result = renderer.callKwargs(...args, kwargs.toJs({ depth: 1 }));
   let pyNode;
-  if (builtins.isinstance(result, abc.Generator)) {
+  if (isGenerator(result)) {
     result.next();
     try {
       if (pyChildren.length === 1) {

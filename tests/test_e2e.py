@@ -1,6 +1,5 @@
 import asyncio
 from asyncio import sleep
-from collections.abc import Awaitable, Callable
 import os
 from pathlib import Path
 import re
@@ -17,6 +16,7 @@ from playwright.async_api import (
 )
 import pytest
 from blu import is_client
+from blu._micropython.abc import Awaitable, Callable
 
 from tests.utils import ClientFixture, PageFixture
 
@@ -246,7 +246,7 @@ async def test_unusual_root_nodes(page: PageFixture):
 async def test_simple_app_e2e(page: PageFixture):
     p = await page("e2e_simple_app")
     await p.goto("/")
-    # await sleep(3600)
+    await sleep(3600)
     await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
 
 

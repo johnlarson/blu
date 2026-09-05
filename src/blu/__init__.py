@@ -1,9 +1,8 @@
 """A full stack React framework for Python."""
 
-from typing import Callable
-
 from blu._utils.client import is_client
-from blu._typing.typing import Protocol, Any
+from blu._micropython.typing import Protocol, Any
+from blu._micropython.abc import Callable
 from blu import html
 from blu._exceptions import WrongEnvironmentError
 from blu._nodes import (

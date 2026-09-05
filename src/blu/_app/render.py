@@ -5,7 +5,7 @@ from pathlib import Path
 # import pickle
 from blu.mPickle import mpickle as pickle
 from blu._settings import settings
-from blu._typing.typing import Optional
+from blu._micropython.typing import Optional
 from xml.etree import ElementTree as ET
 
 from blu._nodes import Jsonable, Node
@@ -84,7 +84,7 @@ async def _get_python_script() -> ET.Element:
     return ET.Element(
         "script",
         {
-            "type": "py",
+            "type": "mpy",
             "config": await json.dumps(await _get_config()),
             "src": "/_blu_internal/client_main.py",
         },

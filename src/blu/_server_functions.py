@@ -1,16 +1,23 @@
-import ast
+try:
+    import ast
+except ImportError:
+    pass
 import asyncio
 import base64
 import functools
-import importlib
 import inspect
 import json
+from blu._micropython.utils import tuple_combine
 from blu.mPickle import mpickle as pickle
-from collections.abc import Awaitable, Callable, Sequence
 from pathlib import Path
-from typing import Any
 
+from blu._micropython.abc import Awaitable, Callable, Sequence
+from blu._micropython.typing import Any, ParamSpec, TypeVar
+from blu._micropython.utils import import_module
 from blu._utils.client import is_client
+
+P = ParamSpec("P")
+R = TypeVar("R")
 
 _BLU_SERVER_FN_ATTR = "_blu_is_server_function"
 
@@ -91,7 +98,7 @@ def _app_py_path_to_module_name(app_root: Path, path: Path) -> str:
     if parts[-1] == "__init__.py":
         pkg_parts = parts[:-1]
     elif parts[-1].endswith(".py"):
-        pkg_parts = (*parts[:-1], parts[-1][:-3])
+        pkg_parts = tuple_combine(parts[:-1], (parts[-1][:-3],))
     else:
         return ""
     if not pkg_parts:
@@ -147,7 +154,7 @@ def _build_server_function_registry() -> dict[tuple[str, str], Callable[..., Any
         if not fn_names:
             continue
         try:
-            mod = importlib.import_module(module_name)
+            mod = import_module(module_name)
         except ImportError:
             continue
         for name in fn_names:
@@ -246,9 +253,9 @@ def _wrap_server(callable: Callable[..., Any]) -> Callable[..., Awaitable[Any]]:
     return sync_wrapper
 
 
-def server[
-    **P, R
-](callable: Callable[P, R | Awaitable[R]],) -> Callable[P, Awaitable[R]]:
+def server(
+    callable: Callable[P, R | Awaitable[R]],
+) -> Callable[P, Awaitable[R]]:
     """
     Create a server function that can be called from the client.
 

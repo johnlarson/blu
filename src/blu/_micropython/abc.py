@@ -5,11 +5,12 @@ if _type_import(
     "collections.abc",
     globals(),
     [
+        "Awaitable",
         "AsyncGenerator",
         "AsyncIterable",
         "AsyncIterator",
         "Callable",
-        "Corouotine",
+        "Coroutine",
         "Generator",
         "Iterable",
         "Iterator",

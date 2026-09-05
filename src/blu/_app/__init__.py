@@ -18,7 +18,7 @@ from blu._server_functions import (
 )
 from blu._utils import asgi
 from blu._nodes import ClientElement, HTMLElement, Key, Node
-from blu._typing.typing import Iterable
+from blu._micropython.typing import Iterable
 from blu import _utils
 from .render import render_to_str
 

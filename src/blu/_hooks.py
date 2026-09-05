@@ -1,11 +1,12 @@
-from collections.abc import AsyncGenerator, Callable, Coroutine, Generator
-from typing import Any
-import typing
-
 from blu._utils import is_client
+from blu._micropython.abc import AsyncGenerator, Callable, Coroutine, Generator
+from blu._micropython import typing
+from blu._micropython.typing import Any, Generic, TypeVar
 
 if is_client or typing.TYPE_CHECKING:
     from pyscript.js_modules._blu_js_utils import useEffect, useRefObj, useState
+
+T = TypeVar("T")
 
 # Integers for JS `useEffect` (avoid classifying return values in JS, where
 # coroutines can be finalized before `isinstance` runs).
@@ -155,7 +156,7 @@ def use_effect(
     useEffect(callback)
 
 
-def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
+def use_state(init: T = None) -> tuple[T, Callable[[T], None]]:
     """
     .. include:: /_includes/hook-note.rst
 
@@ -197,7 +198,7 @@ def use_state[T](init: T = None) -> tuple[T, Callable[[T], None]]:
     return tuple(useState(init))
 
 
-class Ref[T]:
+class Ref(Generic[T]):
     """
     The object returned by :func:`blu.use_ref`.
 
@@ -276,7 +277,7 @@ class Ref[T]:
         self._value = new_value
 
 
-def use_ref[T](init: T = None) -> Ref[T]:
+def use_ref(init: T = None) -> Ref[T]:
     """
     .. include:: /_includes/hook-note.rst
 

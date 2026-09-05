@@ -1,6 +1,3 @@
-import importlib
-
-
 class _TypeStub:
     __slots__ = ()
 
@@ -29,7 +26,11 @@ class _TypeStub:
         return False
 
 
-class _TypeClassStubMeta(type):
+class NoopClass:
+    pass
+
+
+class _TypeClassStub:
     """Metaclass so stub types support ``X | Y`` on runtimes without PEP 604."""
 
     def __or__(cls, other):
@@ -38,8 +39,14 @@ class _TypeClassStubMeta(type):
     def __ror__(cls, other):
         return _TypeStub
 
+    def __getitem__(cls, item):
+        return cls
 
-class _TypeClassStub(metaclass=_TypeClassStubMeta):
+    def __mro_entries__(self, bases):
+        return (NoopClass,)
+
+
+class _TypeClassStubOld:
     __slots__ = ()
 
     def __class_getitem__(cls, item):
@@ -59,5 +66,24 @@ def type_import(module_name, scope, type_stub_names, type_class_stub_names):
 
 
 def _import_all(module_name, scope):
-    module = importlib.import_module(module_name)
+    module = import_module(module_name)
     scope.update({k: v for k, v in module.__dict__.items() if not k.startswith("_")})
+
+
+def import_module(module_name):
+    return __import__(module_name, None, None, ("*",))
+
+
+def mapping_combine(*mappings):
+    ret = {}
+    for m in mappings:
+        for k, v in m.items():
+            ret[k] = v
+    return ret
+
+
+def tuple_combine(*iterables):
+    ret = ()
+    for i in iterables:
+        ret += i
+    return ret

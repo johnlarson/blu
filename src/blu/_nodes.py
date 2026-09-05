@@ -1,46 +1,59 @@
-from collections.abc import Callable, Generator
-import importlib
 import inspect
 from logging import getLogger
-from numbers import Number
 import re
 
 from blu._exceptions import WrongEnvironmentError
-from blu._typing.typing import Any, Mapping, Protocol, Sequence, cast
+from blu._micropython.abc import Callable, Generator, Iterable, Mapping, Sequence
+from blu._micropython.typing import (
+    Any,
+    List,
+    ParamSpec,
+    Protocol,
+    TypeAlias,
+    Union,
+    cast,
+)
+from blu._micropython.utils import import_module, mapping_combine
 from blu._utils.client import is_client
 
+P = ParamSpec("P")
+
 log = getLogger("blu")
+
+Number: TypeAlias = Union[int, float]
 
 """
 JSON-serializable primitive value.
 """
-type JsonPrimitive = bool | Number | str | None
+JsonPrimitive: TypeAlias = Union[bool, Number, str, None]
 
 
 """JSON-serializable value."""
-type Jsonable = JsonPrimitive | Sequence[Jsonable] | Mapping[str, Jsonable]
+Jsonable: TypeAlias = Union[
+    JsonPrimitive, Sequence["Jsonable"], Mapping[str, "Jsonable"]
+]
 
 """Basic item that can serialized and sent from server to client."""
-type SerializableItem = JsonPrimitive | Node
+SerializableItem: TypeAlias = Union[JsonPrimitive, "Node"]
 
 """Can be serialized and sent from server to client."""
-type Serializable = (
-    SerializableItem | Sequence[Serializable] | Mapping[str, Serializable]
-)
+Serializable: TypeAlias = Union[
+    SerializableItem, Sequence["Serializable"], Mapping[str, "Serializable"]
+]
 
-type Node = """
-    ClientElement |
-    HTMLElement |
-    Key |
-    Iterable[Node] |
-    str |
-    int |
-    float |
-    None
-"""
+Node: TypeAlias = Union[
+    "ClientElement",
+    "HTMLElement",
+    "Key",
+    Iterable["Node"],
+    str,
+    int,
+    float,
+    None,
+]
 
 """Valid value for a prop of a `ReactElement`."""
-type PropValue = Jsonable | Node
+PropValue: TypeAlias = Union[Jsonable, Node]
 
 
 def is_jsonable(item: Any) -> bool:
@@ -76,10 +89,10 @@ def is_node(item: Any) -> bool:
 
 
 """Valid props for a `ReactElement`."""
-type Props = Mapping[str, PropValue]
+Props: TypeAlias = Mapping[str, PropValue]
 
 """Valid children of a `ReactElement`."""
-type Children = list[Node]
+Children: TypeAlias = List[Node]
 
 
 class HTMLElement:
@@ -139,7 +152,7 @@ class HTMLElement:
         self._attrs = props
         self._children = children
 
-    def __call__(self, props: Props = {}, /, **kwargs: PropValue) -> "HTMLElement":
+    def __call__(self, props: Props = {}, **kwargs: PropValue) -> "HTMLElement":
         """
         Create a copy of ``self`` with React props set based on the
         given keyword arguments.
@@ -192,10 +205,10 @@ class HTMLElement:
                results in the React element
                ``<div props-only="props" shared="props" kw-only="kw" />``
         """
-        all_props = {
-            **props,
-            **self._rename_props(kwargs),
-        }
+        all_props = mapping_combine(
+            props,
+            self._rename_props(kwargs),
+        )
         for prop_name in all_props:
             if not is_client and prop_name.startswith("on"):
                 raise WrongEnvironmentError(
@@ -361,10 +374,10 @@ class Key:
         return copy
 
 
-type ClientRenderer = Callable[..., Node | Generator[None, Node, Node]]
+ClientRenderer: TypeAlias = Callable[..., Union[Node, Generator[None, Node, Node]]]
 
 
-class Element[**P](Protocol):
+class Element(Protocol):
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> "Element[P]": ...
 
@@ -521,7 +534,7 @@ class ClientElement:
             <div>Hello, Bill!</div>
             <div>Hello, Carrie!</div>
         """
-        kwargs_copy = {**kwargs}
+        kwargs_copy = mapping_combine(kwargs)
         try:
             del kwargs_copy["key"]
         except KeyError:
@@ -613,9 +626,9 @@ def _import_client_module(
     key: Any,
     has_key: bool,
 ):
-    base = getattr(importlib.import_module(module), name)
+    base = getattr(import_module(module), name)
     if has_key:
-        all_kwargs = {**kwargs, "key": key}
+        all_kwargs = mapping_combine(kwargs, {"key": key})
     else:
         all_kwargs = kwargs
     with_args = base(*args, **all_kwargs)

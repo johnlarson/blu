@@ -4,7 +4,14 @@ Types based on https://asgi.readthedocs.io/en/latest/specs/www.html
 
 from collections.abc import Iterable
 
-from blu._typing.typing import Any, Literal, NotRequired, Optional, Protocol, TypedDict
+from blu._micropython.typing import (
+    Any,
+    Literal,
+    NotRequired,
+    Optional,
+    Protocol,
+    TypedDict,
+)
 
 
 class LifespanScopeASGIInfo(TypedDict):

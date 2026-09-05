@@ -1,7 +1,7 @@
 import React from 'https://esm.sh/react';
 import { createElement as $, Fragment } from 'https://esm.sh/react';
 import { createRoot } from 'https://esm.sh/react-dom/client';
-import * as PyScript from 'https://pyscript.net/releases/2026.1.1/core.js';
+import * as PyScript from 'https://pyscript.net/releases/2026.7.3/core.js';
 
 let create_proxy;
 let blu;

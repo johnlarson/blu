@@ -13,7 +13,7 @@ type Renamer = dict[tuple[Optional[str], Path], Optional[str]]
 
 REACT_LOCATION = "https://esm.sh/react"
 REACT_DOM_LOCATION = "https://esm.sh/react-dom"
-PYSCRIPT_URL = "https://pyscript.net/releases/2026.1.1/core.js"
+PYSCRIPT_URL = "https://pyscript.net/releases/2026.7.3/core.js"
 
 
 async def render_to_str(root: Node) -> str:

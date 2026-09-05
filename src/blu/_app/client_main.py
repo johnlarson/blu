@@ -3,7 +3,9 @@ from collections.abc import AsyncGenerator, Generator, Iterable
 import importlib
 from importlib import import_module
 import logging
-import pickle
+
+# import pickle
+from blu.mPickle import mpickle as pickle
 from typing import Any, TypedDict, cast
 
 from js import document  # type: ignore

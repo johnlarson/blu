@@ -5,7 +5,7 @@ import functools
 import importlib
 import inspect
 import json
-import pickle
+from blu.mPickle import mpickle as pickle
 from collections.abc import Awaitable, Callable, Sequence
 from pathlib import Path
 from typing import Any

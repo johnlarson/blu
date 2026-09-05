@@ -1,7 +1,9 @@
 import base64
 from io import StringIO
 from pathlib import Path
-import pickle
+
+# import pickle
+from blu.mPickle import mpickle as pickle
 from blu._settings import settings
 from blu._typing.typing import Optional
 from xml.etree import ElementTree as ET

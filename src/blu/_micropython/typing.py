@@ -5,7 +5,6 @@ try:
     pass
 except ImportError:
     _type_import(
-        "typing",
         globals(),
         [
             "Any",

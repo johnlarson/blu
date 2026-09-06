@@ -53,16 +53,11 @@ class _TypeClassStubOld:
         return cls
 
 
-def type_import(module_name, scope, type_stub_names, type_class_stub_names):
-    try:
-        _import_all(module_name, scope)
-    except ImportError:
-        for type_stub_name in type_stub_names:
-            scope[type_stub_name] = _TypeStub()
-        for type_class_stub_name in type_class_stub_names:
-            scope[type_class_stub_name] = _TypeClassStub()
-        return True
-    return False
+def type_import(scope, type_stub_names, type_class_stub_names):
+    for type_stub_name in type_stub_names:
+        scope[type_stub_name] = _TypeStub()
+    for type_class_stub_name in type_class_stub_names:
+        scope[type_class_stub_name] = _TypeClassStub()
 
 
 def _import_all(module_name, scope):
@@ -87,3 +82,36 @@ def tuple_combine(*iterables):
     for i in iterables:
         ret += i
     return ret
+
+
+def is_iterable(obj):
+    return hasattr(obj, "__iter__")
+
+
+def is_generator(obj):
+    return (
+        hasattr(obj, "__iter__")
+        and hasattr(obj, "__next__")
+        and hasattr(obj, "send")
+        and hasattr(obj, "throw")
+        and hasattr(obj, "close")
+    )
+
+
+def is_async_generator(obj):
+    return (
+        hasattr(obj, "__aiter__")
+        and hasattr(obj, "__anext__")
+        and hasattr(obj, "asend")
+        and hasattr(obj, "athrow")
+        and hasattr(obj, "aclose")
+    )
+
+
+def is_coroutine(obj):
+    return (
+        hasattr(obj, "__await__")
+        and hasattr(obj, "send")
+        and hasattr(obj, "throw")
+        and hasattr(obj, "close")
+    )

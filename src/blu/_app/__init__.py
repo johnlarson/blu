@@ -18,7 +18,7 @@ from blu._server_functions import (
 )
 from blu._utils import asgi
 from blu._nodes import ClientElement, HTMLElement, Key, Node
-from blu._micropython.typing import Iterable
+from blu._micropython.typing import Iterable, Union
 from blu import _utils
 from .render import render_to_str
 
@@ -315,7 +315,7 @@ async def get_page_response(path: str):
     return await _get_router().handle(request)
 
 
-type RenderedNode = (HTMLElement | str | int | float | bool | None)
+RenderedNode = Union[HTMLElement, str, int, float, bool, None]
 
 
 def render_page_node(root: Node) -> Node:

@@ -1,7 +1,11 @@
+import base64
 from pathlib import Path
 
 from blu._utils.asyncio import io_bound
 from blu._utils.client import is_client
+from blu._micropython.typing import Any, cast
+
+from blu.mPickle import mpickle as pickle
 
 if not is_client:
     import shutil
@@ -42,6 +46,16 @@ def walk_dir_files(dir: Path) -> list[Path]:
             file_path = subdir / filename
             ret.append(file_path)
     return ret
+
+
+def unpickle_root() -> Any:
+    from js import document  # type: ignore
+
+    b64_str_uncast = document.querySelector('script[type="react-data"]').textContent  # type: ignore
+    b64_str: str = cast(str, b64_str_uncast)
+    b64_bytes = b64_str.encode("ascii")
+    pickled = base64.b64decode(b64_bytes)
+    return pickle.loads(pickled)  # type: ignore
 
 
 blu_package_root = Path(__file__).parent.parent

@@ -115,3 +115,11 @@ def is_coroutine(obj):
         and hasattr(obj, "throw")
         and hasattr(obj, "close")
     )
+
+
+try:
+    from pyodide.ffi import create_proxy
+except ImportError:
+
+    def create_proxy(obj):
+        return obj

@@ -1,7 +1,7 @@
 import * as mp_mjs from '/_blu_internal/static/micropython.mjs'
-import * as fflate from 'https://cdn.jsdelivr.net/npm/fflate@0.8.3/esm/browser.js'
-// import JSZip from 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
 import * as zipJs from 'https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.11.4/+esm';
+import * as react from 'https://esm.sh/react';
+import * as reactDom from 'https://esm.sh/react-dom/client';
 
 const mp = await mp_mjs.loadMicroPython();
 
@@ -45,56 +45,15 @@ async function mpInstall(packageName) {
 
 await addPackage('/_blu_internal/app_pkg.zip', '/app');
 await addPackage('/_blu_internal/blu_pkg.zip', '/blu');
-await mpInstall('pathlib')
+await mpInstall('pathlib');
+await mpInstall('functools');
+await mpInstall('inspect');
+await mpInstall('logging');
+await mpInstall('base64');
+await mpInstall('types');
+mp.registerJsModule('_react', react);
+mp.registerJsModule('_react_dom', reactDom);
 
-mp.replInit
-
-for (const char of 'import mip\nmip.install("pathlib")') {
-  mp.replProcessChar(char);
-}
-
-// mp.runPython(`
-// import mip
-
-// mip.install("pathlib")
-// `)
-
-await mp.runPythonAsync(`
-    await micropip.install('pathlib')
-`)
-
-mp.pyimport('blu._app.client_main');
-
-// console.log('CONTENT:', appZipContent)
-
-// const files = fflate.unzipSync(appZipContent);
-// console.log(files)
-// for (const [name, data] of Object.entries(files)) {
-//   console.log(name, data);
-// }
-
-
-// const ds = new DecompressionStream('deflate');
-// const decompressed = appZipContent.stream().pipeThrough(ds);
-// const reader = new ReadableStreamDefaultReader(decompressed);
-// console.log(await reader.read())
-mp.FS.writeFile('/app.zip', appZipContent);
-console.log('STAT:', mp.FS.stat('/app.zip'))
-
-
-// window.result = mp.runPython(`
-// import uzipfile
-// import os
-
-// print(os.listdir(os.getcwd()))
-
-
-// `);
-
-window.result = mp.runPython(`
-import os
-
-print(os.listdir(os.getcwd()))
-`);
-
-// document.body.textContent = 'Hello, World!'
+const pyUtils = mp.import('blu._utils');
+const root = pyUtils.unpickle_root();
+console.log(root);

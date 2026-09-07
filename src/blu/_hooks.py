@@ -5,7 +5,7 @@ from blu._micropython.typing import Generic, TypeVar
 from blu._micropython.utils import is_async_generator, is_coroutine, is_generator
 
 if is_client or typing.TYPE_CHECKING:
-    from pyscript.js_modules import _blu_react as react
+    import _react as react
 
 # if is_client or typing.TYPE_CHECKING:
 #     from pyscript.js_modules._blu_js_utils import useEffect, useRefObj, useState

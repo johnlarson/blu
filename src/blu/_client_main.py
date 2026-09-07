@@ -8,8 +8,8 @@ from blu.mPickle import mpickle as pickle
 
 from js import document  # type: ignore
 from pyscript.ffi import create_proxy, to_js  # type: ignore
-from pyscript.js_modules import _blu_react as react
-from pyscript.js_modules import _blu_react_dom as react_dom
+import _react as react
+import _react_dom as react_dom
 
 from blu._nodes import ClientRenderer, ClientElement, HTMLElement, Node, Key
 from blu._micropython.typing import Any, cast
@@ -239,6 +239,3 @@ def parse_py_element(data: dict[str, Any]):
 def get_renderer(data: Any) -> ClientRenderer:
     module = import_module(data["module"])
     return getattr(module, data["name"])
-
-
-await main()

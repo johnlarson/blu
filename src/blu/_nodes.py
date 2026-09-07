@@ -670,7 +670,7 @@ def create_html_element(tagname: str) -> HTMLElement:
 
 
 if is_client:
-    from pyscript.ffi import create_proxy  # type: ignore
+    from blu._micropython.utils import create_proxy  # type: ignore
 
 
 def client(renderer: ClientRenderer) -> ClientElement:

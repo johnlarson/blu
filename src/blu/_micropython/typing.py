@@ -2,7 +2,7 @@ from .utils import type_import as _type_import  # type: ignore
 
 
 try:
-    pass
+    from typing import *  # fmt: skip
 except ImportError:
     _type_import(
         globals(),

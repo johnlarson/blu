@@ -89,8 +89,20 @@ async def _http(
         path = Path(__file__).parent / "client_main.py"
         await _serve_file(path, PYTHON_MIME, send)
         return
+    if scope["path"].startswith("/_blu_internal/static/"):
+        subpath = scope["path"].removeprefix("/_blu_internal/static/")
+        await _serve_blu_static_file(subpath, send)
+        return
     if scope["path"] == "/_blu_internal/util.js":
         path = Path(__file__).parent.parent / "util.js"
+        await _serve_file(path, JS_MIME, send)
+        return
+    if scope["path"] == "/_blu_internal/micropython.mjs":
+        path = Path(__file__).parent.parent / "micropython.mjs"
+        await _serve_file(path, JS_MIME, send)
+        return
+    if scope["path"] == "/_blu_internal/bootstrap.js":
+        path = Path(__file__).parent.parent / "bootstrap.js"
         await _serve_file(path, JS_MIME, send)
         return
     if scope["path"] == "/_blu_internal/server_function":
@@ -137,6 +149,12 @@ async def _http(
             "body": body_str.encode("utf-8"),
         }
     )
+
+
+async def _serve_blu_static_file(subpath: str, send: asgi.Sender):
+    file_path = Path(__file__).parent.parent / "_blu_static_files" / subpath
+    content_type, _ = mimetypes.guess_type(file_path)
+    await _serve_file(file_path, content_type, send)
 
 
 def _host_origin_match(host: str, origin: str) -> bool:

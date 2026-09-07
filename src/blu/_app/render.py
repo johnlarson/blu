@@ -48,11 +48,22 @@ async def _get_document(root: Node) -> ET.Element:
     document.extend(
         [
             await _get_react_data(root),
-            _get_pyscript_include(),
-            await _get_python_script(),
+            # _get_pyscript_include(),
+            # await _get_python_script(),
+            _get_bootstrap_script(),
         ]
     )
     return document
+
+
+def _get_bootstrap_script() -> ET.Element:
+    return ET.Element(
+        "script",
+        {
+            "type": "module",
+            "src": "/_blu_internal/bootstrap.js",
+        },
+    )
 
 
 def _get_placeholder() -> ET.Element:

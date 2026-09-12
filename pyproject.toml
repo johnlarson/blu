@@ -13,7 +13,10 @@ classifiers = [
 ]
 license = "MIT"
 license-files = ["LICENSE"]
-dependencies = ["aiofiles", "uvicorn"]
+dependencies = [
+    "aiofiles",
+    "uvicorn",
+]
 
 [project.urls]
 Homepage = "https://github.com/johnlarson/blu"
@@ -53,5 +56,6 @@ dev = [
     "sphinx-autobuild>=2025.8.25",
     "sphinx-copybutton>=0.5.2",
     "twine>=6.2.0",
+    "yappi>=1.7.6",
 ]
 

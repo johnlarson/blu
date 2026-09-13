@@ -1,0 +1,334 @@
+import React from 'https://esm.sh/react';
+import { createElement as $, Fragment } from 'https://esm.sh/react';
+import { createRoot } from 'https://esm.sh/react-dom/client';
+import * as PyScript from 'https://pyscript.net/releases/2026.7.3/core.js';
+
+let create_proxy;
+let blu;
+let builtins;
+let abc;
+let sys;
+let useEffectInvoke;
+let operator;
+let useEffectCleanupAsyncGen;
+let isGenerator;
+
+export function init(innerPyImport, isGeneratorFn) {
+  const ffi = innerPyImport('pyodide.ffi');
+  create_proxy = ffi.create_proxy(ffi.create_proxy);
+  function pyImport(location) {
+    return create_proxy(innerPyImport(location))
+  }
+  blu = pyImport('blu');
+  builtins = pyImport('builtins');
+  abc = pyImport('blu._micropython.abc');
+  sys = pyImport('sys');
+  operator = pyImport('operator');
+  const hooksMod = pyImport('blu._hooks');
+  useEffectInvoke = getProxy(hooksMod._use_effect_invoke);
+  useEffectCleanupAsyncGen = getProxy(hooksMod._use_effect_cleanup_async_gen);
+  isGenerator = getProxy(isGeneratorFn);
+}
+
+const idToProxyInfo = new Map();
+const proxyToId = new Map();
+
+const PRIMITIVE_TYPES = ['undefined', 'boolean', 'number', 'bigint', 'string', 'symbol'];
+
+function getProxy(obj) {
+  if (obj === null || PRIMITIVE_TYPES.includes(typeof obj)) {
+    return obj;
+  }
+  const id = builtins.id(obj);
+  if (!idToProxyInfo.has(id)) {
+    const proxy = create_proxy(obj)
+    idToProxyInfo.set(id, {
+      proxy,
+      count: 0
+    });
+    proxyToId.set(proxy, id);
+  }
+  const proxyInfo = idToProxyInfo.get(id);
+  proxyInfo.count++;
+  return proxyInfo.proxy;
+}
+
+function destroy(pyProxy) {
+  if (pyProxy === null || PRIMITIVE_TYPES.includes(typeof pyObj)) {
+    return;
+  }
+  const id = proxyToId(pyProxy);
+  const proxyInfo = idToProxyInfo(id);
+  const { proxy, count } = proxyInfo;
+  if (count < 1) {
+    throw new Error(`Too few existing copies (${count}) when destroying ${proxy}`);
+  }
+  proxyInfo.count--;
+  if (proxyInfo.count === 0) {
+    proxyToId.delete(proxy);
+    idToProxyInfo.delete(id);
+    proxy.destroy();
+  }
+}
+
+function unwrap(thing) {
+  if ([undefined, null].includes(thing)) {
+    return thing;
+  }
+  while (thing.type === 'pyodide.ffi.JsProxy') {
+    thing = thing.unwrap();
+  }
+  return thing;
+}
+
+export function renderRoot(pyRoot) {
+  const jsNode = getReactNode(pyRoot);
+  const renderTarget = jsNode.type === 'html' ? document : document.body;
+  createRoot(renderTarget).render(jsNode);
+}
+
+function getReactNode(pyNode) {
+  if (isOfType(pyNode, blu.ClientElement)) {
+    return $(PythonElement, {
+        renderer: getProxy(pyNode._renderer),
+        args: getProxy(pyNode._args),
+        kwargs: getProxy(pyNode._kwargs),
+        pyChildren: getProxy(pyNode._children)
+    })
+  } else if (isOfType(pyNode, blu.Key)) {
+    return $(MemManagedFragment, { key: getProxy(pyNode._key) }, ...getArray(pyNode._children));
+  } else if (isOfType(pyNode, builtins.tuple)) {
+    return $(React.Fragment, null, ...getArray(pyNode));
+  } else if (typeof pyNode === 'string') {
+    return pyNode;
+  } else if (builtins.hasattr(pyNode, '__iter__')) {
+    return getArray(pyNode);
+  } else if (isOfType(pyNode, blu.HTMLElement)) {
+    const attrs = {};
+    let hasRef = false;
+    for (const [k, v] of pyNode._attrs.items()) {
+      if (k == 'ref') {
+        hasRef = true;
+        continue;
+      }
+      attrs[k] = getProxy(v);
+    }
+    if (hasRef) {
+      attrs['ref'] = pyNode._attrs['ref']._ref_proxy;
+    }
+    return $(MemManagedHTMLElement, { _blu_tagname: pyNode._tagname, ...attrs },
+      ...getArray(pyNode._children),
+    );
+  } else if (pyNode === undefined) {
+    return undefined;
+  } else {
+    return pyNode.toString();
+  }
+}
+
+function getProxies(items) {
+  const ret = [];
+  for (const item of items) {
+    ret.push(getProxy(item));
+  }
+  return ret
+}
+
+function PythonElement(proxies) {
+  React.useEffect(() => () => {
+    destroy(proxies.renderer);
+    destroy(proxies.args);
+    destroy(proxies.kwargs);
+    destroy(proxies.pyChildren);
+  }, []);
+  const { renderer, args, kwargs, pyChildren } = unwrapProxyProps(proxies);
+  const result = renderer.callKwargs(...args, kwargs.toJs({ depth: 1 }));
+  let pyNode;
+  if (isGenerator(result)) {
+    result.next();
+    try {
+      if (pyChildren.length === 1) {
+        result.send(pyChildren[0]);
+      } else {
+        result.send(pyChildren);
+      }
+    } catch(e) {
+      if (e.name === 'PythonError') {
+        const pyExc = sys.last_exc;
+        if (isOfType(pyExc, builtins.StopIteration)) {
+          pyNode = pyExc.value;
+        } else {
+          throw e;
+        }
+      } else {
+        throw e;
+      }
+    }
+  } else {
+    pyNode = result;
+  }
+  return getReactNode(pyNode);
+}
+
+function unwrapProxyProps(proxies) {
+  const ret = {}
+  for (const [k, v] of Object.entries(proxies)) {
+    ret[k] = unwrap(v);
+  }
+  return ret
+}
+
+function MemManagedFragment({ key, children }) {
+  const childrenArray = getChildrenArray(children);
+  React.useEffect(() => () => {
+    destroy(key);
+  }, []);
+  return $(React.Fragment, { key }, ...childrenArray);
+}
+
+function getChildrenArray(children) {
+  return children instanceof Array ? children : [children];
+}
+
+function unwrapChildren(children) {
+  if (children instanceof Array) {
+    return children.map(x => unwrap(x));
+  } else {
+    return unwrap(children);
+  }
+}
+
+function destroyChildren(children) {
+  if (children instanceof Array) {
+    for (const child of children) {
+      destroy(child);
+    }
+  } else {
+    destroy(children);
+  }
+}
+
+function MemManagedHTMLElement({ _blu_tagname, children, ...attrs }) {
+  const childrenArray = getChildrenArray(children);
+  React.useEffect(() => () => {
+    for (const attr_value of Object.values(attrs)) {
+      destroy(attr_value);
+    }
+  }, []);
+  return $(_blu_tagname, attrs, ...childrenArray);
+}
+
+function childrenReactArray(children) {
+  const childrenArray = children instanceof Array ? children : [children];
+  return childrenArray.map(x => getReactNode(x));
+}
+
+function getArray(pyIterable) {
+  pyIterable = unwrap(pyIterable);
+  const ret = [];
+  for (const item of pyIterable) {
+    ret.push(getReactNode(item));
+  }
+  return ret;
+}
+
+export function useState(init) {
+  const initUsedRef = React.useRef(false);
+  const wrapped = getProxy(init);
+  const valueRef = React.useRef(wrapped);
+  React.useEffect(() => () => {
+    destroy(valueRef.current);
+  });
+  const [value, setValue] = React.useState(wrapped);
+  if (initUsedRef.current) {
+    destroy(wrapped);
+  }
+  initUsedRef.current = true;
+  function setter(newValue) {
+    destroy(valueRef.current);
+    const newProxy = getProxy(newValue);
+    valueRef.current = newProxy;
+    setValue(newProxy);
+  }
+  return [value, setter];
+}
+
+export function useRefObj(pyRef) {
+  const refProxiedRef = React.useRef(false);
+  pyRef = getProxy(pyRef);
+  pyRef._ref_proxy = refProxy(pyRef);
+  const refRef = React.useRef(pyRef);
+  if (refProxiedRef.current) {
+    destroy(pyRef);
+  }
+  refProxiedRef.current = true;
+  React.useEffect(() => () => {
+    destroy(refRef.current);
+  }, []);
+  return refRef.current;
+}
+
+function refProxy(pyRef) {
+  return {
+    set current(newValue) {
+      pyRef._value = newValue;
+    }
+  }
+}
+
+export function useEffect(callback) {
+  const callbackProxy = getProxy(callback);
+  React.useEffect(() => {
+    const packed = useEffectInvoke(callbackProxy);
+    const tag = operator.getitem(packed, 0).toString();
+    const result = operator.getitem(packed, 1);
+    if (tag === 'async_generator') {
+      const agen = getProxy(result);
+      return () => {
+        const onDone = create_proxy(() => {
+          destroy(agen);
+          onDone.destroy();
+        });
+        useEffectCleanupAsyncGen(agen, onDone);
+        destroy(callbackProxy);
+      };
+    } else if (tag === 'coroutine') {
+      const coro = getProxy(result);
+      return () => {
+        try {
+          coro.close();
+        } catch (e) {
+          // ignore close errors during unmount
+        }
+        destroy(coro);
+        destroy(callbackProxy);
+      };
+    } else if (tag === 'generator') {
+      const generator = getProxy(result);
+      generator.next();
+      return () => {
+        generator.next();
+        destroy(generator);
+        destroy(callbackProxy);
+      };
+    } else {
+      return () => {
+        destroy(callbackProxy);
+      };
+    }
+  });
+}
+
+function isOfType(obj, pyClass) {
+  if (pyClass === undefined || !pyClass.toString().match(/^<class '[_A-Za-z0-9\.]+'>$/g)) {
+    throw Error('Second argument must be a Python class.')
+  }
+  if (obj?.__class__ === undefined) {
+    return false;
+  }
+  return obj.__class__.toString() === pyClass.toString();
+}
+
+function pyIs(obj1, obj2) {
+  return obj1.__repr__() === obj2.__repr__()
+}

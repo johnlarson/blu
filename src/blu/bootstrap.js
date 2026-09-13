@@ -1,8 +1,11 @@
-import * as mp_mjs from '/_blu_internal/static/micropython.mjs'
-import * as zipJs from 'https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.11.4/+esm';
+// import * as mp_mjs from '/_blu_internal/static/micropython.mjs'
+// import * as zipJs from 'https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.11.4/+esm';
+
+import 'https://cdn.jsdelivr.net/pyodide/v314.0.6/full/pyodide.js';
+import * as util from '/_blu_internal/util.js';
+
 import * as react from 'https://esm.sh/react';
 import * as reactDom from 'https://esm.sh/react-dom/client';
-import 'https://cdn.jsdelivr.net/pyodide/v314.0.6/full/pyodide.js';
 
 // bootstrapMicroPython();
 bootstrapPyodide();
@@ -10,12 +13,23 @@ bootstrapPyodide();
 async function bootstrapPyodide() {
   const pyodide = await loadPyodide();
   console.log('Starting')
-  await Promise.all([
-    addPackageMicroPython('/_blu_internal/app_pkg.zip', '/app', pyodide),
-    addPackageMicroPython('/_blu_internal/blu_pkg.zip', '/blu', pyodide),
-  ]);
+  // await Promise.all([
+  //   addPackageMicroPython('/_blu_internal/app_pkg.zip', '/app', pyodide),
+  //   addPackageMicroPython('/_blu_internal/blu_pkg.zip', '/blu', pyodide),
+  // ]);
+  await unpackArchivePyodide('/_blu_internal/app_pkg.zip', './app', pyodide);
+  await unpackArchivePyodide('/_blu_internal/blu_pkg.zip', './blu', pyodide);
+  await pyodide.registerJsModule('_react', react);
+  await pyodide.registerJsModule('_react_dom', reactDom);
+  await pyodide.registerJsModule('_js_util', util)
   console.log('Packages added.');
   await pyodide.pyimport('blu.client_main_old').main()
+}
+
+async function unpackArchivePyodide(url, dest, pyodide) {
+  const zipResponse = await fetch(url);
+  const buffer = await zipResponse.arrayBuffer();
+  await pyodide.unpackArchive(buffer, 'zip', { extractDir: dest });
 }
 
 async function bootstrapMicroPython() {

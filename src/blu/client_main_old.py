@@ -7,9 +7,9 @@ import logging
 from blu.mPickle import mpickle as pickle
 
 from js import document  # type: ignore
-from pyscript.ffi import create_proxy, to_js  # type: ignore
-from pyscript.js_modules import _blu_react as react
-from pyscript.js_modules import _blu_js_utils
+from pyodide.ffi import create_proxy, to_js  # type: ignore
+import _react as react
+import _js_util as _blu_js_utils
 
 from blu._nodes import ClientRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
 from blu._micropython.typing import Any, TypedDict, cast
@@ -28,7 +28,7 @@ PYTHON_TYPES = create_proxy(  # type: ignore
 
 
 async def main():
-    _blu_js_utils.init(import_module)  # type: ignore
+    _blu_js_utils.init(import_module, is_generator)  # type: ignore
     b64_str: str = cast(str, document.querySelector('script[type="react-data"]').textContent)  # type: ignore
     b64_bytes = b64_str.encode("ascii")
     pickled = base64.b64decode(b64_bytes)

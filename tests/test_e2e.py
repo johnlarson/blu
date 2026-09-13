@@ -27,7 +27,7 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""
     p = await page("e2e")
     await p.goto("/rendering")
-    await sleep(3600)
+    # await sleep(3600)
     del_ = p.locator("del")
     await expect(del_).to_have_count(1, timeout=10_000)
     await expect(del_).to_have_id("my-id")
@@ -39,7 +39,7 @@ async def test_routing(page: PageFixture):
     p = await page("e2e")
     route = p.locator("#route")
     await p.goto("/routing/1?q=2")
-    await sleep(3600)
+    # await sleep(3600)
     await expect(route).to_have_text("/routing/_a_ (1, 2)", timeout=10_000)
     await p.goto("/routing/1/2/3/4")
     await expect(route).to_have_text("/routing/_a_/... (1, 2/3/4)")

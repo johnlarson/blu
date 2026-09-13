@@ -46,15 +46,17 @@ async function mpInstall(packageName) {
 
 }
 
-await addPackage('/_blu_internal/app_pkg.zip', '/app');
-await addPackage('/_blu_internal/blu_pkg.zip', '/blu');
-await mpInstall('pathlib');
-await mpInstall('functools');
-await mpInstall('inspect');
-await mpInstall('logging');
-await mpInstall('base64');
-await mpInstall('types');
-await mpInstall('contextlib');
+await Promise.all([
+  addPackage('/_blu_internal/app_pkg.zip', '/app'),
+  addPackage('/_blu_internal/blu_pkg.zip', '/blu'),
+  mpInstall('pathlib'),
+  mpInstall('functools'),
+  mpInstall('inspect'),
+  mpInstall('logging'),
+  mpInstall('base64'),
+  mpInstall('types'),
+  mpInstall('contextlib'),
+])
 mp.registerJsModule('_react', react);
 mp.registerJsModule('_react_dom', reactDom);
 

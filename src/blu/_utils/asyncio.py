@@ -3,7 +3,7 @@ import functools
 
 from blu._exceptions import WrongEnvironmentError
 from blu._micropython.abc import Awaitable, Callable, Coroutine
-from blu._micropython.typing import Any, TypeVar, ParamSpec, cast
+from blu._micropython.typing import Any, IO, TypeVar, ParamSpec, Union, cast
 from blu._utils.client import is_client
 
 if not is_client:
@@ -18,6 +18,8 @@ else:
 T = TypeVar("T")
 P = ParamSpec("P")
 R = TypeVar("R")
+IOType = TypeVar("IOType", bound=Union[IO[str], IO[bytes]])
+IOContentType = TypeVar("IOContentType", bound=Union[str, bytes])
 
 
 async def awaitable(input: T | Awaitable[T]) -> T:

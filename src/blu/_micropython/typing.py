@@ -9,6 +9,7 @@ except ImportError:
         [
             "Any",
             "Generic",
+            "IO",
             "List",
             "Literal",
             "NotRequired",

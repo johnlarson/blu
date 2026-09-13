@@ -38,7 +38,10 @@ async function mpInstall(packageName) {
   for (const [name, hash] of metadata.hashes) {
     const fileUrl = `${PACKAGE_INDEX_ROOT}/file/${hash.slice(0, 2)}/${hash}`;
     const content = await (await fetch(fileUrl)).arrayBuffer();
-    mp.FS.writeFile(`/${name}`, content);
+    const fullPath = `/${name}`;
+    const dir = fullPath.split('/').slice(0, -1).join('/');
+    mp.FS.mkdirTree(dir);
+    mp.FS.writeFile(fullPath, content);
   }
 
 }
@@ -51,6 +54,7 @@ await mpInstall('inspect');
 await mpInstall('logging');
 await mpInstall('base64');
 await mpInstall('types');
+await mpInstall('contextlib');
 mp.registerJsModule('_react', react);
 mp.registerJsModule('_react_dom', reactDom);
 

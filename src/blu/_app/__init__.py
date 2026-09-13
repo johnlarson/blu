@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import mkdtemp
 from zipfile import ZipFile
 
-import aiofiles
+import asyncio
 
 from blu._exceptions import WrongEnvironmentError
 from blu._utils import asgi
@@ -235,12 +235,16 @@ async def _serve_static(
 
 
 async def _serve_file(path: Path, content_type: str | None, send: asgi.Sender):
+    await (await asyncio.to_thread(_serve_file_thread, path, content_type, send))
+
+
+async def _serve_file_thread(path: Path, content_type: str | None, send: asgi.Sender):
     headers = (
         []
         if content_type is None
         else [(b"Content-Type", content_type.encode("utf-8"))]
     )
-    async with aiofiles.open(path, "rb") as file:
+    with open(path, "rb") as file:
         await send(
             {
                 "type": "http.response.start",
@@ -249,7 +253,7 @@ async def _serve_file(path: Path, content_type: str | None, send: asgi.Sender):
                 "trailers": False,
             }
         )
-        async for chunk in file:
+        for chunk in file:
             await send(
                 {
                     "type": "http.response.body",

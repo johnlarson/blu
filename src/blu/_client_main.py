@@ -46,6 +46,8 @@ def render_root(py_root):
 
 def get_react_node(py_node):
     print("PY NODE:", py_node)
+    print("__iter__:", getattr(py_node, "__iter__", None))
+    print("is list:", isinstance(py_node, list))
     if isinstance(py_node, ClientElement):
         return react.createElement(
             ReactComponent,
@@ -68,10 +70,10 @@ def get_react_node(py_node):
         return react.createElement(react.Fragment, None, *get_array(py_node))
     elif isinstance(py_node, str):
         return py_node
-    elif is_iterable(py_node):
-        return get_array(py_node)
     elif isinstance(py_node, HTMLElement):
         return get_react_html_element(py_node)
+    elif is_iterable(py_node):
+        return get_array(py_node)
     elif py_node is None:
         return None
     else:

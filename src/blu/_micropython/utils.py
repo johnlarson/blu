@@ -85,7 +85,11 @@ def tuple_combine(*iterables):
 
 
 def is_iterable(obj):
-    return hasattr(obj, "__iter__")
+    try:
+        iter(obj)
+        return True
+    except TypeError:
+        return False
 
 
 def is_generator(obj):

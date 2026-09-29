@@ -267,7 +267,7 @@ def _get_children(index: Node | tuple[Node, ...]) -> list[Node]:
         except ImportError:
             pass
     if isinstance(index, tuple):
-        children = list(cast(tuple[Node], index))
+        children = list(index)
     else:
         children = [index]
     return [_convert_to_string(x) for x in children]

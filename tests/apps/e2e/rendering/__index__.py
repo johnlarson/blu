@@ -6,7 +6,7 @@ __client__ = True
 
 def __page__():
     return del_(id="my-id")[
-        # Simple,
+        Simple,
         span["A"],
         "B",
         ("C", "D"),
@@ -16,7 +16,7 @@ def __page__():
         None,
         True,
         False,
-        # DoubleRender("Y")[span["Z"]],
+        DoubleRender("Y")[span["Z"]],
     ]
 
 

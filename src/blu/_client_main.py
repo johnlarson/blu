@@ -86,6 +86,8 @@ def ReactComponent(props):
     kwargs = props["kwargs"]
     py_children = list(props["pyChildren"])
     result = renderer(*args, **kwargs)
+    print("result:", result)
+    print("is_generator:", is_generator(result))
     if is_generator(result):
         next(result)
         try:

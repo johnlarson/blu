@@ -591,7 +591,7 @@ class ClientElement:
             log.info("INFO")
             log.debug(f"Non-generator function: {self._renderer}")
             raise TypeError("This element does not accept any children.")
-        log.error(f"ClientElement children: {children}")
+        # log.error(f"ClientElement children: {children}")
         return ClientElement(
             self._renderer,
             self._args,

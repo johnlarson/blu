@@ -6,7 +6,7 @@ import logging
 # import pickle
 from blu.mPickle import mpickle as pickle
 
-from js import document  # type: ignore
+import js  # type: ignore
 
 # from pyscript.ffi import create_proxy, to_js  # type: ignore
 import _react as react
@@ -30,7 +30,7 @@ PYTHON_TYPES = create_proxy(  # type: ignore
 
 async def main():
     # _blu_js_utils.init(import_module)  # type: ignore
-    b64_str: str = cast(str, document.querySelector('script[type="react-data"]').textContent)  # type: ignore
+    b64_str: str = cast(str, js.document.querySelector('script[type="react-data"]').textContent)  # type: ignore
     b64_bytes = b64_str.encode("ascii")
     pickled = base64.b64decode(b64_bytes)
     unpickled = pickle.loads(pickled)
@@ -40,11 +40,12 @@ async def main():
 
 def render_root(py_root):
     js_root = get_react_node(py_root)
-    render_target = document if js_root.type == "html" else document.body
+    render_target = js.document if js_root.type == "html" else js.document.body
     react_dom.createRoot(render_target).render(js_root)
 
 
 def get_react_node(py_node):
+    print("PY NODE:", py_node)
     if isinstance(py_node, ClientElement):
         return react.createElement(
             ReactComponent,
@@ -64,7 +65,7 @@ def get_react_node(py_node):
             *get_array(py_node._children),
         )
     elif isinstance(py_node, tuple):
-        return react.createElement(react.Fragment, null, *get_array(py_node))
+        return react.createElement(react.Fragment, None, *get_array(py_node))
     elif isinstance(py_node, str):
         return py_node
     elif is_iterable(py_node):
@@ -98,6 +99,7 @@ def ReactComponent(props):
 
 
 def get_array(py_iterable):
+    print("py_iterable:", py_iterable)
     ret = js.Array.new()
     for item in py_iterable:
         ret.push(get_react_node(item))
@@ -108,7 +110,7 @@ def get_react_html_element(py_node):
     attrs = {}
     has_ref = False
     for k, v in py_node._attrs.items():
-        if k == ref:
+        if k == "ref":
             has_ref = True
             continue
         attrs[k] = v
@@ -118,5 +120,5 @@ def get_react_html_element(py_node):
         py_node._tagname,
         attrs,
         # to_js(attrs),
-        *py_node._children,
+        *get_array(py_node._children),
     )

@@ -229,6 +229,7 @@ async def test_unusual_root_nodes(page: PageFixture):
     """Any blu.Node can be returned by a __page__ handler."""
     p = await page("e2e")
     await p.goto("/unusual_root_nodes/float")
+    # await sleep(3600)
     await expect(p.get_by_text("1.23485")).to_be_visible(timeout=10_000)
     await p.goto("/unusual_root_nodes/int")
     await expect(p.get_by_text("234857")).to_be_visible(timeout=10_000)
@@ -244,22 +245,33 @@ async def test_unusual_root_nodes(page: PageFixture):
     await expect(p.get_by_text("ABC")).to_be_visible(timeout=10_000)
 
 
-async def test_simple_app_e2e(page: PageFixture):
+async def test_simple_app(page: PageFixture):
     p = await page("e2e_simple_app")
     await p.goto("/")
     # await sleep(3600)
     await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
 
 
-async def test_settings(page: PageFixture):
+# async def test_settings_pyodide(page: PageFixture):
+#     """
+#     Settings in app/__settings__.py work as described in documenation.
+#     """
+#     p = await page("e2e_settings_pyodide")
+#     await p.goto("/")
+#     arrr_exp = expect(p.get_by_text("Ahoy there."))
+#     await arrr_exp.to_be_visible(timeout=10_000)
+#     await expect(p.get_by_text("👍")).to_be_visible()
+
+
+async def test_settings_micropython(page: PageFixture):
     """
     Settings in app/__settings__.py work as described in documenation.
     """
-    p = await page("e2e_settings")
+    p = await page("e2e_settings_micropython")
     await p.goto("/")
-    arrr_exp = expect(p.get_by_text("Ahoy there."))
-    await arrr_exp.to_be_visible(timeout=10_000)
-    await expect(p.get_by_text("👍")).to_be_visible()
+    abc_exp = expect(p.get_by_text("ABC"))
+    await abc_exp.to_be_visible(timeout=10_000)
+    await expect(p.get_by_text("0")).to_be_visible()
 
 
 async def test_multilayer_tuple_children(page: PageFixture):

@@ -31,6 +31,7 @@ async function unpackArchivePyodide(url, dest, pyodide) {
 
 async function bootstrapMicroPython() {
   const mp = await mp_mjs.loadMicroPython();
+  const config = JSON.parse(document.getElementById('config').textContent);
   await Promise.all([
     addPackageMicroPython('/_blu_internal/app_pkg.zip', '/app', mp),
     addPackageMicroPython('/_blu_internal/blu_pkg.zip', '/blu', mp),
@@ -41,6 +42,7 @@ async function bootstrapMicroPython() {
     mpInstall('base64', mp),
     mpInstall('types', mp),
     mpInstall('contextlib', mp),
+    ...config.packages.map(x => mpInstall(x, mp)),
   ]);
   mp.registerJsModule('_react', react);
   mp.registerJsModule('_react_dom', reactDom);

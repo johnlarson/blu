@@ -18,6 +18,8 @@ from blu._micropython.utils import is_generator, is_iterable, create_proxy
 
 logging.basicConfig(level=logging.DEBUG)
 
+log = logging.getLogger()
+
 PYTHON_TYPES = create_proxy(  # type: ignore
     {
         "ClientElement": ClientElement,
@@ -34,18 +36,23 @@ async def main():
     b64_bytes = b64_str.encode("ascii")
     pickled = base64.b64decode(b64_bytes)
     unpickled = pickle.loads(pickled)
+    log.debug(f"Python root node: {unpickled}")
+
     # _blu_js_utils.renderRoot(unpickled)  # type: ignore
     render_root(unpickled)
 
 
 def render_root(py_root):
     js_root = get_react_node(py_root)
-    render_target = js.document if js_root.type == "html" else js.document.body
+    log.debug(f"React root node: {js_root}")
+    render_target = (
+        js.document if getattr(js_root, "type", None) == "html" else js.document.body
+    )
     react_dom.createRoot(render_target).render(js_root)
 
 
 def get_react_node(py_node):
-    print("PY NODE:", py_node)
+    log.debug(f"Converting python node {py_node} to React...")
     print("__iter__:", getattr(py_node, "__iter__", None))
     print("is list:", isinstance(py_node, list))
     if isinstance(py_node, ClientElement):

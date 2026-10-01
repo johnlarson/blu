@@ -47,6 +47,7 @@ async def _get_document(root: Node) -> ET.Element:
     document.append(_get_placeholder())
     document.extend(
         [
+            await _get_config_script(),
             await _get_react_data(root),
             # _get_pyscript_include(),
             # await _get_python_script(),
@@ -100,6 +101,24 @@ async def _get_python_script() -> ET.Element:
             "src": "/_blu_internal/client_main.py",
         },
     )
+
+
+async def _get_config_script() -> ET.Element:
+    script = ET.Element(
+        "script",
+        {
+            "type": "json",
+            "id": "config",
+        },
+    )
+    script.text = await json.dumps(_get_micropython_config())
+    return script
+
+
+def _get_micropython_config() -> dict[str, Jsonable]:
+    return {
+        "packages": settings().CLIENT_REQUIREMENTS,
+    }
 
 
 async def _get_config() -> dict[str, Jsonable]:

@@ -281,6 +281,7 @@ async def test_multilayer_tuple_children(page: PageFixture):
     """
     p = await page("e2e")
     await p.goto("/yield_in_tuple")
+    await sleep(3600)
     await expect(p.get_by_text("This should be red.")).to_be_visible(timeout=10_000)
 
 

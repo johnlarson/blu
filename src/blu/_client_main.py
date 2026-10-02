@@ -18,7 +18,7 @@ from blu._micropython.utils import is_generator, is_iterable, create_proxy
 
 logging.basicConfig(level=logging.DEBUG)
 
-log = logging.getLogger()
+log = logging.getLogger("blu")
 
 PYTHON_TYPES = create_proxy(  # type: ignore
     {
@@ -52,10 +52,11 @@ def render_root(py_root):
 
 
 def get_react_node(py_node):
-    log.debug(f"Converting python node {py_node} to React...")
+    log.debug(f"Converting python node {repr(py_node)} to React...")
     print("__iter__:", getattr(py_node, "__iter__", None))
     print("is list:", isinstance(py_node, list))
     if isinstance(py_node, ClientElement):
+        log.debug("Python node is a ClientElement")
         return react.createElement(
             ReactComponent,
             {
@@ -66,6 +67,7 @@ def get_react_node(py_node):
             },
         )
     elif isinstance(py_node, Key):
+        log.debug("Python node is a key.")
         return react.createElement(
             react.Fragment,
             {
@@ -74,16 +76,23 @@ def get_react_node(py_node):
             *get_array(py_node._children),
         )
     elif isinstance(py_node, tuple):
+        log.debug("Python node is a tuple.")
         return react.createElement(react.Fragment, None, *get_array(py_node))
     elif isinstance(py_node, str):
+        log.debug("Python node is a string.")
         return py_node
     elif isinstance(py_node, HTMLElement):
+        log.debug("Python node is an HTMLElement.")
+        log.debug(f"Children: {py_node._children}")
         return get_react_html_element(py_node)
     elif is_iterable(py_node):
+        log.debug("Python node is iterable.")
         return get_array(py_node)
     elif py_node is None:
+        log.debug("Python node is None.")
         return None
     else:
+        log.debug("Default: Python node will be converted to a string.")
         return str(py_node)
 
 
@@ -110,10 +119,14 @@ def ReactComponent(props):
 
 
 def get_array(py_iterable):
-    print("py_iterable:", py_iterable)
+    log.debug(f"py_iterable: {repr(py_iterable)}")
     ret = js.Array.new()
     for item in py_iterable:
-        ret.push(get_react_node(item))
+        log.debug(f"item: {repr(item)}")
+        item_react = get_react_node(item)
+        log.debug(f"item_react: {repr(item_react)}")
+        ret.push(item_react)
+    log.debug(f"Built JavaScript Array: {repr(ret)}")
     return ret
 
 

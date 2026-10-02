@@ -247,6 +247,7 @@ class HTMLElement:
               :type:`blu.Node`\\ s: A copy of :data:`self` whose
               children are set to ``list(children)``.
         """
+        log.debug(f"Children passed into HTMLElement: {repr(children)}")
         return HTMLElement(
             self._tagname,
             props=self._attrs,
@@ -258,6 +259,8 @@ class HTMLElement:
 
 
 def _get_children(index: Node | tuple[Node, ...]) -> list[Node]:
+    log.debug("Processing input children...")
+    log.debug(f"Input children: {repr(index)}")
     if is_client:
         try:
             from pyodide.ffi import JsProxy
@@ -375,6 +378,7 @@ class Key:
             children are ``list(children)``. Otherwise, a fragment whose
             children are ``[children]``.
         """
+        log.debug(f"Children passed into Key: {children}")
         copy = Key(self._key)
         copy._children = _get_children(children)
         return copy
@@ -587,11 +591,11 @@ class ClientElement:
             is not a :py:class:`Generator <collections.abc.Generator>`,
             i.e. doesn't contain a ``yield`` statement.
         """
+        log.debug(f"Children passed into ClientElement: {children}")
         if not inspect.isgeneratorfunction(self._renderer):
             log.info("INFO")
             log.debug(f"Non-generator function: {self._renderer}")
             raise TypeError("This element does not accept any children.")
-        # log.error(f"ClientElement children: {children}")
         return ClientElement(
             self._renderer,
             self._args,
@@ -639,7 +643,7 @@ def _import_client_module(
         all_kwargs = kwargs
     with_args = base(*args, **all_kwargs)
     if children:
-        return with_args[children]
+        return with_args[tuple(children)]
     else:
         return with_args
 

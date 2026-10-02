@@ -46,7 +46,17 @@ async function bootstrapMicroPython() {
   ]);
   mp.registerJsModule('_react', react);
   mp.registerJsModule('_react_dom', reactDom);
-
+  mp.runPython(`
+print('Hi!')
+class A:
+    def __getitem__(self, x):
+        return x
+print('1')
+a = A()
+print('2')
+x = a['Hello',]
+print('value:', x)
+`)
   await mp.pyimport('blu._client_main').main();
 }
 

@@ -115,7 +115,9 @@ def ReactComponent(props):
             py_node = exc.value
     else:
         py_node = result
-    return get_react_node(py_node)
+    react_node = get_react_node(py_node)
+    js.console.log("React node:", react_node)
+    return react_node
 
 
 def get_array(py_iterable):
@@ -142,7 +144,7 @@ def get_react_html_element(py_node):
         attrs["ref"] = py_node._attrs["ref"]._ref_proxy
     return react.createElement(
         py_node._tagname,
-        attrs,
-        # to_js(attrs),
+        # attrs,
+        to_js(attrs),
         *get_array(py_node._children),
     )

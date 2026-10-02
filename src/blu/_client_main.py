@@ -144,7 +144,7 @@ def get_react_html_element(py_node):
         attrs["ref"] = py_node._attrs["ref"]._ref_proxy
     return react.createElement(
         py_node._tagname,
-        # attrs,
-        to_js(attrs),
+        attrs,
+        # to_js(attrs),
         *get_array(py_node._children),
     )

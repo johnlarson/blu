@@ -229,7 +229,7 @@ async def _invoke_server_function_remote(
 
 
 def _wrap_client(callable: Callable[..., Any]) -> Callable[..., Awaitable[Any]]:
-    module = callable.__module__
+    module = callable.__globals__["__name__"]
     name = callable.__name__
 
     @functools.wraps(callable)

@@ -144,7 +144,23 @@ def get_react_html_element(py_node):
         attrs["ref"] = py_node._attrs["ref"]._ref_proxy
     return react.createElement(
         py_node._tagname,
-        attrs,
+        # attrs,
         # to_js(attrs),
+        attrs_to_js(attrs),
         *get_array(py_node._children),
     )
+
+
+def attrs_to_js(attrs):
+    ret = str_key_dict_to_js(attrs)
+    if "style" in attrs:
+        log.debug('Props have "styles" attribute; converting to JavaScript.')
+        ret["style"] = str_key_dict_to_js(attrs["style"])
+    return ret
+
+
+def str_key_dict_to_js(the_dict):
+    ret = js.Object.new()
+    for k, v in the_dict.items():
+        ret[k] = v
+    return ret

@@ -140,7 +140,25 @@ def use_state(init: T = None) -> tuple[T, Callable[[T], None]]:
         return _use_state_micropython(init)
 
 
-def _use_state_pyodide(init): ...
+def _use_state_pyodide(init):
+    container_ref = react.useRef(js.Array.new())
+    proxy_in = create_proxy(init)
+    proxy_out, set_proxy_out = react.useState(proxy_in)
+    if proxy_in.unwrap() is proxy_out.unwrap():
+        container_ref.current[0] = proxy_in
+    else:
+        proxy_in.destroy()
+    useDestroyContainedProxy(container_ref.current, js.Array.new())
+
+    value = proxy_out.unwrap()
+
+    def setter(new_value):
+        new_proxy = create_proxy(new_value)
+        set_proxy_out(new_proxy)
+        container_ref.current[0].destroy()
+        container_ref.current[0] = new_proxy
+
+    return value, setter
 
 
 def _use_state_micropython(init):
@@ -286,7 +304,7 @@ def use_ref(init: T = None) -> Ref[T]:
         container_ref = react.useRef(js.Array.new())
         proxy = create_proxy(ref)
         ref_ref = react.useRef(proxy)
-        if ref_ref.current is proxy:
+        if ref_ref.current.unwrap() is proxy.unwrap():
             container_ref.current[0] = proxy
         else:
             proxy.destroy()

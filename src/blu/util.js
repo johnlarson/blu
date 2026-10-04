@@ -334,7 +334,7 @@ function pyIs(obj1, obj2) {
 }
 
 export function useDestroyProxy(pyProxy, watch) {
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       pyProxy.destroy();
     }
@@ -342,7 +342,7 @@ export function useDestroyProxy(pyProxy, watch) {
 }
 
 export function useDestroyContainedProxy(container, watch) {
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       container[0].destroy()
     }
@@ -350,7 +350,7 @@ export function useDestroyContainedProxy(container, watch) {
 }
 
 export function useDestroyRefProxy(ref, watch) {
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       ref.current.destroy()
     }

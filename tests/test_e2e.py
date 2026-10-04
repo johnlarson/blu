@@ -289,7 +289,7 @@ async def test_server_function(page: PageFixture):
     """Server functions work as described in documentation."""
     p = await page("e2e")
     await p.goto("/server_functions")
-    await sleep(3600)
+    # await sleep(3600)
     await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
 
 

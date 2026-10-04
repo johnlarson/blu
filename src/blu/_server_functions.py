@@ -210,22 +210,45 @@ async def _invoke_server_function_remote(
     args: tuple[Any, ...],
     kwargs: dict[str, Any],
 ) -> Any:
-    from pyodide.http import pyfetch  # type: ignore
+    # from pyodide.http import pyfetch  # type: ignore
 
     payload = json.dumps(
         {"module": module, "name": name, "args": list(args), "kwargs": kwargs}
     )
-    response = await pyfetch(
+    # response = await pyfetch(
+    #     "/_blu_internal/server_function",
+    #     method="POST",
+    #     body=payload,
+    #     headers={"Content-Type": "application/json"},
+    # )
+    # text = await response.string()
+    response = await _fetch(
         "/_blu_internal/server_function",
         method="POST",
         body=payload,
         headers={"Content-Type": "application/json"},
     )
-    text = await response.string()
+    text = await response.text()
     data = json.loads(text)
     if not data.get("ok"):
         raise RuntimeError(data.get("error", "server function call failed"))
     return pickle.loads(base64.b64decode(data["result_b64"]))
+
+
+async def _fetch(url: str, method: str, body: str, headers: Mapping[str, str]) -> Any:
+    import js
+
+    js_headers = js.Object.new()
+    for k, v in headers.items():
+        js_headers[k] = v
+    return await js.fetch(
+        url,
+        {
+            "method": method,
+            "body": body,
+            "headers": js_headers,
+        },
+    )
 
 
 def _wrap_client(callable: Callable[..., Any]) -> Callable[..., Awaitable[Any]]:

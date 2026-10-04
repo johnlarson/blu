@@ -4,11 +4,15 @@ from blu._utils import is_client
 from blu._micropython.abc import Callable, Generator
 from blu._micropython import typing
 from blu._micropython.typing import Generic, TypeVar
-from blu._micropython.utils import is_generator
+from blu._micropython.utils import is_generator, is_pyodide
 
 if is_client or typing.TYPE_CHECKING:
     import _react as react
     import js
+    from _js_util import useDestroyContainedProxy
+
+if is_pyodide or typing.TYPE_CHECKING:
+    from pyodide.ffi import create_proxy
 
 log = getLogger("blu")
 
@@ -57,6 +61,7 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     Otherwise, ``callback`` will be called immediately after the element
     is initially rendered to the DOM.
     """
+    teardown_container = js.Array.new()
 
     def react_callback():
         log.debug("calling use_effect_callback")
@@ -66,17 +71,28 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
             log.debug("use_effect callback result is a generator.")
             next(result)
 
-            def ret():
+            def teardown():
                 try:
                     next(result)
                 except StopIteration:
                     pass
 
-            return ret
+            if is_pyodide:
+                ret = create_proxy(teardown)
+                teardown_container[0] = ret
+                return ret
+            else:
+                return teardown
         else:
             return js.undefined
 
-    react.useEffect(react_callback)
+    if is_pyodide:
+        callback_proxy = create_proxy(react_callback)
+        useDestroyProxy(callback_proxy)
+        useDestroyContainedProxy(teardown_container)
+        react.useEffect(callback_proxy)
+    else:
+        react.useEffect(react_callback)
 
 
 def use_state(init: T = None) -> tuple[T, Callable[[T], None]]:
@@ -118,6 +134,16 @@ def use_state(init: T = None) -> tuple[T, Callable[[T], None]]:
         render, the first item in the tuple will be ``init``.
 
     """
+    if is_pyodide:
+        return _use_state_pyodide(init)
+    else:
+        return _use_state_micropython(init)
+
+
+def _use_state_pyodide(init): ...
+
+
+def _use_state_micropython(init):
     return tuple(react.useState(init))
 
 
@@ -256,5 +282,16 @@ def use_ref(init: T = None) -> Ref[T]:
     ref = Ref()
     ref[:] = init
     ref._ref_proxy = _RefProxy(ref)
-    ref_ref = react.useRef(ref)
-    return ref_ref.current
+    if is_pyodide:
+        container_ref = react.useRef(js.Array.new())
+        proxy = create_proxy(ref)
+        ref_ref = react.useRef(proxy)
+        if ref_ref.current is proxy:
+            container_ref.current[0] = proxy
+        else:
+            proxy.destroy()
+        useDestroyContainedProxy(container_ref.current, js.Array.new())
+        return ref_ref.current.unwrap()
+    else:
+        ref_ref = react.useRef(ref)
+        return ref_ref.current

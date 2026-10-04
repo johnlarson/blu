@@ -128,7 +128,11 @@ def is_coroutine(obj):
 
 try:
     from pyodide.ffi import create_proxy
+
+    is_pyodide = True
 except ImportError:
 
     def create_proxy(obj):
         return obj
+
+    is_pyodide = False

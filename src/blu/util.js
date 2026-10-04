@@ -332,3 +332,27 @@ function isOfType(obj, pyClass) {
 function pyIs(obj1, obj2) {
   return obj1.__repr__() === obj2.__repr__()
 }
+
+export function useDestroyProxy(pyProxy, watch) {
+  useEffect(() => {
+    return () => {
+      pyProxy.destroy();
+    }
+  }, watch);
+}
+
+export function useDestroyContainedProxy(container, watch) {
+  useEffect(() => {
+    return () => {
+      container[0].destroy()
+    }
+  }, watch)
+}
+
+export function useDestroyRefProxy(ref, watch) {
+  useEffect(() => {
+    return () => {
+      ref.current.destroy()
+    }
+  }, watch)
+}

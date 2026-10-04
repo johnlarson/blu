@@ -20,7 +20,10 @@ from blu._utils import get_available_port
 
 HEADLESS = True
 
-type InterpreterArg = Literal["micropython", "pyodide"] | None
+
+@pytest.fixture(params=["micropython", "pyodide"])
+def interpreter(request: pytest.FixtureRequest) -> Generator[None, None, str]:
+    return request.param
 
 
 @pytest.fixture

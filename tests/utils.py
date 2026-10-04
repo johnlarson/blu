@@ -20,6 +20,8 @@ tests = Path(__file__).parent
 projects = tests / "projects"
 test_projects = projects
 
+type Interpreter = Literal["micropython", "pyodide"]
+
 type ClientFixture = Callable[[str], Awaitable[aiohttp.ClientSession]]
 
 

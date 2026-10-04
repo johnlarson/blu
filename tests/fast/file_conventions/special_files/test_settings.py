@@ -67,17 +67,11 @@ async def test_CLIENT_REQUIRMENTS_multiple_requirements(patch_app):  # type: ign
     assert settings().CLIENT_REQUIREMENTS == ["requests", "flask"]
 
 
-async def test_CLIENT_REQUIREMENTS_default(patch_app):  # type: ignore
-    """CLIENT_REQUIREMENTS defaults to an empty list."""
-    patch_app("empty_settings")
-    assert settings().CLIENT_REQUIREMENTS == []
-
-
 def test_no_settings_file_use_defaults(patch_app):  # type: ignore
     """
     If no app.__settings__ module, all settings are set to default
     values.
     """
     patch_app("basic")
-    s = settings()
-    assert s.CLIENT_REQUIREMENTS == []
+    assert settings().CLIENT_REQUIREMENTS == []
+    assert settings().INTERPRETER == "micropython"

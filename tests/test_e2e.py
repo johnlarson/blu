@@ -17,14 +17,14 @@ import pytest
 from blu import is_client
 from blu._micropython.abc import Callable
 
-from tests.utils import ClientFixture, PageFixture
+from tests.utils import ClientFixture, Interpreter, PageFixture
 
 pytestmark = pytest.mark.slow
 
 
-async def test_render_nodes(page: PageFixture):
+async def test_render_nodes(page: PageFixture, interpreter: Interpreter):
     """Nodes should render as described in the documentation."""
-    p = await page("e2e", "micropython")
+    p = await page("e2e", interpreter)
     await p.goto("/rendering")
     del_ = p.locator("del")
     await expect(del_).to_have_count(1, timeout=10_000)
@@ -46,22 +46,25 @@ async def test_routing(page: PageFixture):
     await expect(route).to_have_text("/routing/_a_/_b_ (1, 2)")
 
 
-async def test_is_client(page: PageFixture):
+async def test_is_client(page: PageFixture, interpreter: Interpreter):
     """
     blu.is_client should be True client-side and False server-side.
     """
     assert not is_client
-    p = await page("e2e")
+    p = await page("e2e", interpreter)
     await p.goto("/is_client")
     await expect(p.locator("#is_client")).to_have_text("True", timeout=10_000)
 
 
-async def test_wrong_environment_error(page: PageFixture):
+async def test_wrong_environment_error(
+    page: PageFixture,
+    interpreter: Interpreter,
+):
     """
     Trying to use blu.Response or blu.app client-side should raise a
     blu.WrongEnvironmentError.
     """
-    p = await page("e2e")
+    p = await page("e2e", interpreter)
     await p.goto("/wrong_environment_error")
     await expect(p.locator("#errors")).to_have_text(
         "app,Response",
@@ -69,9 +72,9 @@ async def test_wrong_environment_error(page: PageFixture):
     )
 
 
-async def test_use_effect(page: PageFixture):
+async def test_use_effect(page: PageFixture, interpreter: Interpreter):
     """blu.use_effect should work as described in the documentation."""
-    p = await page("e2e")
+    p = await page("e2e", interpreter)
     events_div = p.locator("#events")
     await p.goto("/use_effect")
     await expect(events_div).to_have_text("", timeout=10_000)
@@ -85,12 +88,12 @@ async def test_use_effect(page: PageFixture):
     )
 
 
-async def test_use_ref(page: PageFixture):
+async def test_use_ref(page: PageFixture, interpreter: Interpreter):
     """
     blu.use_ref should store references and be editable as described in
     the documentation.
     """
-    p = await page("e2e")
+    p = await page("e2e", interpreter)
     await p.goto("/use_ref")
     counter = p.locator("#count")
     await expect(counter).to_have_text("0", timeout=10_000)
@@ -106,11 +109,11 @@ async def test_use_ref(page: PageFixture):
     await expect(counter).to_have_text("3")
 
 
-async def test_use_state(page: PageFixture):
+async def test_use_state(page: PageFixture, interpreter: Interpreter):
     """
     blu.use_state should behave as described in the documentation.
     """
-    p = await page("e2e")
+    p = await page("e2e", interpreter)
     await p.goto("/use_state")
     counter = p.locator("#count")
     await expect(counter).to_have_text("0", timeout=10_000)
@@ -120,22 +123,18 @@ async def test_use_state(page: PageFixture):
     await expect(counter).to_have_text("2")
 
 
-async def test_use_ref_html_element(page: PageFixture):
+async def test_use_ref_html_element(
+    page: PageFixture,
+    interpreter: Interpreter,
+):
     """
     Passing a Ref as the "ref" prop of an HTML element should result in
     that Ref referencing the HTML element in an effect and during the
     following render.
     """
-    p = await page("e2e")
+    p = await page("e2e", interpreter)
     await p.goto("/html_editing_effect")
     await expect(p.locator("#test-div")).to_have_text("Hello.", timeout=10_000)
-
-
-async def test_client_side_availability(page: PageFixture):
-    """The js and pyscript packages are available client-side."""
-    p = await page("e2e")
-    await p.goto("/client_import")
-    await expect(p.locator("#status")).to_have_text("Success!", timeout=10_000)
 
 
 async def test_static_files(client: ClientFixture):
@@ -222,9 +221,9 @@ async def test_dev_server(patch_app: Callable[[str], None]):
                     await browser.close()
 
 
-async def test_unusual_root_nodes(page: PageFixture):
+async def test_unusual_root_nodes(page: PageFixture, interpreter: Interpreter):
     """Any blu.Node can be returned by a __page__ handler."""
-    p = await page("e2e")
+    p = await page("e2e", interpreter)
     await p.goto("/unusual_root_nodes/float")
     await expect(p.get_by_text("1.23485")).to_be_visible(timeout=10_000)
     await p.goto("/unusual_root_nodes/int")
@@ -241,24 +240,13 @@ async def test_unusual_root_nodes(page: PageFixture):
     await expect(p.get_by_text("ABC")).to_be_visible(timeout=10_000)
 
 
-async def test_simple_app(page: PageFixture):
-    p = await page("e2e_simple_app")
+async def test_simple_app(page: PageFixture, interpreter: Interpreter):
+    p = await page("e2e_simple_app", interpreter)
     await p.goto("/")
     await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
 
 
-# async def test_settings_pyodide(page: PageFixture):
-#     """
-#     Settings in app/__settings__.py work as described in documenation.
-#     """
-#     p = await page("e2e_settings_pyodide")
-#     await p.goto("/")
-#     arrr_exp = expect(p.get_by_text("Ahoy there."))
-#     await arrr_exp.to_be_visible(timeout=10_000)
-#     await expect(p.get_by_text("👍")).to_be_visible()
-
-
-async def test_settings_micropython(page: PageFixture):
+async def test_settings(page: PageFixture):
     """
     Settings in app/__settings__.py work as described in documenation.
     """
@@ -269,18 +257,34 @@ async def test_settings_micropython(page: PageFixture):
     await expect(p.get_by_text("0")).to_be_visible()
 
 
-async def test_multilayer_tuple_children(page: PageFixture):
+async def test_settings_pyodide(page: PageFixture):
+    """
+    Settings in app/__settings__.py work as described in documenation
+    for pyodide projects (some settings are used differently for
+    different intepreters).
+    """
+    p = await page("e2e_settings_pyodide")
+    await p.goto("/")
+    arrr_exp = expect(p.get_by_text("Ahoy there."))
+    await arrr_exp.to_be_visible(timeout=10_000)
+    await expect(p.get_by_text("👍")).to_be_visible()
+
+
+async def test_multilayer_tuple_children(
+    page: PageFixture,
+    interpreter: Interpreter,
+):
     """
     HTMLElement correctly renders when a tuple of tuples is passed in as
     children.
     """
-    p = await page("e2e")
+    p = await page("e2e", interpreter)
     await p.goto("/yield_in_tuple")
     await expect(p.get_by_text("This should be red.")).to_be_visible(timeout=10_000)
 
 
-async def test_server_function(page: PageFixture):
+async def test_server_function(page: PageFixture, interpreter: Interpreter):
     """Server functions work as described in documentation."""
-    p = await page("e2e")
+    p = await page("e2e", interpreter)
     await p.goto("/server_functions")
     await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)

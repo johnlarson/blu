@@ -8,7 +8,6 @@ except ImportError:
         globals(),
         [
             "Any",
-            "Generic",
             "IO",
             "List",
             "Literal",
@@ -27,3 +26,9 @@ except ImportError:
 
     def cast(_, x):  # type: ignore
         return x  # type: ignore
+
+    class _GenericClass:
+        def __getitem__(self, _):
+            return object
+
+    Generic = _GenericClass()

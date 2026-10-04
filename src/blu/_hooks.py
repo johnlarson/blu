@@ -128,7 +128,7 @@ def use_state(init: T = None) -> tuple[T, Callable[[T], None]]:
         render, the first item in the tuple will be ``init``.
 
     """
-    return tuple(useState(init))
+    return tuple(react.useState(init))
 
 
 class Ref(Generic[T]):
@@ -249,5 +249,5 @@ def use_ref(init: T = None) -> Ref[T]:
     """
     ref = Ref()
     ref[:] = init
-    ref_ref = useRef(ref)
+    ref_ref = react.useRef(ref)
     return ref_ref.current

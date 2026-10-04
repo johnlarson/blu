@@ -1,6 +1,10 @@
 from blu import client, use_effect, use_ref, use_state
 from blu.html import button, div
 
+from logging import getLogger
+
+log = getLogger("blu")
+
 __client__ = True
 
 
@@ -17,11 +21,13 @@ def EffectTest():
 
     @use_effect
     def _():
-        events_ref[:] = [*events_ref[:], "SETUP"]
-        yield
-        events_ref[:] = [*events_ref[:], "TEARDOWN"]
+        events_ref[:] = events_ref[:] + ["SETUP"]
+
+    #     yield
+    #     events_ref[:] = events_ref[:] + ["TEARDOWN"]
 
     def handle_button_click(e):
+        log.debug("Handling button click...")
         rerender(render_id + 1)
 
     return (

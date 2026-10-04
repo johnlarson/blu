@@ -2,6 +2,7 @@ import base64
 
 # from importlib import import_module
 import logging
+import micropip
 
 # import pickle
 from blu.mPickle import mpickle as pickle
@@ -27,7 +28,9 @@ PYTHON_TYPES = create_proxy(  # type: ignore
 )
 
 
-async def main():
+async def main(packages):
+    for package in packages:
+        await micropip.install(package)
     _blu_js_utils.init(import_module, is_generator)  # type: ignore
     b64_str: str = cast(str, document.querySelector('script[type="react-data"]').textContent)  # type: ignore
     b64_bytes = b64_str.encode("ascii")

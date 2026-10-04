@@ -250,7 +250,7 @@ async def test_settings(page: PageFixture):
     """
     Settings in app/__settings__.py work as described in documenation.
     """
-    p = await page("e2e_settings_micropython")
+    p = await page("e2e_settings")
     await p.goto("/")
     abc_exp = expect(p.get_by_text("ABC"))
     await abc_exp.to_be_visible(timeout=10_000)

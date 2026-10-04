@@ -58,11 +58,17 @@ async def _get_document(root: Node) -> ET.Element:
 
 
 def _get_bootstrap_script() -> ET.Element:
+    interpreter = settings().INTERPRETER
+    assert interpreter in ["micropython", "pyodide"]
+    if interpreter == "micropython":
+        bootstrap_script_name = "micropython-bootstrap.js"
+    else:
+        bootstrap_script_name = "pyodide-bootstrap.js"
     return ET.Element(
         "script",
         {
             "type": "module",
-            "src": "/_blu_internal/bootstrap.js",
+            "src": f"/_blu_internal/static/{bootstrap_script_name}",
         },
     )
 

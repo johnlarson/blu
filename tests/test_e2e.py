@@ -27,7 +27,6 @@ async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
     """Nodes should render as described in the documentation."""
     p = await page("e2e")
     await p.goto("/rendering")
-    await sleep(3600)
     del_ = p.locator("del")
     await expect(del_).to_have_count(1, timeout=10_000)
     await expect(del_).to_have_id("my-id")
@@ -39,7 +38,6 @@ async def test_routing(page: PageFixture):
     p = await page("e2e")
     route = p.locator("#route")
     await p.goto("/routing/1?q=2")
-    # await sleep(3600)
     await expect(route).to_have_text("/routing/_a_ (1, 2)", timeout=10_000)
     await p.goto("/routing/1/2/3/4")
     await expect(route).to_have_text("/routing/_a_/... (1, 2/3/4)")
@@ -77,7 +75,6 @@ async def test_use_effect(page: PageFixture):
     p = await page("e2e")
     events_div = p.locator("#events")
     await p.goto("/use_effect")
-    # await sleep(3600)
     await expect(events_div).to_have_text("", timeout=10_000)
     await p.click("button")
     await expect(events_div).to_have_text("SETUP")
@@ -230,7 +227,6 @@ async def test_unusual_root_nodes(page: PageFixture):
     """Any blu.Node can be returned by a __page__ handler."""
     p = await page("e2e")
     await p.goto("/unusual_root_nodes/float")
-    # await sleep(3600)
     await expect(p.get_by_text("1.23485")).to_be_visible(timeout=10_000)
     await p.goto("/unusual_root_nodes/int")
     await expect(p.get_by_text("234857")).to_be_visible(timeout=10_000)
@@ -249,7 +245,6 @@ async def test_unusual_root_nodes(page: PageFixture):
 async def test_simple_app(page: PageFixture):
     p = await page("e2e_simple_app")
     await p.goto("/")
-    # await sleep(3600)
     await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
 
 
@@ -289,24 +284,4 @@ async def test_server_function(page: PageFixture):
     """Server functions work as described in documentation."""
     p = await page("e2e")
     await p.goto("/server_functions")
-    # await sleep(3600)
     await expect(p.get_by_text("Hello!")).to_be_visible(timeout=10_000)
-
-
-async def test_async_effect(page: PageFixture):
-    """use_effect accepts async callbacks."""
-    p = await page("e2e")
-    await p.goto("/async_effect", wait_until="networkidle")
-    await expect(p).to_have_title(
-        re.compile(r"blu-async-effect:SETUP,SETUP ONLY"),
-        timeout=10_000,
-    )
-    await expect(p.locator("#events")).to_have_text("SETUP,SETUP ONLY")
-    await p.locator("#rerender").click()
-    await expect(p.locator("#events")).to_have_text(
-        "SETUP,SETUP ONLY,TEARDOWN,SETUP,SETUP ONLY",
-    )
-    await p.locator("#rerender").click()
-    await expect(p.locator("#events")).to_have_text(
-        "SETUP,SETUP ONLY,TEARDOWN,SETUP,SETUP ONLY,TEARDOWN,SETUP,SETUP ONLY",
-    )

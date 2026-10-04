@@ -9,7 +9,7 @@ from blu._micropython.utils import is_generator, is_pyodide
 if is_client or typing.TYPE_CHECKING:
     import _react as react
     import js
-    from _js_util import useDestroyContainedProxy
+    from _js_util import useDestroyContainedProxy, useDestroyProxy
 
 if is_pyodide or typing.TYPE_CHECKING:
     from pyodide.ffi import create_proxy
@@ -88,9 +88,9 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
 
     if is_pyodide:
         callback_proxy = create_proxy(react_callback)
+        react.useEffect(callback_proxy)
         useDestroyProxy(callback_proxy)
         useDestroyContainedProxy(teardown_container)
-        react.useEffect(callback_proxy)
     else:
         react.useEffect(react_callback)
 

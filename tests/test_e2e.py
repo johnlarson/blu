@@ -77,7 +77,6 @@ async def test_use_effect(page: PageFixture, interpreter: Interpreter):
     p = await page("e2e", interpreter)
     events_div = p.locator("#events")
     await p.goto("/use_effect")
-    await sleep(3600)
     await expect(events_div).to_have_text("", timeout=10_000)
     await p.click("button")
     await expect(events_div).to_have_text("SETUP")

@@ -22,9 +22,9 @@ def EffectTest():
     @use_effect
     def _():
         events_ref[:] = events_ref[:] + ["SETUP"]
-
-    #     yield
-    #     events_ref[:] = events_ref[:] + ["TEARDOWN"]
+        log.debug("Called use_effect callback in use_effect test.")
+        yield
+        events_ref[:] = events_ref[:] + ["TEARDOWN"]
 
     def handle_button_click(e):
         log.debug("Handling button click...")

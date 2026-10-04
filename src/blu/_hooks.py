@@ -1,11 +1,16 @@
+from logging import getLogger
+
 from blu._utils import is_client
-from blu._micropython.abc import AsyncGenerator, Callable, Coroutine, Generator
+from blu._micropython.abc import Callable, Generator
 from blu._micropython import typing
 from blu._micropython.typing import Generic, TypeVar
-from blu._micropython.utils import is_async_generator, is_coroutine, is_generator
+from blu._micropython.utils import is_generator
 
 if is_client or typing.TYPE_CHECKING:
     import _react as react
+    import js
+
+log = getLogger("blu")
 
 # if is_client or typing.TYPE_CHECKING:
 #     from pyscript.js_modules._blu_js_utils import useEffect, useRefObj, useState
@@ -13,15 +18,7 @@ if is_client or typing.TYPE_CHECKING:
 T = TypeVar("T")
 
 
-def use_effect(
-    callback: Callable[
-        [],
-        None
-        | Generator[None]
-        | Coroutine[None, None, None]
-        | AsyncGenerator[None, None],
-    ],
-):
+def use_effect(callback: Callable[[], None | Generator[None]]):
     """
     .. include:: /_includes/hook-note.rst
 
@@ -61,21 +58,12 @@ def use_effect(
     is initially rendered to the DOM.
     """
 
-    async def react_callback():
+    def react_callback():
+        log.debug("calling use_effect_callback")
         result = callback()
-        if is_async_generator(result):
-            await anext(result)
-
-            async def ret():
-                try:
-                    await anext(result)
-                except StopAsyncIteration:
-                    pass
-
-            return ret
-        elif is_coroutine(result):
-            await result
-        elif is_generator(result):
+        log.debug("called use_effect_callback")
+        if is_generator(result):
+            log.debug("use_effect callback result is a generator.")
             next(result)
 
             def ret():
@@ -85,6 +73,8 @@ def use_effect(
                     pass
 
             return ret
+        else:
+            return js.undefined
 
     react.useEffect(react_callback)
 

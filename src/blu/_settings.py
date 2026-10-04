@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field, fields
 import functools
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 
 @functools.cache
@@ -26,5 +26,5 @@ def default[T](factory: Callable[[], Any]):
 
 @dataclass
 class Settings:
-
     CLIENT_REQUIREMENTS: list[str] = default(lambda: [])
+    INTERPRETER: Literal["micropython", "pyodide"] = "micropython"

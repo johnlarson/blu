@@ -268,7 +268,7 @@ export function useRefObj(pyRef) {
   return refRef.current;
 }
 
-function refProxy(pyRef) {
+export function refProxy(pyRef) {
   return {
     set current(newValue) {
       pyRef._value = newValue;

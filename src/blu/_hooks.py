@@ -130,7 +130,7 @@ class _RefProxy(Generic[T]):
 
     @current.setter
     def current(self, new_value: T):
-        self._ref[:] = new_value
+        self._ref._value = new_value
 
     def __init__(self, ref: "Ref[T]"):
         self._ref = ref
@@ -257,5 +257,4 @@ def use_ref(init: T = None) -> Ref[T]:
     ref[:] = init
     ref._ref_proxy = _RefProxy(ref)
     ref_ref = react.useRef(ref)
-    ref._ref_proxy = ref_ref
     return ref_ref.current

@@ -132,7 +132,6 @@ async def test_use_ref_html_element(page: PageFixture):
     """
     p = await page("e2e")
     await p.goto("/html_editing_effect")
-    await sleep(3600)
     await expect(p.locator("#test-div")).to_have_text("Hello.", timeout=10_000)
 
 

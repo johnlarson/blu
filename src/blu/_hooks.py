@@ -121,6 +121,21 @@ def use_state(init: T = None) -> tuple[T, Callable[[T], None]]:
     return tuple(react.useState(init))
 
 
+class _RefProxy(Generic[T]):
+    _ref: "Ref[T]"
+
+    @property
+    def current(self) -> T:
+        return self._ref[:]
+
+    @current.setter
+    def current(self, new_value: T):
+        self._ref[:] = new_value
+
+    def __init__(self, ref: "Ref[T]"):
+        self._ref = ref
+
+
 class Ref(Generic[T]):
     """
     The object returned by :func:`blu.use_ref`.
@@ -140,6 +155,7 @@ class Ref(Generic[T]):
     """
 
     _value: T
+    _ref_proxy: _RefProxy[T]
 
     def __getitem__(self, empty_slice: slice) -> T:
         """
@@ -239,5 +255,7 @@ def use_ref(init: T = None) -> Ref[T]:
     """
     ref = Ref()
     ref[:] = init
+    ref._ref_proxy = _RefProxy(ref)
     ref_ref = react.useRef(ref)
+    ref._ref_proxy = ref_ref
     return ref_ref.current

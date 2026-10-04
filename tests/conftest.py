@@ -6,7 +6,8 @@ from pathlib import Path
 import shutil
 import sys
 from tempfile import TemporaryDirectory
-from typing import Generator
+from types import ModuleType
+from typing import Generator, Literal
 
 import aiohttp
 from playwright.async_api import async_playwright, Page
@@ -19,6 +20,8 @@ from blu._utils import get_available_port
 
 HEADLESS = True
 
+type InterpreterArg = Literal["micropython", "pyodide"] | None
+
 
 @pytest.fixture
 async def page(
@@ -29,8 +32,11 @@ async def page(
         chromium = playwright.chromium
         browser = await chromium.launch(headless=HEADLESS)
 
-        async def ret(app_name: str) -> Page:
-            patch_app(app_name)
+        async def ret(
+            app_name: str,
+            interpreter: Literal["micropython", "pyodide"] | None = None,
+        ) -> Page:
+            patch_app(app_name, interpreter)
             base_url = await server()
             context = await browser.new_context(base_url=base_url)
             page = await context.new_page()
@@ -114,13 +120,16 @@ def patch_app(patch_project_dir):  # type: ignore
     with TemporaryDirectory() as temp_dir_str:
         temp_dir = Path(temp_dir_str)
 
-        def handler(app_name: str):
+        def handler(
+            app_name: str,
+            interpreter: Literal["micropython", "pyodide"] | None = None,
+        ):
             for path in temp_dir.iterdir():
                 shutil.rmtree(path)
             src_path = TESTS_DIR / "apps" / app_name
             ln_path = temp_dir / "app"
             ln_path.symlink_to(src_path)
-            patch_project_dir(temp_dir)
+            patch_project_dir(temp_dir, interpreter)
 
         yield handler
 
@@ -135,13 +144,29 @@ def patch_project(patch_project_dir):  # type: ignore
 
 @pytest.fixture
 def patch_project_dir(monkeypatch: pytest.MonkeyPatch):
-    def handler(path: Path):
+    def handler(
+        path: Path,
+        interpreter: Literal["micropython", "pyodide"] | None = None,
+    ):
         importlib.reload(_app)
         to_delete = [x for x in sys.modules if x == "app" or x.startswith("app.")]
         for name in to_delete:
             del sys.modules[name]
         monkeypatch.syspath_prepend(path)  # type: ignore
         monkeypatch.chdir(path)
+        if interpreter is not None:
+            try:
+                from app import __settings__
+            except ImportError:
+                settings_module = ModuleType("app.__settings__")
+                sys.modules["app.__settings__"] = settings_module
+                from app import __settings__
+            monkeypatch.setattr(
+                __settings__,
+                "INTERPRETER",
+                interpreter,
+                raising=False,
+            )
         settings.cache_clear()
         _get_app_def.cache_clear()
         _get_router.cache_clear()

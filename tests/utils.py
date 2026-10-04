@@ -1,5 +1,6 @@
 from collections.abc import Awaitable, Callable
 import importlib
+from typing import Literal, Protocol
 from unittest import mock
 
 from contextlib import contextmanager
@@ -21,7 +22,13 @@ test_projects = projects
 
 type ClientFixture = Callable[[str], Awaitable[aiohttp.ClientSession]]
 
-type PageFixture = Callable[[str], Awaitable[Page]]
+
+class PageFixture(Protocol):
+    async def __call__(
+        self,
+        app_name: str,
+        interpreter: Literal["micropython", "pyodide"] | None = None,
+    ): ...
 
 
 async def receive() -> asgi.ReceiveEvent:

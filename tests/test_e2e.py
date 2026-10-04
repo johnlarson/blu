@@ -11,21 +11,20 @@ import time
 
 from playwright.async_api import (
     async_playwright,
-    Page,
     expect,
 )
 import pytest
 from blu import is_client
-from blu._micropython.abc import Awaitable, Callable
+from blu._micropython.abc import Callable
 
 from tests.utils import ClientFixture, PageFixture
 
 pytestmark = pytest.mark.slow
 
 
-async def test_render_nodes(page: Callable[[str], Awaitable[Page]]):
+async def test_render_nodes(page: PageFixture):
     """Nodes should render as described in the documentation."""
-    p = await page("e2e")
+    p = await page("e2e", "micropython")
     await p.goto("/rendering")
     del_ = p.locator("del")
     await expect(del_).to_have_count(1, timeout=10_000)

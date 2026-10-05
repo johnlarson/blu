@@ -240,7 +240,8 @@ async def _fetch(url: str, method: str, body: str, headers: Mapping[str, str]) -
 
     js_headers = js.Object.new()
     for k, v in headers.items():
-        js_headers[k] = v
+        # js_headers[k] = v
+        setattr(js_headers, k, v)
     return await js.fetch(
         url,
         {

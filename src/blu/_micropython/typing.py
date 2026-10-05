@@ -32,3 +32,5 @@ except ImportError:
             return object
 
     Generic = _GenericClass()
+
+    TYPE_CHECKING = False

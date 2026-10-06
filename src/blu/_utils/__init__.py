@@ -5,7 +5,7 @@ from blu._utils.asyncio import io_bound
 from blu._utils.client import is_client
 from blu._micropython.typing import Any, cast
 
-from blu.mPickle import mpickle as pickle
+from blu._mPickle import mpickle as pickle
 
 if not is_client:
     import shutil

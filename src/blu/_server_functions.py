@@ -8,7 +8,7 @@ import functools
 import inspect
 import json
 from blu._micropython.utils import tuple_combine
-from blu.mPickle import mpickle as pickle
+from blu._mPickle import mpickle as pickle
 from pathlib import Path
 
 from blu._micropython.abc import Awaitable, Callable, Sequence

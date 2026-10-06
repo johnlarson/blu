@@ -159,13 +159,13 @@ def patch_project_dir(monkeypatch: pytest.MonkeyPatch):
         monkeypatch.chdir(path)
         if interpreter is not None:
             try:
-                from app import __settings__
+                from app import __settings__  # type: ignore
             except ImportError:
                 settings_module = ModuleType("app.__settings__")
                 sys.modules["app.__settings__"] = settings_module
-                from app import __settings__
+                from app import __settings__  # type: ignore
             monkeypatch.setattr(
-                __settings__,
+                __settings__,  # type: ignore
                 "INTERPRETER",
                 interpreter,
                 raising=False,

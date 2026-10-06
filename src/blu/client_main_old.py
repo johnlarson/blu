@@ -5,7 +5,7 @@ import logging
 import micropip
 
 # import pickle
-from blu.mPickle import mpickle as pickle
+from blu._mPickle import mpickle as pickle
 
 from js import document  # type: ignore
 from pyodide.ffi import create_proxy, to_js  # type: ignore

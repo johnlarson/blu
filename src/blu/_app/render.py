@@ -3,7 +3,7 @@ from io import StringIO
 from pathlib import Path
 
 # import pickle
-from blu.mPickle import mpickle as pickle
+from blu._mPickle import mpickle as pickle
 from blu._settings import settings
 from blu._micropython.typing import Optional
 from xml.etree import ElementTree as ET

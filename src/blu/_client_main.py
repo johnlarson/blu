@@ -4,7 +4,7 @@ import base64
 import logging
 
 # import pickle
-from blu.mPickle import mpickle as pickle
+from blu._mPickle import mpickle as pickle
 
 import js  # type: ignore
 

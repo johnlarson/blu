@@ -16,9 +16,9 @@ from blu._micropython.typing import (
 from blu._micropython.utils import import_module, mapping_combine
 from blu._utils.client import is_client
 
-P = ParamSpec("P")
-
 log = getLogger("blu")
+
+P = ParamSpec("P")
 
 Number: TypeAlias = Union[int, float]
 

@@ -2,7 +2,7 @@
 // import * as zipJs from 'https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.11.4/+esm';
 
 import 'https://cdn.jsdelivr.net/pyodide/v314.0.6/full/pyodide.js';
-import * as util from '/_blu_internal/util.js';
+import * as util from '/_blu_internal/static/util.js';
 
 import * as react from 'https://esm.sh/react';
 import * as reactDom from 'https://esm.sh/react-dom/client';
@@ -25,7 +25,7 @@ async function bootstrapPyodide() {
     // ...config.packages.map(x => pyodide.loadPackage(x)),
   ]);
   console.log('Packages added.');
-  await pyodide.pyimport('blu.client_main_old').main(config.packages)
+  await pyodide.pyimport('blu._client_main_pyodide').main(config.packages)
   // await pyodide.pyimport('blu._client_main').main()
 }
 

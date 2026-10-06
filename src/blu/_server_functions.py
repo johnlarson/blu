@@ -7,13 +7,12 @@ import base64
 import functools
 import inspect
 import json
-from blu._micropython.utils import tuple_combine
-from blu._mPickle import mpickle as pickle
 from pathlib import Path
 
 from blu._micropython.abc import Awaitable, Callable, Sequence
 from blu._micropython.typing import Any, ParamSpec, TypeVar
-from blu._micropython.utils import import_module
+from blu._micropython.utils import import_module, tuple_combine
+from blu._mPickle import mpickle as pickle
 from blu._utils.client import is_client
 
 P = ParamSpec("P")
@@ -210,18 +209,9 @@ async def _invoke_server_function_remote(
     args: tuple[Any, ...],
     kwargs: dict[str, Any],
 ) -> Any:
-    # from pyodide.http import pyfetch  # type: ignore
-
     payload = json.dumps(
         {"module": module, "name": name, "args": list(args), "kwargs": kwargs}
     )
-    # response = await pyfetch(
-    #     "/_blu_internal/server_function",
-    #     method="POST",
-    #     body=payload,
-    #     headers={"Content-Type": "application/json"},
-    # )
-    # text = await response.string()
     response = await _fetch(
         "/_blu_internal/server_function",
         method="POST",
@@ -240,7 +230,6 @@ async def _fetch(url: str, method: str, body: str, headers: Mapping[str, str]) -
 
     js_headers = js.Object.new()
     for k, v in headers.items():
-        # js_headers[k] = v
         setattr(js_headers, k, v)
     return await js.fetch(
         url,

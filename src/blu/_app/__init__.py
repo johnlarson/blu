@@ -93,10 +93,6 @@ async def _http(
         subpath = scope["path"].removeprefix("/_blu_internal/static/")
         await _serve_blu_static_file(subpath, send)
         return
-    if scope["path"] == "/_blu_internal/util.js":
-        path = Path(__file__).parent.parent / "util.js"
-        await _serve_file(path, JS_MIME, send)
-        return
     if scope["path"] == "/_blu_internal/micropython.mjs":
         path = Path(__file__).parent.parent / "micropython.mjs"
         await _serve_file(path, JS_MIME, send)

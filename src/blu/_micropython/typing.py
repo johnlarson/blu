@@ -33,4 +33,4 @@ except ImportError:
 
     Generic = _GenericClass()
 
-    TYPE_CHECKING = False
+    TYPE_CHECKING = False  # type: ignore

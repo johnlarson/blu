@@ -8,26 +8,23 @@ from blu._mPickle import mpickle as pickle
 
 import js  # type: ignore
 
-# from pyscript.ffi import create_proxy, to_js  # type: ignore
 import _react as react
 import _react_dom as react_dom
 
 from blu._nodes import ClientElement, HTMLElement, Key
 from blu._micropython.typing import cast
-from blu._micropython.utils import is_generator, is_iterable, create_proxy
+from blu._micropython.utils import is_generator, is_iterable
 
 logging.basicConfig(level=logging.DEBUG)
 
 log = logging.getLogger("blu")
 
-PYTHON_TYPES = create_proxy(  # type: ignore
-    {
-        "ClientElement": ClientElement,
-        "Key": Key,
-        "tuple": tuple,
-        "HTMLElement": HTMLElement,
-    }
-)
+PYTHON_TYPES = {  # type: ignore
+    "ClientElement": ClientElement,
+    "Key": Key,
+    "tuple": tuple,
+    "HTMLElement": HTMLElement,
+}
 
 
 async def main():

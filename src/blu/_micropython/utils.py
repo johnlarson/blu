@@ -46,23 +46,11 @@ class _TypeClassStub:
         return (NoopClass,)
 
 
-class _TypeClassStubOld:
-    __slots__ = ()
-
-    def __class_getitem__(cls, item):
-        return cls
-
-
 def type_import(scope, type_stub_names, type_class_stub_names):
     for type_stub_name in type_stub_names:
         scope[type_stub_name] = _TypeStub()
     for type_class_stub_name in type_class_stub_names:
         scope[type_class_stub_name] = _TypeClassStub()
-
-
-def _import_all(module_name, scope):
-    module = import_module(module_name)
-    scope.update({k: v for k, v in module.__dict__.items() if not k.startswith("_")})
 
 
 def import_module(module_name):

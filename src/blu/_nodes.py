@@ -663,10 +663,6 @@ def create_html_element(tagname: str) -> HTMLElement:
     return HTMLElement(tagname, {}, [])
 
 
-if is_client:
-    from blu._micropython.utils import create_proxy  # type: ignore
-
-
 def client(renderer: ClientRenderer) -> ClientElement:
     """
     Decorator that converts a rendering function into a

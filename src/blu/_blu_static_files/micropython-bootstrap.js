@@ -58,7 +58,7 @@ print('2')
 x = a['Hello',]
 print('value:', x)
 `)
-  await mp.pyimport('blu._client_main').main();
+  await mp.pyimport('blu._client_main.micropython').main();
 }
 
 async function addPackageMicroPython(url, dest, mp) {

@@ -14,12 +14,9 @@ if is_client or typing.TYPE_CHECKING:
 if is_pyodide or typing.TYPE_CHECKING:
     from pyodide.ffi import create_proxy
 
-log = getLogger("blu")
-
-# if is_client or typing.TYPE_CHECKING:
-#     from pyscript.js_modules._blu_js_utils import useEffect, useRefObj, useState
-
 T = TypeVar("T")
+
+log = getLogger("blu")
 
 
 def use_effect(callback: Callable[[], None | Generator[None]]):
@@ -52,14 +49,14 @@ def use_effect(callback: Callable[[], None | Generator[None]]):
     :param callback: A non-generator function or a generator function
         with a single ``yield`` statement.
 
-    If ``callback`` is a generator function or async generator function,
-    it will be run right up until the ``yield`` statement immediately
-    after the element is initially rendered to the DOM. The rest of the
-    function will be run immediately before the element is removed from
-    the DOM.
+    If ``callback`` is a generator function, it will be run right up
+    until the ``yield`` statement immediately after each time the
+    element is rendered. The rest of the function will be run
+    immediately before the element is re-rendered or removed from the
+    DOM.
 
-    Otherwise, ``callback`` will be called immediately after the element
-    is initially rendered to the DOM.
+    Otherwise, ``callback`` will be called immediately after each time
+    the element is rendered.
     """
     teardown_container = js.Array.new()
 

@@ -25,7 +25,7 @@ async function bootstrapPyodide() {
     // ...config.packages.map(x => pyodide.loadPackage(x)),
   ]);
   console.log('Packages added.');
-  await pyodide.pyimport('blu._client_main_pyodide').main(config.packages)
+  await pyodide.pyimport('blu._client_main.pyodide').main(config.packages)
   // await pyodide.pyimport('blu._client_main').main()
 }
 

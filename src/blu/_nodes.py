@@ -261,14 +261,6 @@ class HTMLElement:
 def _get_children(index: Node | tuple[Node, ...]) -> list[Node]:
     log.debug("Processing input children...")
     log.debug(f"Input children: {repr(index)}")
-    if is_client:
-        try:
-            from pyodide.ffi import JsProxy
-
-            if isinstance(index, JsProxy):
-                index = cast(Node, index.unwrap())
-        except ImportError:
-            pass
     if isinstance(index, tuple):
         children = list(index)
     else:
@@ -278,14 +270,6 @@ def _get_children(index: Node | tuple[Node, ...]) -> list[Node]:
 
 def _convert_to_string(item: Node) -> Node:
     str_types = (float, bool)
-    if is_client:
-        try:
-            from pyodide.ffi import jsnull
-
-            if item == jsnull:
-                return str(item)
-        except ImportError:
-            pass
     if isinstance(item, str_types):
         return str(item)
     else:

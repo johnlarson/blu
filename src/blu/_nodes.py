@@ -772,7 +772,4 @@ def client(renderer: ClientRenderer) -> ClientElement:
         <span style='color: red'></span>
 
     """
-    element = ClientElement(renderer, (), {}, [], None, False)
-    if is_client:
-        create_proxy(element)  # type: ignore
-    return element
+    return ClientElement(renderer, (), {}, [], None, False)

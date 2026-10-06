@@ -1,167 +1,28 @@
 import base64
-
-# from importlib import import_module
+from js import document  # type: ignore
 import logging
 import micropip
 
-# import pickle
-from blu._mPickle import mpickle as pickle
-
-from js import document  # type: ignore
-from pyodide.ffi import create_proxy, to_js  # type: ignore
-import _react as react
 import _js_util as _blu_js_utils
-
-from blu._nodes import ClientRenderer, ClientElement, HTMLElement, Jsonable, Node, Key
-from blu._micropython.typing import Any, TypedDict, cast
+from blu._micropython.typing import cast
 from blu._micropython.utils import import_module
+from blu._mPickle import mpickle as pickle
 
 logging.basicConfig(level=logging.DEBUG)
 
-PYTHON_TYPES = create_proxy(  # type: ignore
-    {
-        "ClientElement": ClientElement,
-        "Key": Key,
-        "tuple": tuple,
-        "HTMLElement": HTMLElement,
-    }
-)
-
 
 async def main(packages):
-    for package in packages:
-        await micropip.install(package)
+    for package in packages:  # type: ignore
+        await micropip.install(package)  # type: ignore
     _blu_js_utils.init(import_module, is_generator)  # type: ignore
-    b64_str: str = cast(str, document.querySelector('script[type="react-data"]').textContent)  # type: ignore
+    b64_str: str = cast(
+        str,
+        document.querySelector('script[type="react-data"]').textContent,  # type: ignore
+    )
     b64_bytes = b64_str.encode("ascii")
     pickled = base64.b64decode(b64_bytes)
-    unpickled = pickle.loads(pickled)
+    unpickled = pickle.loads(pickled)  # type: ignore
     _blu_js_utils.renderRoot(unpickled)  # type: ignore
-
-
-def get_node(data: Any):
-    if isinstance(data, ClientElement):
-        return react.createElement(
-            PythonElement,
-            to_js(
-                {
-                    "renderer": create_proxy(data._renderer),
-                    "args": data._args,
-                    "kwargs": data._kwargs,
-                    "py_children": data._children,
-                }
-            ),
-        )
-    elif isinstance(data, Key):
-        props = {"key": data["key"]}
-        return react.createElement(
-            react.Fragment,
-            to_js({"key": data._key}),
-            *get_array(data._children),
-        )
-    elif isinstance(data, tuple):
-        return react.createElement(
-            react.Fragment,
-            to_js({}),
-            *get_array(data),
-        )
-    elif isinstance(data, str):
-        return data
-    elif is_iterable(data):
-        return get_array(data)
-    elif isinstance(data, HTMLElement):
-        props = {k: v for k, v in data._attrs.items() if k != "ref"}
-        if "ref" in data._attrs.keys():
-            props["ref"] = data._attrs["ref"]._js_ref
-        return react.createElement(
-            data._tagname,
-            to_js(props),
-            *get_array(data._children),
-        )
-    elif data is None:
-        return None
-    else:
-        return str(data)
-
-
-def get_obj(obj: dict[str, Any]):
-    return {k: get_node(v) for k, v in obj.items()}
-
-
-def get_dict(my_dict: dict):
-    return {k: get_node(v) for k, v in my_dict.items()}
-
-
-def get_array(array: Any):
-    return to_js([get_node(x) for x in array])
-
-
-class PythonElementProps(TypedDict):
-    renderer: ClientRenderer
-    args: tuple[Jsonable, ...]
-    kwargs: dict[str, Jsonable]
-    py_children: list[Node]
-
-
-@create_proxy
-def PythonElement(props: PythonElementProps, extra: Any = None):
-    result = props.renderer(*props.args, **props.kwargs.as_object_map())
-    if is_generator(result):
-        next(result)
-        try:
-            result.send(props.py_children)
-        except StopIteration as e:
-            return get_node(e.value)
-    elif is_async_generator(result):
-        raise TypeError(
-            "ClientElements cannot be created from async rendering functions."
-        )
-    else:
-        return get_node(result)
-
-
-def py_to_js_node(py_node: Node):
-    if isinstance(py_node, ClientElement):
-        return react.createElement(
-            PythonElement,
-            to_js(
-                {
-                    "renderer": create_proxy(py_node.renderer),
-                    "args": py_node.args,
-                    "kwargs": py_node.kwargs,
-                    "py_children": py_node.children,
-                }
-            ),
-        )
-    elif isinstance(py_node, HTMLElement):
-        return react.createElement(
-            py_node.tagname,
-            to_js(
-                {
-                    k: create_proxy(v) if k.startswith("on") else v
-                    for k, v in py_node.props.items()
-                }
-            ),
-            *py_node.children,
-        )
-
-
-def parse_py_element(data: dict[str, Any]):
-    return ClientElement(
-        get_renderer(data),
-        get_array(data["args"]),
-        get_obj(data["kwargs"]),
-        get_node(data["children"]),
-    )
-
-
-def get_renderer(data: Any) -> ClientRenderer:
-    module = import_module(data["module"])
-    return getattr(module, data["name"])
-
-
-def is_iterable(obj):
-    return hasattr(obj, "__iter__")
 
 
 def is_generator(obj):
@@ -174,14 +35,4 @@ def is_generator(obj):
     )
 
 
-def is_async_generator(obj):
-    return (
-        hasattr(obj, "__aiter__")
-        and hasattr(obj, "__anext__")
-        and hasattr(obj, "asend")
-        and hasattr(obj, "athrow")
-        and hasattr(obj, "aclose")
-    )
-
-
-# await main()
+__all__ = ["main"]

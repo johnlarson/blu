@@ -1,16 +1,10 @@
-import base64
-
-# from importlib import import_module
-import logging
-
-# import pickle
-from blu._mPickle import mpickle as pickle
-
-import js  # type: ignore
-
 import _react as react
 import _react_dom as react_dom
+import base64
+import logging
+import js  # type: ignore
 
+from blu._mPickle import mpickle as pickle
 from blu._nodes import ClientElement, HTMLElement, Key
 from blu._micropython.typing import cast
 from blu._micropython.utils import is_generator, is_iterable
@@ -19,23 +13,16 @@ logging.basicConfig(level=logging.DEBUG)
 
 log = logging.getLogger("blu")
 
-PYTHON_TYPES = {  # type: ignore
-    "ClientElement": ClientElement,
-    "Key": Key,
-    "tuple": tuple,
-    "HTMLElement": HTMLElement,
-}
-
 
 async def main():
-    # _blu_js_utils.init(import_module)  # type: ignore
-    b64_str: str = cast(str, js.document.querySelector('script[type="react-data"]').textContent)  # type: ignore
+    b64_str: str = cast(
+        str,
+        js.document.querySelector('script[type="react-data"]').textContent,  # type: ignore
+    )
     b64_bytes = b64_str.encode("ascii")
     pickled = base64.b64decode(b64_bytes)
     unpickled = pickle.loads(pickled)
     log.debug(f"Python root node: {unpickled}")
-
-    # _blu_js_utils.renderRoot(unpickled)  # type: ignore
     render_root(unpickled)
 
 
@@ -50,8 +37,6 @@ def render_root(py_root):
 
 def get_react_node(py_node):
     log.debug(f"Converting python node {repr(py_node)} to React...")
-    print("__iter__:", getattr(py_node, "__iter__", None))
-    print("is list:", isinstance(py_node, list))
     if isinstance(py_node, ClientElement):
         log.debug("Python node is a ClientElement")
         return react.createElement(
@@ -99,8 +84,6 @@ def ReactComponent(props):
     kwargs = props["kwargs"]
     py_children = list(props["pyChildren"])
     result = renderer(*args, **kwargs)
-    print("result:", result)
-    print("is_generator:", is_generator(result))
     if is_generator(result):
         next(result)
         try:
@@ -113,7 +96,6 @@ def ReactComponent(props):
     else:
         py_node = result
     react_node = get_react_node(py_node)
-    js.console.log("React node:", react_node)
     return react_node
 
 
@@ -141,8 +123,6 @@ def get_react_html_element(py_node):
         attrs["ref"] = py_node._attrs["ref"]._ref_proxy
     return react.createElement(
         py_node._tagname,
-        # attrs,
-        # to_js(attrs),
         attrs_to_js(attrs),
         *get_array(py_node._children),
     )

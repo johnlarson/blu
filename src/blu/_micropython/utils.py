@@ -81,11 +81,6 @@ def is_iterable(obj):
 
 
 def is_generator(obj):
-    print("__iter__", hasattr(obj, "__iter__"))
-    print("__next__", hasattr(obj, "__next__"))
-    print("send", hasattr(obj, "send"))
-    print("throw", hasattr(obj, "throw"))
-    print("close", hasattr(obj, "close"))
     return (
         is_iterable(obj)
         and hasattr(obj, "__next__")

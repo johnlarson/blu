@@ -171,7 +171,6 @@ name = "blu-react"
 version = "0.0.2"
 source = { editable = "." }
 dependencies = [
-    { name = "aiofiles" },
     { name = "uvicorn" },
 ]
 
@@ -199,10 +198,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "aiofiles" },
-    { name = "uvicorn" },
-]
+requires-dist = [{ name = "uvicorn" }]
 
 [package.metadata.requires-dev]
 dev = [

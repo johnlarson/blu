@@ -13,10 +13,7 @@ classifiers = [
 ]
 license = "MIT"
 license-files = ["LICENSE"]
-dependencies = [
-    "aiofiles",
-    "uvicorn",
-]
+dependencies = ["uvicorn"]
 
 [project.urls]
 Homepage = "https://github.com/johnlarson/blu"

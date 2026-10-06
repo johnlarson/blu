@@ -85,21 +85,9 @@ async def _http(
         path = _python_zip_dir() / "blu.zip"
         await _serve_file(path, ZIP_MIME, send)
         return
-    if scope["path"] == "/_blu_internal/client_main.py":
-        path = Path(__file__).parent / "client_main.py"
-        await _serve_file(path, PYTHON_MIME, send)
-        return
     if scope["path"].startswith("/_blu_internal/static/"):
         subpath = scope["path"].removeprefix("/_blu_internal/static/")
         await _serve_blu_static_file(subpath, send)
-        return
-    if scope["path"] == "/_blu_internal/micropython.mjs":
-        path = Path(__file__).parent.parent / "micropython.mjs"
-        await _serve_file(path, JS_MIME, send)
-        return
-    if scope["path"] == "/_blu_internal/bootstrap.js":
-        path = Path(__file__).parent.parent / "bootstrap.js"
-        await _serve_file(path, JS_MIME, send)
         return
     if scope["path"] == "/_blu_internal/server_function":
         if scope["method"] != "POST":

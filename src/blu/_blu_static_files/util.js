@@ -347,11 +347,3 @@ export function useDestroyContainedProxy(container, watch) {
     }
   }, watch)
 }
-
-export function useDestroyRefProxy(ref, watch) {
-  React.useEffect(() => {
-    return () => {
-      ref.current.destroy()
-    }
-  }, watch)
-}

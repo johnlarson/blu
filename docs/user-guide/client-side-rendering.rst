@@ -355,7 +355,7 @@ What's happening here:
 Accessing Server-Side Resources from the Client
 -----------------------------------------------
 
-Sometimes you'll need to access server-side resources after a page has loaded, usually in response to user input. You can do using the :func:`@blu.server` decorator, which exposes a server-side function to be called client-side.
+Sometimes you'll need to access server-side resources after a page has loaded, usually in response to user input. You can do so using the :func:`@blu.server` decorator, which exposes a server-side function to be called client-side.
 
 .. code-block:: python
     :caption: app/hello_module.py

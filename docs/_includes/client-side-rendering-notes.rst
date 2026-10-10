@@ -43,6 +43,17 @@
 
 .. note::
 
+    By default, Python code that runs on the client is run by the MicroPython interpreter. This means some features of Python are unavailable to modules that are used client-side. You can choose to use a more fully-featured but slower-loading Python interpreter called Pyodide by adding the following to ``app/__settings__.py``:
+
+    .. code-block:: python
+        :caption: app/__settings__.py
+
+        INTERPRETER = 'pyodide'
+
+    For more information, see :doc:`/appendices/choosing-an-interpreter`
+
+.. note::
+
     Client-side code runs in a different environment than server-side code. If your client-side code uses an external library, make sure it is installed in the client environment by adding it to the list of client dependencies in ``app/__settings__.py`` (if the ``__settings__.py`` doesn't exist, create it)::
 
         app/
@@ -52,7 +63,7 @@
     .. code-block:: python
         :caption: app/__index__.py
 
-        import arrr
+        import base64
         from blu import client
 
         __client__ = True
@@ -64,15 +75,16 @@
 
         @client
         def MyClientElement():
-            return p[
-                arrr.translate('Hello there. How are you?')
+            return div[
+                p['Message: Hello, World!'],
+                p['Base64-encoded:', base64.encode('Hello, World!')],
             ]
 
 
     .. code-block:: python
         :caption: app/__settings__.py
 
-        CLIENT_REQUIREMENTS = ['arrr']
+        CLIENT_REQUIREMENTS = ['base64']
 
 
 .. note::
@@ -86,7 +98,7 @@
         from blu import client
         from blu.html import button
         
-        from pyscript import window
+        from js import window
 
         __client__ = True
 
@@ -111,7 +123,7 @@
         from blu.html import button
         
         if is_client:
-            from pyscript import window
+            from js import window
 
         __client__ = True
 

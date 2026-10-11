@@ -188,14 +188,14 @@ __settings__.py
 
 Configuration for your Blu app.
 
-Should be placed in the root of the ``app/`` directory, i.e. the app directory should be the immediate parent of __settings__.py.
-
 .. code-block:: python
     :caption: app/__settings__.py
 
+    INTERPRETER = 'pyodide'
+
     CLIENT_REQUIREMENTS = ['arrr', 'aiohttp']
 
-You can configure your Blu app by creating a __settings__.py file and assigning configuration values at the top level of the file. For example, the __settings__.py file above sets the ``CLIENT_REQUIREMENTS`` configuration property to ``['arrr', 'aiohttp']``.
+Must be placed in the root of the ``app/`` directory, i.e. the app directory must be the immediate parent of __settings__.py.
 
 A __settings__.py file is not required, and an app without a __settings__.py file will be treated the same as an app whose __settings__.py is empty.
 
@@ -207,13 +207,21 @@ A __settings__.py file can have any of the following settings:
     
     .. code-block:: python
 
-        CLIENT_REQUIREMENTS = ['arrr', 'aiohttp']
+        CLIENT_REQUIREMENTS = ['abc', 'io']
 
-    The Python libraries that Blu should install in the client environment. For example, if you have code running client-side that uses `aiohttp <https://pypi.org/project/aiohttp/>`_, you must add aiohttp to the client-side requirements:
+    The Python libraries that Blu should install in the client environment.
+
+    If using the default Python interpreter, ``CLIENT_REQUIREMENTS`` can include any packages from the `micropython-lib repository <https://github.com/micropython/micropython-lib>`_, under the ``python-stdlib/``, ``python-ecosys/``, ``micropython/``, or ``unix-ffi/`` directories.
 
     .. code-block:: python
 
-        CLIENT_REQUIREMENTS = ['aiohttp']
+        CLIENT_REQUIREMENTS = ['bluetooth', 'io']
+
+    If :doc:`opting in to Pyodide </appendices/choosing-an-interpreter>`, ``CLIENT_REQUIREMENTS`` can include any values that can be passed in as requirements to Pyodide's `micropip.install() <https://micropip.pyodide.org/en/stable/project/api.html#micropip.install>`_ function.
+
+    .. code-block:: python
+
+        CLIENT_REQUIREMENTS = ['arrr', 'emoji']
 
 
 .. _file-conventions/files/what-does-triple-star-url-mean:

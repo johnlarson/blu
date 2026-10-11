@@ -1,13 +1,13 @@
 ``js`` (client-only)
 ====================
 
-Because Blu's client-side code :ref:`runs in a PyScript environment <pyscript>`, the ``js`` module is also available client-side.
-
-This module allows access to the JavaScript environment's global namespace:
+The JavaScript global scope is available in the client-side Python environment through the ``js`` module:
 
 .. code-block:: python
 
     from blu import is_client
+
+    __client__ = True
 
 
     if is_client:
@@ -30,6 +30,6 @@ This module allows access to the JavaScript environment's global namespace:
             from js import document
 
 
-The ``js`` module allows you to work with native JavaScript web APIs within your client-side code.
+By default, Blu runs Python on the client using the MicroPython interpreter. You can view MicroPython's documentation on `in-browser type conversions <https://github.com/micropython/micropython/blob/master/ports/webassembly/README.md#proxying>`_ to learn how JavaScript types are converted into Python.
 
-PyScript provides the choice of two Python interpreters: Pyodide and MicroPython. Blu uses Pyodide. You can view the `Type translations <https://pyodide.org/en/stable/usage/type-conversions.html>`_ section in Pyodide's documentation to learn more about how JavaScript objects are converted when imported into a Python scope.
+If you :doc:`opt in to using Pyodide </appendices/choosing-an-interpreter>` as your client-side Python interpreter, you can learn about Pyodide's type conversions `here <https://pyodide.org/en/stable/usage/type-conversions.html>`_.

@@ -8,6 +8,6 @@ API Reference
    blu
    blu.html
    js
-   pyscript
+   pyodide
    file-conventions
    cli

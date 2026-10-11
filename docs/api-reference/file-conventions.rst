@@ -204,12 +204,12 @@ A __settings__.py file can have any of the following settings:
 .. data:: CLIENT_REQUIREMENTS
     :type: list[str]
     :value: []
+
+    The Python libraries that Blu should install in the client environment.
     
     .. code-block:: python
 
         CLIENT_REQUIREMENTS = ['abc', 'io']
-
-    The Python libraries that Blu should install in the client environment.
 
     If using the default Python interpreter, ``CLIENT_REQUIREMENTS`` can include any packages from the `micropython-lib repository <https://github.com/micropython/micropython-lib>`_, under the ``python-stdlib/``, ``python-ecosys/``, ``micropython/``, or ``unix-ffi/`` directories.
 
@@ -222,6 +222,18 @@ A __settings__.py file can have any of the following settings:
     .. code-block:: python
 
         CLIENT_REQUIREMENTS = ['arrr', 'emoji']
+
+.. data:: INTERPRETER
+    :type: typing.Literal['micropython', 'pyodide']
+    :value: 'micropython'
+
+    The Python interpreter to use for client-side code.
+
+    .. code-block:: python
+
+        INTERPRETER = 'pyodide'
+    
+    See :doc:`/appendices/choosing-an-interpreter` for more details.
 
 
 .. _file-conventions/files/what-does-triple-star-url-mean:

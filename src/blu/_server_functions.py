@@ -273,15 +273,15 @@ def server(
     Create a server function that can be called from the client.
 
     .. code-block:: python
-        :caption: app/server_functions.py
+        :caption: app/path/to/module.py
 
         from blu import server
 
 
         @server
-        def read_greeting_from_file(name):
+        def get_greeting(first_name, last_name):
             with open('app/hello.txt', 'r') as f:
-                return f.read() + name
+                return f'{f.read()} {first_name} {last_name}!'
 
     .. code-block:: none
         :caption: app/hello.txt
@@ -289,35 +289,33 @@ def server(
         Hello,
 
     .. code-block:: python
-        :caption: app/__index__.py
 
-        from blu import client
-        from blu.html import div
+        import asyncio
+
+        from app.path.to.module import get_greeting
 
         __client__ = True
 
+        async def print_greeting(first_name, last_name):
+            greeting = await get_greeting(first_name, last_name)
+            print(greeting)
 
-        def __page__():
-            return MyClientElement
+        asyncio.run(print_greeting('George', 'Harrison'))
 
 
-        @client
-        def MyClientElement():
-            return div[read_greeting_from_file('George')]
+    This prints the following to the browser console::
 
-    .. code-block:: html
-
-        <div>Hello, George!</div>
+        Hello, George Harrison!
 
     :param callable: A :class:`Callable <collections.abc.Callable>`
+        whose return value is picklable.
     :return: An asynchronous function that, when called in a client
         environment, runs ``callable`` on the server with the provided
         arguments, and returns the return value of ``callable``.
 
     When calling the returned function in a client environment, the
-    arguments provided must be JSON-serializable and the return value
-    must be picklable. Otherwise, the function will be unable to
-    complete.
+    arguments provided must be JSON-serializable. Otherwise, the
+    function call will be unable to complete.
 
     The function must be defined at the top level of a module in order
     to be accessible client-side.

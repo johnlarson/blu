@@ -10,6 +10,8 @@ Setup
 
 3. Ensure `uv <https://docs.astral.sh/uv/>`_ is installed.
 
+
+
 4. Run tests with ``uv run pytest``. If the tests pass, you have successfully set up your development environment and are ready to make a change to the codebase.
 
 
@@ -29,4 +31,4 @@ Making Changes
 Make a Pull Request Early
 -------------------------
 
-You don't have to wait until your changes are ready to merge to make a pull request. In fact, making a pull request early allows you to get early feedback, preventing you from doing significant work that is later rejected. For example, a pull request with just proposed documentation changes allows revisions to be made before anything is implemented, and a pull request with initial work allows revisions to be made to the implementation stategy before more work has been put into the implementation.
+You don't have to wait until your changes are ready to merge to make a pull request. In fact, making a pull request early allows you to get early feedback, preventing you from doing significant work that is later rejected. For example, a pull request with only proposed documentation changes allows revisions to be made before anything is implemented, and a pull request with initial work allows revisions to be made to the implementation stategy before more work has been put into the implementation.

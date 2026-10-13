@@ -6,7 +6,7 @@
 Blu
 =================
 
-Welcome Blu's documentation.
+Welcome to Blu's documentation.
 
 .. toctree::
    :maxdepth: 2

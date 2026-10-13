@@ -10,7 +10,7 @@ from datetime import datetime
 import sys
 
 project = "Blu"
-copyright = f"2025-{datetime.now().year} John Larson"
+copyright = f"2024-{datetime.now().year} John Larson"
 author = "John Larson"
 release = "0.0.1"
 

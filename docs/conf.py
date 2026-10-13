@@ -6,10 +6,11 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from datetime import datetime
 import sys
 
 project = "Blu"
-copyright = "2024, John Larson"
+copyright = f"2025-{datetime.now().year} John Larson"
 author = "John Larson"
 release = "0.0.1"
 

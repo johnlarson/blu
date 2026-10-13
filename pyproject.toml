@@ -1,6 +1,6 @@
 [project]
 name = "blu-react"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
     { name="John Larson", email="john.robert.larson@gmail.com" },
 ]

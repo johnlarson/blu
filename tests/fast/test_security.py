@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import cast
 from zipfile import ZipFile
 
 import aiohttp
@@ -67,12 +66,7 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     p = await page("server_function_csrf")
     from app.server_functions import value
 
-    host_and_port = cast(str, p.base_url).replace("http://", "")
-    host, port_str = host_and_port.split(":")
-    port = int(port_str)
-    await p.goto(httpserver.url_for("/"))
-
-    async def fetch_fn(value: int) -> tuple[int, str]:
+    async def fetch_fn(value: str) -> tuple[int, str]:
         return await p.evaluate(
             f"""
                 async () => {{
@@ -84,7 +78,7 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
                             body: JSON.stringify({{
                                 module: 'app.server_functions',
                                 name: 'change_value',
-                                args: [{value}],
+                                args: ['{value}'],
                                 kwargs: {{}},
                             }}),
                         }},
@@ -94,17 +88,18 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
             """
         )
 
+    p.goto("/")
+    status = await fetch_fn("SET BY SAME ORIGIN")
+    assert status == 200
+    assert value[0] == "SET BY SAME ORIGIN"
+
+    await p.goto(httpserver.url_for("/"))
     try:
         await fetch_fn("SET BY CROSS-SITE FETCH")
     except Exception as e:
         assert "TypeError: Failed to fetch" in str(e)
     else:
         assert False  # If didn't raise error, fail.
-    assert value[0] == "UNTOUCHED"
-
-    p.goto("/")
-    status = await fetch_fn("SET BY SAME ORIGIN")
-    assert status == 200
     assert value[0] == "SET BY SAME ORIGIN"
 
     # If Blu receives a request without the header Content-Type:
@@ -157,7 +152,7 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     # If Blu receives an non-POST request, it will respond with a 405.
     async with aiohttp.ClientSession(p.base_url) as session:
 
-        def test_method(method: str, body: bool = True) -> tuple[int, str]:
+        async def test_method(method: str, body: bool = True) -> tuple[int, str]:
             extra_kwargs = (
                 {
                     "json": {
@@ -177,21 +172,21 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
             )
             return (response.status, await response.text())
 
-        assert test_method("POST")[0] == 200
+        assert await test_method("POST")[0] == 200
         assert value[0] == "POST"
-        assert test_method("GET", body=False) == (405, "")
+        assert await test_method("GET", body=False) == (405, "")
         assert value[0] == "POST"
-        assert test_method("HEAD", body=False) == (405, "")
+        assert await test_method("HEAD", body=False) == (405, "")
         assert value[0] == "POST"
-        assert test_method("OPTIONS") == (405, "")
+        assert await test_method("OPTIONS") == (405, "")
         assert value[0] == "POST"
-        assert test_method("PUT") == (405, "")
+        assert await test_method("PUT") == (405, "")
         assert value[0] == "POST"
-        assert test_method("PATCH") == (405, "")
+        assert await test_method("PATCH") == (405, "")
         assert value[0] == "POST"
-        assert test_method("DELETE") == (405, "")
+        assert await test_method("DELETE") == (405, "")
         assert value[0] == "POST"
-        assert test_method("MADEUPMETHOD") == (405, "")
+        assert await test_method("MADEUPMETHOD") == (405, "")
         assert value[0] == "POST"
 
 

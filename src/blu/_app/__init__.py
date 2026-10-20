@@ -94,14 +94,8 @@ async def _http(
             await _serve_405(send)
             return
         headers = _get_asgi_headers(scope)
-        if headers.get("host", None) is None:
-            await _serve_400(send)
-            return
-        if headers.get("origin", None) is None:
-            await _serve_400(send)
-            return
-        if not _host_origin_match(headers["host"], headers["origin"]):
-            await _serve_400(send)
+        if headers.get("content-type", None) != "application/json":
+            await _serve_415(send)
             return
         from blu._server_functions import handle_server_function_request
 
@@ -141,16 +135,6 @@ async def _serve_blu_static_file(subpath: str, send: asgi.Sender):
     await _serve_file(file_path, content_type, send)
 
 
-def _host_origin_match(host: str, origin: str) -> bool:
-    if origin.startswith("https://"):
-        exp_host = origin.replace("https://", "")
-    elif origin.startswith("http://"):
-        exp_host = origin.replace("http://", "")
-    else:
-        return False
-    return host == exp_host
-
-
 def _get_asgi_headers(scope: asgi.HTTPConnectionScope) -> dict[str, str]:
     return {k.decode("utf-8"): v.decode("utf-8") for k, v in scope["headers"]}
 
@@ -185,7 +169,7 @@ async def _serve_405(send: asgi.Sender):
     )
 
 
-async def _serve_400(send: asgi.Sender):
+async def _serve_415(send: asgi.Sender):
     await send(
         {
             "type": "http.response.start",

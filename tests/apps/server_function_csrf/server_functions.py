@@ -4,5 +4,5 @@ value = ["UNTOUCHED"]
 
 
 @server
-def change_file_contents():
-    value[0] = "CHANGED"
+def set_value(new_value):
+    value[0] = new_value

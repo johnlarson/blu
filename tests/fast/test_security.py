@@ -1,4 +1,3 @@
-import asyncio
 from pathlib import Path
 from typing import cast
 from zipfile import ZipFile
@@ -62,132 +61,138 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
     associated Blu application, will not be called from requests that
     have any method other than POST.
     """
+    # If another site attempts send a request using fetch, it won't succeed.
+
     httpserver.expect_request("/").respond_with_data("Other Site")
     p = await page("server_function_csrf")
+    from app.server_functions import value
+
     host_and_port = cast(str, p.base_url).replace("http://", "")
     host, port_str = host_and_port.split(":")
     port = int(port_str)
     await p.goto(httpserver.url_for("/"))
 
-    async def fetch_fn(method: str, body: bool = True) -> tuple[int, str]:
-        req_body = (
-            f"""
-            body: JSON.stringify({{
-                module: 'app.server_functions',
-                name: 'change_file_contents',
-                args: [],
-                kwargs: {{}},
-            }})
-        """
-            if body
-            else ""
-        )
+    async def fetch_fn(value: int) -> tuple[int, str]:
         return await p.evaluate(
             f"""
                 async () => {{
                     const response = await fetch(
                         '{p.base_url}/_blu_internal/server_function',
                         {{
-                            method: '{method}',
-                            {req_body}
+                            method: 'POST',
+                            headers: {{'Content-Type': 'application/json'}},
+                            body: JSON.stringify({{
+                                module: 'app.server_functions',
+                                name: 'change_value',
+                                args: [{value}],
+                                kwargs: {{}},
+                            }}),
                         }},
                     );
-                    return [response.status, await response.text()];
+                    return response.status;
                 }}
             """
         )
 
     try:
-        await fetch_fn("POST")
+        await fetch_fn("SET BY CROSS-SITE FETCH")
     except Exception as e:
         assert "TypeError: Failed to fetch" in str(e)
     else:
         assert False  # If didn't raise error, fail.
-
-    async def assert_405(method: str, body: bool = True):
-        status, body = await fetch_fn(method, body=body)
-        assert status == 405
-        assert body == ""
-
-    await p.goto("/")
-    await assert_405("GET", body=False)
-    await assert_405("HEAD", body=False)
-    await assert_405("OPTIONS")
-    await assert_405("PUT")
-    await assert_405("PATCH")
-    await assert_405("DELETE")
-    await assert_405("MADEUPMETHOD")
-
-    async with aiohttp.ClientSession(p.base_url) as session:
-
-        # Non-matching Host and Origin
-        response = await session.post(
-            f"{p.base_url}/_blu_internal/server_function",
-            headers={"Origin": "http://www.google.com"},
-            json={
-                "module": "app.server_functions",
-                "name": "change_file_contents",
-                "args": [],
-                "kwargs": {},
-            },
-        )
-        assert response.status == 400
-        assert await response.text() == ""
-
-        # No Origin, only Host
-        response = await session.post(
-            f"{p.base_url}/_blu_internal/server_function",
-            json={
-                "module": "app.server_functions",
-                "name": "change_file_contents",
-                "args": [],
-                "kwargs": {},
-            },
-        )
-        assert response.status == 400
-        assert await response.text() == ""
-
-    # No Host, only Origin
-    reader, writer = await asyncio.open_connection(host, port)
-    writer.write(b"POST /_blu_internal/server_function HTTP/1.1\r\n")
-    writer.write(b"Origin: " + p.base_url.encode("utf-8") + b"\r\n")
-    writer.write(b"\r\n")
-    await writer.drain()
-    response = await reader.read(1024)
-    assert response.startswith(b"HTTP/1.1 400")
-    writer.close()
-    await writer.wait_closed()
-
-    # No Host or Origin
-    reader, writer = await asyncio.open_connection(host, port)
-    writer.write(b"POST /_blu_internal/server_function HTTP/1.1\r\n")
-    writer.write(b"Host: " + host_and_port.encode("utf-8") + b"\r\n")
-    writer.write(b"\r\n")
-    await writer.drain()
-    response = await reader.read(1024)
-    assert response.startswith(b"HTTP/1.1 400")
-    writer.close()
-    await writer.wait_closed()
-
-    from app.server_functions import value
-
     assert value[0] == "UNTOUCHED"
 
+    p.goto("/")
+    status = await fetch_fn("SET BY SAME ORIGIN")
+    assert status == 200
+    assert value[0] == "SET BY SAME ORIGIN"
+
+    # If Blu receives a request without the header Content-Type:
+    # application/json, it won't accept it.
     async with aiohttp.ClientSession(p.base_url) as session:
-        # Matching Host and Origin
+
+        # Without Content-Type header
         response = await session.post(
             f"{p.base_url}/_blu_internal/server_function",
-            headers={"Origin": p.base_url},
             json={
                 "module": "app.server_functions",
                 "name": "change_file_contents",
-                "args": [],
+                "args": ["SET WITH NO CONTENT-TYPE"],
+                "kwargs": {},
+            },
+        )
+        assert response.status == 415
+        assert await response.text() == ""
+        assert value[0] == "SET BY SAME ORIGIN"
+
+        # Wrong Content-Type
+        response = await session.post(
+            f"{p.base_url}/_blu_internal/server_function",
+            headers={"Content-Type": "text/javascript"},
+            json={
+                "module": "app.server_functions",
+                "name": "change_file_contents",
+                "args": ["SET WITH WRONG CONTENT-TYPE"],
+                "kwargs": {},
+            },
+        )
+        assert response.status == 415
+        assert await response.text() == ""
+        assert value[0] == "SET BY SAME ORIGIN"
+
+        # With Content-Type: application/json
+        response = await session.post(
+            f"{p.base_url}/_blu_internal/server_function",
+            headers={"Content-Type": "application/json"},
+            json={
+                "module": "app.server_functions",
+                "name": "change_file_contents",
+                "args": ["SET WITH CONTENT-TYPE APPLICATION/JSON"],
                 "kwargs": {},
             },
         )
         assert response.status == 200
+        assert value[0] == "SET WITH CONTENT-TYPE APPLICATION/JSON"
 
-    assert value[0] == "CHANGED"
+    # If Blu receives an non-POST request, it will respond with a 405.
+    async with aiohttp.ClientSession(p.base_url) as session:
+
+        def test_method(method: str, body: bool = True) -> tuple[int, str]:
+            extra_kwargs = (
+                {
+                    "json": {
+                        "module": "app.server_functions",
+                        "name": "change_file_contents",
+                        "args": [method],
+                        "kwargs": {},
+                    },
+                }
+                if body
+                else {}
+            )
+            response = await session.post(
+                f"{p.base_url}/_blu_internal/server_function",
+                headers={"Content-Type": "application/json"},
+                **extra_kwargs,
+            )
+            return (response.status, await response.text())
+
+        assert test_method("POST")[0] == 200
+        assert value[0] == "POST"
+        assert test_method("GET", body=False) == (405, "")
+        assert value[0] == "POST"
+        assert test_method("HEAD", body=False) == (405, "")
+        assert value[0] == "POST"
+        assert test_method("OPTIONS") == (405, "")
+        assert value[0] == "POST"
+        assert test_method("PUT") == (405, "")
+        assert value[0] == "POST"
+        assert test_method("PATCH") == (405, "")
+        assert value[0] == "POST"
+        assert test_method("DELETE") == (405, "")
+        assert value[0] == "POST"
+        assert test_method("MADEUPMETHOD") == (405, "")
+        assert value[0] == "POST"
 
 
 async def test_server_function_no_call_arbitrary_function(

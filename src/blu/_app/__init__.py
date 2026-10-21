@@ -184,18 +184,6 @@ async def _serve_415(send: asgi.Sender):
     )
 
 
-async def _serve_server_function_options(send: asgi.Sender):
-    await send(
-        {
-            "type": "http.response.start",
-            "status": 200,
-            "headers": [
-                (b"Access", b""),
-            ],
-        },
-    )
-
-
 async def _serve_static(
     scope: asgi.HTTPConnectionScope,
     send: asgi.Sender,

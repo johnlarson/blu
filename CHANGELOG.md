@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Security
+
+- Update server function CSRF protection to use the "Avoiding simple requests" defense described in https://developer.mozilla.org/en-US/docs/Web/Security/Attacks/CSRF#avoiding_simple_requests.
+
+### Added
+
+- Add support for HTTP proxying.
+
 ## v0.0.3 - 2026-10-12
 
 _Blu now uses MicroPython by default and no longer uses PyScript. If you are upgrading from v0.0.2, add `INTERPRETER = 'pyodide'` to your `__settings__.py` and remove any references to the `pyscript`._

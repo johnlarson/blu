@@ -4,7 +4,6 @@ from zipfile import ZipFile
 import aiohttp
 from pytest_httpserver import HTTPServer
 
-from blu._utils import json
 from tests.utils import ClientFixture, PageFixture
 
 
@@ -105,22 +104,19 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
 
     # If Blu receives a request without the header Content-Type:
     # application/json, it won't accept it.
+
     async with aiohttp.ClientSession(p.base_url) as session:
 
         # Without Content-Type header
         response = await session.post(
             f"{p.base_url}/_blu_internal/server_function",
-            headers={"Content-Type": ""},
-            data=(
-                await json.dumps(
-                    {
-                        "module": "app.server_functions",
-                        "name": "set_value",
-                        "args": ["SET WITH NO CONTENT-TYPE"],
-                        "kwargs": {},
-                    }
-                )
-            ).encode("utf-8"),
+            skip_auto_headers={"Content-Type"},
+            json={
+                "module": "app.server_functions",
+                "name": "set_value",
+                "args": ["SET WITH NO CONTENT-TYPE"],
+                "kwargs": {},
+            },
         )
         assert response.status == 415
         assert await response.text() == ""
@@ -171,14 +167,15 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
                 if body
                 else {}
             )
-            response = await session.post(
+            response = await session.request(
+                method,
                 f"{p.base_url}/_blu_internal/server_function",
                 headers={"Content-Type": "application/json"},
                 **extra_kwargs,
             )
             return (response.status, await response.text())
 
-        assert await test_method("POST")[0] == 200
+        assert (await test_method("POST"))[0] == 200
         assert value[0] == "POST"
         assert await test_method("GET", body=False) == (405, "")
         assert value[0] == "POST"

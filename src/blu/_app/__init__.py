@@ -90,9 +90,6 @@ async def _http(
         await _serve_blu_static_file(subpath, send)
         return
     if scope["path"] == "/_blu_internal/server_function":
-        # if scope["method"] == "OPTIONS":
-        #     await _serve_server_function_options(send)
-        #     return
         if scope["method"] != "POST":
             await _serve_405(send)
             return
@@ -176,7 +173,7 @@ async def _serve_415(send: asgi.Sender):
     await send(
         {
             "type": "http.response.start",
-            "status": 400,
+            "status": 415,
         }
     )
     await send(

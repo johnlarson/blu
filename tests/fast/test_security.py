@@ -189,6 +189,8 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
         assert value[0] == "POST"
         assert await test_method("DELETE") == (405, "")
         assert value[0] == "POST"
+        assert await test_method("TRACE") == (405, "")
+        assert value[0] == "POST"
         assert await test_method("MADEUPMETHOD") == (405, "")
         assert value[0] == "POST"
 

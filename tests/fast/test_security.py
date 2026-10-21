@@ -4,6 +4,7 @@ from zipfile import ZipFile
 import aiohttp
 from pytest_httpserver import HTTPServer
 
+from blu._utils import json
 from tests.utils import ClientFixture, PageFixture
 
 
@@ -77,7 +78,7 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
                             headers: {{'Content-Type': 'application/json'}},
                             body: JSON.stringify({{
                                 module: 'app.server_functions',
-                                name: 'change_value',
+                                name: 'set_value',
                                 args: ['{value}'],
                                 kwargs: {{}},
                             }}),
@@ -88,7 +89,7 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
             """
         )
 
-    p.goto("/")
+    await p.goto("/")
     status = await fetch_fn("SET BY SAME ORIGIN")
     assert status == 200
     assert value[0] == "SET BY SAME ORIGIN"
@@ -109,12 +110,17 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
         # Without Content-Type header
         response = await session.post(
             f"{p.base_url}/_blu_internal/server_function",
-            json={
-                "module": "app.server_functions",
-                "name": "change_file_contents",
-                "args": ["SET WITH NO CONTENT-TYPE"],
-                "kwargs": {},
-            },
+            headers={"Content-Type": ""},
+            data=(
+                await json.dumps(
+                    {
+                        "module": "app.server_functions",
+                        "name": "set_value",
+                        "args": ["SET WITH NO CONTENT-TYPE"],
+                        "kwargs": {},
+                    }
+                )
+            ).encode("utf-8"),
         )
         assert response.status == 415
         assert await response.text() == ""
@@ -126,7 +132,7 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
             headers={"Content-Type": "text/javascript"},
             json={
                 "module": "app.server_functions",
-                "name": "change_file_contents",
+                "name": "set_value",
                 "args": ["SET WITH WRONG CONTENT-TYPE"],
                 "kwargs": {},
             },
@@ -141,7 +147,7 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
             headers={"Content-Type": "application/json"},
             json={
                 "module": "app.server_functions",
-                "name": "change_file_contents",
+                "name": "set_value",
                 "args": ["SET WITH CONTENT-TYPE APPLICATION/JSON"],
                 "kwargs": {},
             },
@@ -157,7 +163,7 @@ async def test_server_function_csrf(page: PageFixture, httpserver: HTTPServer):
                 {
                     "json": {
                         "module": "app.server_functions",
-                        "name": "change_file_contents",
+                        "name": "set_value",
                         "args": [method],
                         "kwargs": {},
                     },

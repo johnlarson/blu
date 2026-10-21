@@ -10,8 +10,6 @@ Setup
 
 3. Ensure `uv <https://docs.astral.sh/uv/>`_ is installed.
 
-
-
 4. Run tests with ``uv run pytest``. If the tests pass, you have successfully set up your development environment and are ready to make a change to the codebase.
 
 
@@ -24,7 +22,7 @@ Making Changes
 
 3. Ensure the tests you wrote or changed fail.
 
-4. Get all tests to pass.
+4. Get all tests to pass. Ensure test coverage is at least 57% (check using ``uv run pytest --cov=src``). If your test coverage is higher, that is the new requirement going forward; update this document to reflect it.
 
 5. Update CHANGELOG.md, adding notes under the "Unreleased" section at the top.
 

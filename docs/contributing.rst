@@ -26,7 +26,10 @@ Making Changes
 
 4. Get all tests to pass.
 
-5. If you haven't already, make a pull request.
+5. Update CHANGELOG.md, adding notes under the "Unreleased" section at the top.
+
+6. If you haven't already, make a pull request.
+
 
 Make a Pull Request Early
 -------------------------

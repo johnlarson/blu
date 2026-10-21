@@ -1,6 +1,8 @@
 Quickstart
 ==========
 
+.. include:: /_includes/meets-project-needs-warning.rst
+
 If you haven't already, :ref:`install Blu <install:Install>`.
 
 Next, create a directory called ``app``. Inside this directory, create a file called ``__index__.py`` with the following content:

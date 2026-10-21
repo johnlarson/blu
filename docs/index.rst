@@ -8,6 +8,8 @@ Blu
 
 Welcome to Blu's documentation.
 
+.. include:: /_includes/meets-project-needs-warning.rst
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

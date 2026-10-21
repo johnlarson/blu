@@ -22,7 +22,7 @@ Making Changes
 
 3. Ensure the tests you wrote or changed fail.
 
-4. Get all tests to pass. Ensure test coverage is at least 57% (check using ``uv run pytest --cov=src``). If your test coverage is higher, that is the new requirement going forward; update this document to reflect it.
+4. Get all tests to pass. Ensure test coverage is at least 77%. If your test coverage is higher, that is the new requirement going forward; update this document to reflect it.
 
 5. Update CHANGELOG.md, adding notes under the "Unreleased" section at the top.
 

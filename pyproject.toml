@@ -28,6 +28,10 @@ packages = ["src/blu"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+addopts = "--cov=src"
+
+[tool.coverage.run]
+omit = ["src/blu/_mPickle/*"]
 
 [build-system]
 requires = ["hatchling"]

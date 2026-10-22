@@ -235,6 +235,33 @@ A __settings__.py file can have any of the following settings:
     
     See :doc:`/appendices/choosing-an-interpreter` for more details.
 
+.. data:: SECRET_KEY
+    :type: str | None
+    :value: None
+
+    A secret key used to sign session data. Required in order to use
+    :data:`blu.session`.
+
+    .. code-block:: python
+
+        SECRET_KEY = '...'
+
+    .. warning::
+
+       Keep this key secret. Do not include it in version control.
+       Anyone with this key has the ability to forge session data.
+
+.. data:: SESSION_TIMEOUT
+    :type: int | None
+    :value: None
+
+    The number of seconds a session should stay valid. If ``None``, it
+    never times out.
+
+    .. code-block:: python
+
+        SESSION_TIMEOUT = 3600
+
 
 .. _file-conventions/files/what-does-triple-star-url-mean:
 

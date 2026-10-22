@@ -1,10 +1,36 @@
+import base64
 from pathlib import Path
+from urllib.parse import unquote
 from zipfile import ZipFile
 
 import aiohttp
+import pytest
 from pytest_httpserver import HTTPServer
 
-from tests.utils import ClientFixture, PageFixture
+from tests.utils import ClientFixture, PageFixture, Sender, receive
+
+
+def _cookie_contains(cookie_header: str, needle: str) -> bool:
+    """Return True if needle appears in a cookie value under common encodings."""
+    cookie_pair = cookie_header.split(";", 1)[0]
+    if "=" not in cookie_pair:
+        return False
+    _, value = cookie_pair.split("=", 1)
+    candidates = [value, unquote(value)]
+    for candidate in candidates:
+        if needle in candidate:
+            return True
+        for part in [candidate, *candidate.split(".")]:
+            try:
+                padded = part + "=" * (-len(part) % 4)
+                decoded = base64.urlsafe_b64decode(padded)
+            except Exception:
+                continue
+            if needle.encode() in decoded:
+                return True
+            if needle in decoded.decode("utf-8", "ignore"):
+                return True
+    return False
 
 
 async def test_server_functions_no_expose_server_only_modules(
@@ -312,3 +338,60 @@ async def test_server_functions_cannot_be_called_outside_app_package(
     from tests.resources.server_fn_outside_app import invalid_called
 
     assert invalid_called == [False]
+
+
+async def test_requires_SECRET_KEY(patch_app):  # type: ignore
+    """
+    Using the session without a SECRET_KEY setting raises RuntimeError.
+    """
+    from blu import app
+
+    patch_app("session_no_secret")
+    with pytest.raises(RuntimeError, match="SECRET_KEY"):
+        await app(
+            {
+                "asgi": {
+                    "version": "1",
+                    "spec_version": "2.0",
+                },
+                "path": "/",
+                "headers": [],
+                "type": "http",
+                "http_version": "1.1",
+                "method": "GET",
+                "query_string": b"",
+            },
+            receive,
+            Sender(),
+        )
+
+
+async def test_session_readable_by_client(client: ClientFixture):
+    """
+    Session data is sent to the client (e.g. in a cookie) in a form that
+    can be read by the client.
+    """
+    c = await client("session")
+    response = await c.get("/set_readable")
+    set_cookie_headers = response.headers.getall("Set-Cookie", [])
+    assert set_cookie_headers
+    assert any(
+        _cookie_contains(header, "client-readable-marker-42")
+        for header in set_cookie_headers
+    )
+
+
+async def test_tampered_session_cookie_is_rejected(client: ClientFixture):
+    """
+    A session cookie that has been tampered with is not accepted.
+    """
+    c = await client("session")
+    response = await c.get("/")
+    assert response.headers["X-Count"] == "1"
+    set_cookie_headers = response.headers.getall("Set-Cookie", [])
+    assert set_cookie_headers
+    cookie_pair = set_cookie_headers[0].split(";", 1)[0]
+    name, value = cookie_pair.split("=", 1)
+    c.cookie_jar.clear()
+    response = await c.get("/", cookies={name: f"tampered-{value}"})
+    assert response.headers["X-Count"] == "1"

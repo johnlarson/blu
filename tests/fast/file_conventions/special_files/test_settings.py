@@ -75,3 +75,17 @@ def test_no_settings_file_use_defaults(patch_app):  # type: ignore
     patch_app("basic")
     assert settings().CLIENT_REQUIREMENTS == []
     assert settings().INTERPRETER == "micropython"
+    assert settings().SECRET_KEY is None
+    assert settings().SESSION_TIMEOUT is None
+
+
+def test_SECRET_KEY(patch_app):  # type: ignore
+    """SECRET_KEY is read from __settings__.py."""
+    patch_app("session")
+    assert settings().SECRET_KEY == "test-secret-key"
+
+
+def test_SESSION_TIMEOUT(patch_app):  # type: ignore
+    """SESSION_TIMEOUT is read from __settings__.py."""
+    patch_app("session_timeout")
+    assert settings().SESSION_TIMEOUT == 1

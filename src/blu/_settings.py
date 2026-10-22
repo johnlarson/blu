@@ -28,3 +28,5 @@ def default[T](factory: Callable[[], Any]):
 class Settings:
     CLIENT_REQUIREMENTS: list[str] = default(lambda: [])
     INTERPRETER: Literal["micropython", "pyodide"] = "micropython"
+    SECRET_KEY: str | None = None
+    SESSION_TIMEOUT: int | None = None

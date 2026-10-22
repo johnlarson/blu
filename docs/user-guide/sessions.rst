@@ -1,7 +1,7 @@
 Sessions
 ========
 
-You can store data across requests for a given user using ``session``:
+You can store data across requests for a given user using :data:`blu.session`:
 
 .. code-block:: python
 
@@ -12,7 +12,7 @@ You can store data across requests for a given user using ``session``:
         session['a'] = 1
         return 'Hello'
 
-Session keys must be ``str``\ s, and values must be JSON-serializable.
+Session keys must be :class:`str`\ s, and values must be JSON-serializable.
 
 .. warning::
 

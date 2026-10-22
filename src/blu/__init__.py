@@ -16,6 +16,7 @@ from blu._nodes import (
 )
 from blu._hooks import Ref, use_effect, use_ref, use_state
 from blu._server_functions import server
+from blu._session import Session, session
 
 
 class ServerOnlyClientInterface:
@@ -49,6 +50,7 @@ __all__ = [
     "Node",
     "Ref",
     "Response",
+    "Session",
     "WrongEnvironmentError",
     "app",
     "client",
@@ -56,6 +58,7 @@ __all__ = [
     "html",
     "is_client",
     "server",
+    "session",
     "use_effect",
     "use_state",
     "use_ref",

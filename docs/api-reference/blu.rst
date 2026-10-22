@@ -1,8 +1,8 @@
 ``blu``
 =======
-
+ 
 .. automodule:: blu
-    :exclude-members: HTMLElement, ClientElement, Key, Ref, ClientRenderer, Node
+    :exclude-members: HTMLElement, ClientElement, Key, Ref, ClientRenderer, Node, Session, session
 
     .. autoclass:: ClientElement()
         :special-members: __call__, __getitem__
@@ -15,7 +15,15 @@
 
     .. autoclass:: Ref
         :special-members: __getitem__, __setitem__
-    
+
+    .. autoclass:: Session()
+        :special-members: __getitem__, __setitem__
+
+    .. py:data:: session
+        :type: Session
+
+        The :class:`Session` for the current request.
+
     .. py:data:: is_client
         :annotation: bool
 

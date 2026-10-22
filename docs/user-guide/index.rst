@@ -11,4 +11,5 @@ User Guide
    routing
    client-side-rendering
    static-files
+   sessions
    deploying-your-app

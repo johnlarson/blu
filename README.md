@@ -2,10 +2,7 @@
 
 # Blu
 
-*Blu is still in early testing and should not be used in production applications.*
-
 A full stack React framework for Python.
-
 
 ```python
 from blu import client
@@ -41,6 +38,10 @@ def ClickCounter():
 ```bash
 pip install -U blu-react
 ```
+
+## Is Blu Right for You?
+
+Read [here](https://blu-react.readthedocs.io/en/latest/appendices/is-blu-right-for-you.html) to ensure Blu meets the needs of your project.
 
 ## Documentation
 

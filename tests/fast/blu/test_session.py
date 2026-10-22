@@ -45,6 +45,8 @@ async def test_set_and_get_within_request(client: ClientFixture):
     c = await client("session")
     response = await c.get("/")
     assert response.headers["X-Count"] == "1"
+    response = await c.get("/")
+    assert response.headers["X-Count"] == "2"
 
 
 async def test_persists_across_requests(client: ClientFixture):

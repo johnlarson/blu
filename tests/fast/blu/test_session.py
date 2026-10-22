@@ -5,6 +5,15 @@ import pytest
 from tests.utils import ClientFixture, Sender, receive
 
 
+def _set_cookie_value(set_cookie_headers: list[str], name: str) -> str | None:
+    prefix = f"{name}="
+    for header in set_cookie_headers:
+        cookie_pair = header.split(";", 1)[0]
+        if cookie_pair.startswith(prefix):
+            return cookie_pair[len(prefix) :]
+    return None
+
+
 def _http_scope(path: str = "/", cookie: str | None = None):
     headers: list[tuple[bytes, bytes]] = []
     if cookie is not None:
@@ -60,6 +69,19 @@ async def test_get_returns_none_when_missing(client: ClientFixture):
     assert response.headers["X-Get-Default"] == "None"
 
 
+async def test_no_cookie_when_session_empty(client: ClientFixture):
+    """
+    If nothing has been set on the session, no _blu_session cookie is
+    sent in the response.
+    """
+    c = await client("session")
+    response = await c.get("/get")
+    assert (
+        _set_cookie_value(response.headers.getall("Set-Cookie", []), "_blu_session")
+        is None
+    )
+
+
 async def test_get_returns_default_when_missing(client: ClientFixture):
     """
     session.get(key, default) returns default when key is not in the
@@ -90,18 +112,6 @@ async def test_getitem_raises_KeyError_when_missing(patch_app):  # type: ignore
     patch_app("session")
     with pytest.raises(KeyError):
         await app(_http_scope("/missing_key"), receive, Sender())
-
-
-async def test_SESSION_TIMEOUT_expires_session(client: ClientFixture):
-    """
-    After SESSION_TIMEOUT seconds, session data is no longer valid.
-    """
-    c = await client("session_timeout")
-    response = await c.get("/")
-    assert response.headers["X-Count"] == "1"
-    await asyncio.sleep(1.1)
-    response = await c.get("/")
-    assert response.headers["X-Count"] == "1"
 
 
 async def test_SESSION_TIMEOUT_None_never_expires(client: ClientFixture):

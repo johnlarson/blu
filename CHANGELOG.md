@@ -9,6 +9,7 @@
 ### Added
 
 - Add support for HTTP proxying.
+- Add secure session support.
 
 ## v0.0.3 - 2026-10-12
 

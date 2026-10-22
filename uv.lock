@@ -171,6 +171,7 @@ name = "blu-react"
 version = "0.0.3"
 source = { editable = "." }
 dependencies = [
+    { name = "itsdangerous" },
     { name = "uvicorn" },
 ]
 
@@ -199,7 +200,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "uvicorn" }]
+requires-dist = [
+    { name = "itsdangerous", specifier = ">=2.2.0" },
+    { name = "uvicorn" },
+]
 
 [package.metadata.requires-dev]
 dev = [

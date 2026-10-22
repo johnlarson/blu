@@ -13,7 +13,10 @@ classifiers = [
 ]
 license = "MIT"
 license-files = ["LICENSE"]
-dependencies = ["uvicorn"]
+dependencies = [
+    "itsdangerous>=2.2.0",
+    "uvicorn",
+]
 
 [project.urls]
 Homepage = "https://github.com/johnlarson/blu"

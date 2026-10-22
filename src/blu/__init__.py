@@ -16,7 +16,6 @@ from blu._nodes import (
 )
 from blu._hooks import Ref, use_effect, use_ref, use_state
 from blu._server_functions import server
-from blu._session import Session, session
 
 
 class ServerOnlyClientInterface:
@@ -36,10 +35,13 @@ class ServerOnlyClientInterface:
 
 if is_client:
     Response = ServerOnlyClientInterface("Response")
+    Session = ServerOnlyClientInterface("Session")
     app = ServerOnlyClientInterface("app")
+    session = ServerOnlyClientInterface("session")
 else:
     from blu._http import Response
     from blu._app import app
+    from blu._session import Session, session
 
 
 __all__ = [

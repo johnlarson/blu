@@ -1,3 +1,4 @@
+import asyncio
 import base64
 from pathlib import Path
 from urllib.parse import unquote
@@ -402,4 +403,19 @@ async def test_tampered_session_cookie_is_rejected(client: ClientFixture):
         "/",
         cookies={SESSION_COOKIE_NAME: f"tampered-{value}"},
     )
+    assert response.headers["X-Count"] == "1"
+
+
+async def test_SESSION_TIMEOUT_expires_session(client: ClientFixture):
+    """
+    After SESSION_TIMEOUT seconds, session data is no longer valid.
+    """
+    c = await client("session_timeout")
+    await c.get("/")
+    response = await c.get("/")
+    assert response.headers["X-Count"] == "2"
+    # itsdangerous timestamps are whole seconds, so wait more than
+    # SESSION_TIMEOUT + 1s to ensure expiry.
+    await asyncio.sleep(2.1)
+    response = await c.get("/")
     assert response.headers["X-Count"] == "1"

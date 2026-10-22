@@ -67,7 +67,10 @@ async def client(patch_app, server: Callable[[], Awaitable[str]]):  # type: igno
         async def ret(app_name: str):
             nonlocal session
             patch_app(app_name)
-            session = aiohttp.ClientSession(await server())
+            session = aiohttp.ClientSession(
+                await server(),
+                cookie_jar=aiohttp.CookieJar(unsafe=True),
+            )
             await session.__aenter__()
             return session
 

@@ -108,25 +108,31 @@ async def _http(
     else:
         return
     request = await _create_request(scope)
+    from blu._session import bind_session, unbind_session
+
+    session_token = bind_session(request.headers.get("cookie"))
     try:
-        response = await _get_router().handle(request)
-    except NotFound:
-        await _serve_404("Not Found: " + scope["path"], send)
-        return
-    await send(
-        {
-            "type": "http.response.start",
-            "status": response._status,
-            "headers": _get_headers(response),
-        }
-    )
-    body_str = await render_to_str(response._body)
-    await send(
-        {
-            "type": "http.response.body",
-            "body": body_str.encode("utf-8"),
-        }
-    )
+        try:
+            response = await _get_router().handle(request)
+        except NotFound:
+            await _serve_404("Not Found: " + scope["path"], send)
+            return
+        await send(
+            {
+                "type": "http.response.start",
+                "status": response._status,
+                "headers": _get_headers(response),
+            }
+        )
+        body_str = await render_to_str(response._body)
+        await send(
+            {
+                "type": "http.response.body",
+                "body": body_str.encode("utf-8"),
+            }
+        )
+    finally:
+        unbind_session(session_token)
 
 
 async def _serve_blu_static_file(subpath: str, send: asgi.Sender):
@@ -247,10 +253,16 @@ def _is_static_file(url_path: str):
 
 
 def _get_headers(response: Response) -> Iterable[tuple[bytes, bytes]]:
-    return [
+    from blu._session import session_cookie_header
+
+    headers: list[tuple[bytes, bytes]] = [
         (b"Access-Control-Allow-Origin", b"https://micropython.org"),
         *[(k.encode("utf-8"), v.encode("utf-8")) for k, v in response._headers.items()],
     ]
+    cookie = session_cookie_header()
+    if cookie is not None:
+        headers.append((b"set-cookie", cookie.encode("utf-8")))
+    return headers
 
 
 async def _create_request(scope: asgi.HTTPConnectionScope) -> Request:

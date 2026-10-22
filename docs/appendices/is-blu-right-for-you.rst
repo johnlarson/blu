@@ -3,11 +3,6 @@ Is Blu Right for You?
 
 Before using Blu, you should refer to this list of features that Blu doesn't have in order to make sure it fits your needs.
 
-Blu doesn't support authentication.
------------------------------------
-
-Blu has no built-in authentication support and doesn't provide access to the request and response data necessary to implement authentication.
-
 Blu doesn't pre-render client components on the server.
 -------------------------------------------------------
 
